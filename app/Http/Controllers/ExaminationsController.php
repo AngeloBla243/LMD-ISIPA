@@ -400,7 +400,7 @@ class ExaminationsController extends Controller
                 $dataS['subject_name'] = $exam['subject_name'];
                 $dataS['class_work'] = $exam['class_work'];
                 $dataS['exam'] = $exam['exam'];
-                $dataS['total_score'] = $exam['total_score'];
+                $dataS['total_score'] = $total_score;
                 $dataS['totals_score'] = $totals_score;
                 $dataS['full_marks'] = $exam['full_marks'];
                 $dataS['passing_mark'] = $exam['passing_mark'];
