@@ -326,7 +326,7 @@
 @endsection
 
 @section('script')
-    .
+
     <script type="text/javascript">
         $('.SubmitForm').submit(function(e) {
             e.preventDefault();

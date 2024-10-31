@@ -67,7 +67,7 @@
                                                 @php
                                                     $Grandtotals_score = $Grandtotals_score + $exam['totals_score'];
                                                     $total_score = $exam['total_score'] ?? 0;
-                                                    $passing_mark = $exam['passing_mark']?? 0;
+                                                    $passing_mark = $exam['passing_mark'] ?? 0;
                                                     $full_marks += $exam['ponde'];
 
                                                     if ($total_score >= 10) {
@@ -82,7 +82,7 @@
                                 <td>{{ $exam['home_work'] }}</td>
                                 <td>{{ $exam['exam'] }}</td> --}}
                                                     <td>{{ $exam['ponde'] }}</td>
-                                                    <td>
+                                                    {{-- <td>
                                                         @if ($exam['total_score'] >= $exam['passing_mark'])
                                                             <span
                                                                 style="color: green; font-weight: bold;"><b>{{ $exam['total_score'] }}</b></span>
@@ -92,6 +92,22 @@
                                                             @php
                                                                 $fail_count++;
                                                             @endphp
+                                                        @endif
+                                                    </td> --}}
+                                                    <td>
+                                                        @if ($exam['total_score'] == 0)
+                                                            <span style="color: gray; font-weight: bold;">ND</span>
+                                                        @else
+                                                            @if ($exam['total_score'] >= $exam['passing_mark'])
+                                                                <span
+                                                                    style="color: green; font-weight: bold;"><b>{{ $exam['total_score'] }}</b></span>
+                                                            @else
+                                                                <span
+                                                                    style="color: red; font-weight: bold;"><b>{{ $exam['total_score'] }}</b></span>
+                                                                @php
+                                                                    $fail_count++;
+                                                                @endphp
+                                                            @endif
                                                         @endif
                                                     </td>
 
@@ -118,7 +134,8 @@
 
                                             <tr>
                                                 <td colspan="1">
-                                                    {{-- <b>Grand Total: {{ $Grandtotals_score }}/{{ $full_marks }}</b> --}}
+                                                    <canvas id="creditsChart" width="50"
+                                                        height="50"></canvas>
                                                 </td>
                                                 <td colspan="3">
                                                     <b>Grand Total: {{ $credits_obtenus }}/{{ $full_marks }}</b>
@@ -141,4 +158,31 @@
         </section>
         <!-- /.content -->
     </div>
+@endsection
+
+@section('script')
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var ctx = document.getElementById('creditsChart').getContext('2d');
+            var creditsChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Crédits Obtenus', 'Crédits Restants'],
+                    datasets: [{
+                        data: [{{ $credits_obtenus }}, {{ $full_marks - $credits_obtenus }}],
+                        backgroundColor: ['#27ae60', '#ddd'],
+                    }]
+                },
+                options: {
+                    cutoutPercentage: 70,
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    legend: {
+                        display: false
+                    }
+                }
+            });
+        });
+    </script>
 @endsection

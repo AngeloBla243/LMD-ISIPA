@@ -95,6 +95,31 @@
             object-fit: cover;
         }
 
+        .badge {
+            display: inline-block;
+            padding: 0.25em 0.5em;
+            font-size: 0.9em;
+            font-weight: 600;
+            color: #fff;
+            border-radius: 5px;
+        }
+
+        .badge-adm {
+            background-color: #27ae60;
+        }
+
+        .badge-comp {
+            background-color: #f1c40f;
+        }
+
+        .badge-def {
+            background-color: #e74c3c;
+        }
+
+        .badge-aj {
+            background-color: #e67e22;
+        }
+
         .title-section {
             display: flex;
             flex-direction: column;
@@ -207,14 +232,65 @@
             <h3>{{ $getClass->class_name }}, ANNÉE ACADÉMIQUE {{ now()->year }}</h3>
         </div>
 
+        @php
+    $zeroScoreFound = false;
+    $moyenne = 0;
+
+    // Calcul de la moyenne et vérification des scores nuls
+    foreach ($getExamMark as $exam) {
+        $total_score = $exam['total_score'] ?? 0;
+
+        if ($total_score === 0) {
+            $zeroScoreFound = true;
+        }
+
+        if ($total_score >= 0 && $total_score <= 20) {
+            $moyenne += $total_score;
+        }
+    }
+
+    // Calcul de la moyenne en prenant en compte uniquement les scores valides
+    $moyenne = $zeroScoreFound ? 0 : min(round($moyenne / count($getExamMark), 2), 20);
+
+@endphp
+
         <p><strong>Étudiant : {{ $getStudent->name }} {{ $getStudent->last_name }}</strong></p>
+
+        @php
+            if (!$zeroScoreFound) {
+                $message = '';
+                $backgroundColor = '';
+
+                if ($moyenne >= 18) {
+                    $message = 'Félicitations pour votre excellent travail !';
+                    $backgroundColor = '#27ae60'; // vert foncé
+                } elseif ($moyenne >= 16) {
+                    $message = 'Très bon travail, continuez ainsi !';
+                    $backgroundColor = '#2ecc71'; // vert
+                } elseif ($moyenne >= 14) {
+                    $message = 'Bon travail, vous êtes sur la bonne voie !';
+                    $backgroundColor = '#f1c40f'; // jaune
+                } elseif ($moyenne >= 12) {
+                    $message = 'Encouragements à persévérer !';
+                    $backgroundColor = '#e67e22'; // orange
+                } elseif ($moyenne >= 10) {
+                    $message = 'Vous avez atteint le niveau de passage.';
+                    $backgroundColor = '#e74c3c'; // rouge clair
+                } else {
+                    $message = 'Reprenez les matières nécessaires pour améliorer vos résultats.';
+                    $backgroundColor = '#c0392b'; // rouge foncé
+                }
+
+                echo "<div style='background-color: $backgroundColor; color: #fff; padding: 10px; border-radius: 5px; margin-top: 10px; text-align: center; font-weight: bold;'>$message</div>";
+            }
+        @endphp
 
         <!-- Academic results table -->
         <table>
             <thead>
                 <tr>
                     <th>UE</th>
-                    <th>Crédit</th>
+                    <th>Crédit UC</th>
                     <th>Note / 20</th>
                     <th>Décision</th>
                 </tr>
@@ -317,18 +393,91 @@
                         @endif
                     </td>
                     <td>{{ $echefsLourd }}</td>
-                    <td>
+                    {{-- <td>
                         {{ !$zeroScoreFound && $credits_obtenus >= 36 && $echefsLourd < 1 && $echefsLeger < 4 ? 'Admis' : 'Ajourné' }}
+                    </td> --}}
+                    <td>
+                        @php
+                            if ($zeroScoreFound) {
+                                echo 'DEF'; // Manque de note
+                            } elseif ($credits_obtenus == $full_marks) {
+                                echo 'ADM'; // Admis avec capitalisation définitive des crédits
+                            } elseif ($credits_obtenus >= 0.75 * $full_marks) {
+                                echo 'COMP'; // Admis avec compensation des notes
+                            } else {
+                                echo 'AJ'; // Ajourné ou non admis
+                            }
+                        @endphp
                     </td>
                 </tr>
             </table>
         </div>
 
-        <footer class="footer">
+        {{-- <footer class="footer">
             <div class="certification">
                 <p><strong>Certification :</strong> Je certifie que les informations ci-dessus sont exactes.</p>
                 <p>Fait à {{ now()->format('d/m/Y') }}</p>
                 <p>Signature : ______________________</p>
+            </div>
+        </footer> --}}
+
+        <footer class="footer">
+            <div class="certification">
+                <p><strong>Certification :</strong> Je certifie que les informations ci-dessus sont exactes.</p>
+
+                <!-- Affichage de la décision -->
+                {{-- <p>
+                    Décision :
+                    @php
+                        if ($zeroScoreFound) {
+                            echo 'DEF'; // Défaillant
+                        } elseif ($credits_obtenus == $full_marks) {
+                            echo 'ADM'; // Admis avec capitalisation
+                        } elseif ($credits_obtenus >= 0.75 * $full_marks) {
+                            echo 'COMP'; // Admis avec compensation
+                        } else {
+                            echo 'AJ'; // Ajourné
+                        }
+                    @endphp
+                </p> --}}
+
+
+                <p>
+                    Décision :
+                    @php
+                        if ($zeroScoreFound) {
+                            $decision = 'DEF';
+                            $icon = '<i class="fa fa-times-circle" style="color: #e74c3c;"></i>'; // Icône pour défaillant
+                            $badgeColor = 'badge-def';
+                            $badgeText = 'Défaillant';
+                        } elseif ($credits_obtenus == $full_marks) {
+                            $decision = 'ADM';
+                            $icon = '<i class="fa fa-check-circle" style="color: #27ae60;"></i>'; // Icône pour admis avec capitalisation
+                            $badgeColor = 'badge-adm';
+                            $badgeText = 'Admis avec Capitalisation';
+                        } elseif ($credits_obtenus >= 0.75 * $full_marks) {
+                            $decision = 'COMP';
+                            $icon = '<i class="fa fa-balance-scale" style="color: #f1c40f;"></i>'; // Icône pour admis avec compensation
+                            $badgeColor = 'badge-comp';
+                            $badgeText = 'Admis avec Compensation';
+                        } else {
+                            $decision = 'AJ';
+                            $icon = '<i class="fa fa-exclamation-circle" style="color: #e67e22;"></i>'; // Icône pour ajourné
+                            $badgeColor = 'badge-aj';
+                            $badgeText = 'Ajourné';
+                        }
+                        echo $icon . " <span class='badge $badgeColor'>$decision - $badgeText</span>";
+                    @endphp
+                </p>
+                <!-- Affichage des crédits accumulés pour le cycle -->
+                <p>Crédits accumulés pour le cycle en cours (Licence {{ $getClass->class_name }}) :
+                    <b>{{ $credits_obtenus }}/{{ $full_marks }}</b>
+                </p>
+
+                <p>Fait à {{ now()->format('d/m/Y') }}</p>
+
+                <!-- Zone pour le saut de l'établissement -->
+                <p>Saut de l'établissement : ______________________</p>
             </div>
         </footer>
     </div>
