@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Résultats Académiques</title>
+    <title>Mes Résultats Académiques</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         :root {
@@ -96,12 +96,17 @@
         }
 
         .badge {
+            transition: transform 0.2s;
             display: inline-block;
             padding: 0.25em 0.5em;
             font-size: 0.9em;
             font-weight: 600;
             color: #fff;
             border-radius: 5px;
+        }
+
+        .badge:hover {
+            transform: scale(1.1);
         }
 
         .badge-adm {
@@ -196,6 +201,11 @@
             .table-container {
                 overflow: visible !important;
             }
+            /* Forcer les couleurs d'impression */
+            body {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
 
 
             /* Forcing print to multiple pages */
@@ -219,17 +229,21 @@
     <div class="container">
         <!-- Header with print button -->
         <header class="header">
-            <button onclick="window.print()"><i class="fa-solid fa-file-pdf"></i> Imprimer</button>
+            <button onclick="window.print()"><i class="fas fa-print"></i> Imprimer</button>
+            {{-- <i class="fa-solid fa-file-pdf"></i> --}}
         </header>
 
         <!-- Title section with logo and school details -->
         <div class="title-section">
-            <img src="{{ $getSetting->getLogo() }}" alt="Logo de l'établissement" class="school-logo">
-            <h2>INSTITUT SUPERIEUR D'INFORMATIQUE PROGRAMMATION ET ANALYSE</h2>
+            <img src="{{ $getSetting->getLogo() }}" alt="Logo de l'établissement" class="school-logo"> <br>
+            <h2>RÉPUBLIQUE DÉMOCRATIQUE DU CONGO</h2>
+            <h2>INSTITUT SUPERIEUR D'INFORMATIQUE <br>PROGRAMMATION ET ANALYSE</h2>
+            <h2>I.S.I.P.A</h2>
             <h3>SECRÉTARIAT GÉNÉRAL ACADÉMIQUE</h3>
             <h3>SCIENCES INFORMATIQUES</h3>
-            <h3>DEPT/OPTION: GENIE LOGICIEL</h3>
-            <h3>{{ $getClass->class_name }}, ANNÉE ACADÉMIQUE {{ now()->year }}</h3>
+            <h3>OPTION: {{ $getClass->class_opt }}</h3>
+            <h3>{{ $getClass->class_name ?? 'Inconnu' }}, ANNÉE ACADÉMIQUE {{ now()->year }}</h3>
+            <h2>Examen : {{ $getExam->name }}</h2>
         </div>
 
         @php
@@ -289,6 +303,7 @@
         <table>
             <thead>
                 <tr>
+                    <th>Code UE</th>
                     <th>UE</th>
                     <th>Crédit UC</th>
                     <th>Note / 20</th>
@@ -333,6 +348,7 @@
                         }
                     @endphp
                     <tr>
+                        <td>{{ $exam['subject_code'] }}</td>
                         <td>{{ $exam['subject_name'] }}</td>
                         <td>{{ $exam['ponde'] }}</td>
                         <td

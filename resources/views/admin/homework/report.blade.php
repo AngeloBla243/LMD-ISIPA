@@ -190,7 +190,7 @@ button.download-btn:active {
                         <tr>
                           <td>{{ $value->id }}</td>
                           <td style="min-width: 100px;">{{ $value->first_name }} {{ $value->last_name }}</td>
-                          <td>{{ $value->class_name }}</td>
+                          <td style="min-width: 200px;">{{ $value->class_name }} {{ $value->class_opt }}</td>
                           <td>{{ $value->subject_name }}</td>
                           <td>{{ date('d-m-Y', strtotime($value->getHomework->homework_date)) }}</td>
                           <td>{{ date('d-m-Y', strtotime($value->getHomework->submission_date)) }}</td>

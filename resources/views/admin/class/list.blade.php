@@ -124,6 +124,7 @@
                     <tr>
                       <th>#</th>
                       <th>Name</th>
+                      <th>Option</th>
                       <th>Amount</th>
                       <th>Status</th>
                       <th>Created By</th>
@@ -136,6 +137,7 @@
                         <tr>
                             <td style="min-width: 100px;">{{ ($getRecord->currentPage() - 1) * $getRecord->perPage() + $loop->iteration }}</td>
                           <td style="min-width: 100px;">{{ $value->name }}</td>
+                          <td style="min-width: 100px;">{{ $value->opt }}</td>
                           <td style="min-width: 100px;">${{ number_format($value->amount, 2) }}</td>
                           <td style="min-width: 100px;">
                             @if($value->status == 0)
@@ -146,7 +148,7 @@
                           </td>
                           <td style="min-width: 100px;">{{ $value->created_by_name }}</td>
                           <td style="min-width: 100px;">{{ date('d-m-Y H:i A', strtotime($value->created_at)) }}</td>
-                          <td style="min-width: 100px;">
+                          <td style="min-width: 150px;">
                              <a href="{{ url('admin/class/edit/'.$value->id) }}" class="btn btn-info"><i class="fas fa-pencil-alt"></i>Edit</a>
                             <a href="{{ url('admin/class/delete/'.$value->id) }}" class="btn btn-danger"><i class="fas fa-trash"></i>Delete</a>
 

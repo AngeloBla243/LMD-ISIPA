@@ -88,7 +88,7 @@
                                                 <option value="">Select</option>
                                                 @foreach ($getClass as $class)
                                                     <option {{ Request::get('class_id') == $class->id ? 'selected' : '' }}
-                                                        value="{{ $class->id }}">{{ $class->name }}</option>
+                                                        value="{{ $class->id }}">{{ $class->name }} {{ $class->opt }}</option>
                                                 @endforeach
                                             </select>
                                         </div>

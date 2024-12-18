@@ -57,7 +57,7 @@
                     @include('_message')
 
                     @foreach($getRecord as $value)
-                        <h2 style="font-size: 32px;margin-bottom: 15px;">Class: <span style="color: blue">{{ $value['class_name'] }}</span></h2>
+                        <h2 style="font-size: 32px;margin-bottom: 15px;">Class: <span style="color: blue">{{ $value['class_name'] }} {{ $value['class_opt'] }}</span></h2>
                         <div class="card">
                             <div class="card-header">
                                 <h3 class="card-title">Exam Details</h3>

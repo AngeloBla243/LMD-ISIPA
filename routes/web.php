@@ -211,6 +211,8 @@ Route::post('admin/assign_class_teacher/assign_subject_subject1', [AssignClassTe
     Route::get('admin/examinations/exam/delete/{id}', [ExaminationsController::class, 'exam_delete']);
     Route::get('admin/my_exam_result/print', [ExaminationsController::class, 'myExamResultPrint']);
 
+    Route::get('admin/result_print/print', [ExaminationsController::class, 'printClassResults']);
+
     Route::get('admin/examinations/exam_schedule', [ExaminationsController::class, 'exam_schedule']);
     Route::post('admin/examinations/exam_schedule_insert', [ExaminationsController::class, 'exam_schedule_insert']);
 

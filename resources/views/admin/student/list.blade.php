@@ -290,7 +290,7 @@
                                                 <td style="min-width: 100px;">{{ $value->email }}</td>
                                                 <td style="min-width: 100px;">{{ $value->admission_number }}</td>
                                                 <td style="min-width: 100px;">{{ $value->roll_number }}</td>
-                                                <td style="min-width: 100px;">{{ $value->class_name }}</td>
+                                                <td style="min-width: 300px;">{{ $value->class_name }} {{ $value->class_opt }}</td>
                                                 <td style="min-width: 100px;">{{ $value->gender }}</td>
                                                 <td style="min-width: 100px;">
                                                     @if (!empty($value->date_of_birth))

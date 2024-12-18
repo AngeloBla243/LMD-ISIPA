@@ -47,7 +47,7 @@ class HomeworkSubmitModel extends Model
 
     static public function getHomeworkReport()
     {
-        $return = HomeworkSubmitModel::select('homework_submit.*', 'class.name as class_name', 'subject.name as subject_name', 'users.name as first_name', 'users.last_name')
+        $return = HomeworkSubmitModel::select('homework_submit.*', 'class.name as class_name', 'class.opt as class_opt', 'subject.name as subject_name', 'users.name as first_name', 'users.last_name')
                         ->join('users','users.id', '=', 'homework_submit.student_id')
                         ->join('homework','homework.id', '=', 'homework_submit.homework_id')
                         ->join('class', 'class.id', '=', 'homework.class_id')

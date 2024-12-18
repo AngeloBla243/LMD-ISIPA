@@ -206,8 +206,7 @@
                         </div>
 
                         <div class="form-group">
-                            <label>Section / Département :</label>
-                            <input type="text" name="section" class="form-control">
+                            <label>Section / Département : {{ Auth::user()->class->opt }} / {{ Auth::user()->note }}</label>
                         </div>
 
                         <div class="form-group">
@@ -221,31 +220,32 @@
                         <h4 class="section-title">I. Objet (Prière de cocher la case concernée)</h4>
                         <div class="checkbox-group">
                             <div>
-                                <input type="checkbox" name="objet[]" value="omission-cotes" class="single-checkbox">
+                                <input type="checkbox" name="objet[]" value="Omission des cotes sur la grille de délibération" class="single-checkbox">
                                 Omission des cotes sur la grille de délibération
                             </div>
                             <div>
-                                <input type="checkbox" name="objet[]" value="omission-nom" class="single-checkbox"> Omission
+                                <input type="checkbox" name="objet[]" value="Omission
+                                du nom sur la grille de délibération" class="single-checkbox"> Omission
                                 du nom sur la grille de délibération
                             </div>
                             <div>
-                                <input type="checkbox" name="objet[]" value="calcul-errone" class="single-checkbox"> Calcul
+                                <input type="checkbox" name="objet[]" value="Calcul erroné des cotes" class="single-checkbox"> Calcul
                                 erroné des cotes
                             </div>
                             <div>
-                                <input type="checkbox" name="objet[]" value="non-transmission" class="single-checkbox"> Non
+                                <input type="checkbox" name="objet[]" value="Non transmission des cotes au Jury" class="single-checkbox"> Non
                                 transmission des cotes au Jury
                             </div>
                             <div>
-                                <input type="checkbox" name="objet[]" value="transcription-erronne"class="single-checkbox">
+                                <input type="checkbox" name="objet[]" value="Transcription erronée des cotes par l'enseignant (titulaire) ou le secrétaire du jury"class="single-checkbox">
                                 Transcription erronée des cotes par l'enseignant (titulaire) ou le secrétaire du jury
                             </div>
                             <div>
-                                <input type="checkbox" name="objet[]" value="omission-correction" class="single-checkbox">
+                                <input type="checkbox" name="objet[]" value="Omission de la correction des copies" class="single-checkbox">
                                 Omission de la correction des copies
                             </div>
                             <div>
-                                <input type="checkbox" name="objet[]" value="id-confuse" class="single-checkbox">
+                                <input type="checkbox" name="objet[]" value="Identification confuse des copies" class="single-checkbox">
                                 Identification confuse des copies
                             </div>
 

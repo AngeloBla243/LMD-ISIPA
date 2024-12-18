@@ -20,36 +20,53 @@ class MarksRegisterModel extends Model
     static public function getExam($student_id)
     {
         return MarksRegisterModel::select('marks_register.*', 'exam.name as exam_name')
-                ->join('exam','exam.id','=', 'marks_register.exam_id')
-                ->where('marks_register.student_id', '=', $student_id)
-                ->groupBy('marks_register.exam_id')
-                ->get();
+            ->join('exam', 'exam.id', '=', 'marks_register.exam_id')
+            ->where('marks_register.student_id', '=', $student_id)
+            ->groupBy('marks_register.exam_id')
+            ->get();
     }
 
 
     static public function getExamSubject($exam_id, $student_id)
     {
-        return MarksRegisterModel::select('marks_register.*', 'exam.name as exam_name', 'subject.name as subject_name')
-                ->join('exam','exam.id','=', 'marks_register.exam_id')
-                ->join('subject','subject.id','=', 'marks_register.subject_id')
-                ->where('marks_register.exam_id', '=', $exam_id)
-                ->where('marks_register.student_id', '=', $student_id)            
-                ->get();
+        return MarksRegisterModel::select('marks_register.*', 'exam.name as exam_name', 'subject.name as subject_name', 'subject.code as subject_code')
+            ->join('exam', 'exam.id', '=', 'marks_register.exam_id')
+            ->join('subject', 'subject.id', '=', 'marks_register.subject_id')
+            ->where('marks_register.exam_id', '=', $exam_id)
+            ->where('marks_register.student_id', '=', $student_id)
+            ->get();
     }
 
     static public function getClass($exam_id, $student_id)
     {
-        return MarksRegisterModel::select('class.name as class_name')
-                ->join('exam','exam.id','=', 'marks_register.exam_id')
-                ->join('class','class.id','=', 'marks_register.class_id')
-                ->join('subject','subject.id','=', 'marks_register.subject_id')
-                ->where('marks_register.exam_id', '=', $exam_id)
-                ->where('marks_register.student_id', '=', $student_id)            
-                ->first();
+        return MarksRegisterModel::select('class.name as class_name', 'class.opt as class_opt' )
+            ->join('exam', 'exam.id', '=', 'marks_register.exam_id')
+            ->join('class', 'class.id', '=', 'marks_register.class_id')
+            ->join('subject', 'subject.id', '=', 'marks_register.subject_id')
+            ->where('marks_register.exam_id', '=', $exam_id)
+            ->where('marks_register.student_id', '=', $student_id)
+            ->first();
     }
 
-    
-
-    
-
+    static public function getClassResults($exam_id, $class_id)
+    {
+        return MarksRegisterModel::select(
+            'student.id as student_id',
+            'student.name as student_name',
+            'subject.name as subject_name',
+            'marks_register.class_work',
+            'marks_register.exam',
+            'marks_register.ponde',
+            'exam.name as exam_name',
+            'class.name as class_name'
+        )
+            ->join('exam', 'exam.id', '=', 'marks_register.exam_id')
+            ->join('class', 'class.id', '=', 'marks_register.class_id')
+            ->join('subject', 'subject.id', '=', 'marks_register.subject_id')
+            ->join('student', 'student.id', '=', 'marks_register.student_id')
+            ->where('marks_register.exam_id', '=', $exam_id)
+            ->where('marks_register.class_id', '=', $class_id)
+            ->orderBy('student.name')
+            ->get();
+    }
 }

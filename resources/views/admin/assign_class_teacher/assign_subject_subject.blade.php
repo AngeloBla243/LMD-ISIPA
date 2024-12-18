@@ -48,7 +48,7 @@
                                         <select name="subject_ids[]" class="form-control" multiple required>
                                             @if ($subjects && count($subjects) > 0)
                                                 @foreach ($subjects as $subject)
-                                                    <option value="{{ $subject->id }}">{{ $subject->name }}</option>
+                                                    <option value="{{ $subject->id }}">{{ $subject->name }} / {{ $subject->code }}</option>
                                                 @endforeach
                                             @else
                                                 <option value="">Aucune matière disponible</option>

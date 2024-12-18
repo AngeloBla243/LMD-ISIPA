@@ -132,6 +132,7 @@
                       <th style="min-width: 200px;">Teacher Name</th>
                       <th>Status</th>
                       <th>Subject</th>
+                      <th>Subject Code</th>
                       <th style="min-width: 200px;">Created By</th>
                       <th style="min-width: 200px;">Created Date</th>
                       <th>Action</th>
@@ -151,6 +152,7 @@
                             @endif
                           </td>
                           <td style="min-width: 200px;">{{ $value->subject_name }}</td>
+                          <td style="min-width: 200px;">{{ $value->subject_code }}</td>
                           <td>{{ $value->created_by_name }}</td>
                           <td style="min-width: 100px;">{{ date('d-m-Y H:i A', strtotime($value->created_at)) }}</td>
                           <td style="min-width: 500px;">

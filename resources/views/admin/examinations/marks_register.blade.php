@@ -91,7 +91,7 @@
                                                 <option value="">Select</option>
                                                 @foreach ($getClass as $class)
                                                     <option {{ Request::get('class_id') == $class->id ? 'selected' : '' }}
-                                                        value="{{ $class->id }}">{{ $class->name }}</option>
+                                                        value="{{ $class->id }}">{{ $class->name }} {{ $class->opt }}</option>
                                                 @endforeach
                                             </select>
                                         </div>
@@ -274,7 +274,9 @@
                                                                 <button type="submit"
                                                                     class="btn btn-success">Save</button>
                                                                 <a class="btn btn-primary" target="_blank"
-                                                                    href="{{ url('admin/my_exam_result/print?exam_id=' . Request::get('exam_id') . '&student_id=' . $student->id) }}">Print</a>
+                                                                    href="{{ url('admin/my_exam_result/print?exam_id=' . Request::get('exam_id') . '&student_id=' . $student->id) }}">Print
+                                                                </a>
+
                                                                 @if (!empty($totalStudentMark))
                                                                     <br>
                                                                     <br>
@@ -307,6 +309,14 @@
                                             @endif
                                         </tbody>
                                     </table>
+
+
+                                </div>
+                                <div style="text-align: center; padding: 20px;">
+                                    <a class="btn btn-primary" target="_blank"
+                                        href="{{ url('admin/result_print/print?exam_id=' . Request::get('exam_id') . '&class_id=' . Request::get('class_id')) }}">
+                                        Imprimer
+                                    </a>
                                 </div>
                             </div>
                         @endif
@@ -326,7 +336,6 @@
 @endsection
 
 @section('script')
-
     <script type="text/javascript">
         $('.SubmitForm').submit(function(e) {
             e.preventDefault();

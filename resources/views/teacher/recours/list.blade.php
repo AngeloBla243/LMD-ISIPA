@@ -112,7 +112,7 @@
                             <tr>
                                 <td>{{ $recour->id }}</td>
                                 <td>{{ $recour->student->name }}</td> <!-- Nom de l'étudiant -->
-                                <td>{{ $recour->class->name }}</td> <!-- Nom de la classe -->
+                                <td>{{ $recour->class->name }} {{ $recour->class->opt }}</td> <!-- Nom de la classe -->
                                 <td>{{ $recour->subject->name }}</td> <!-- Nom de la matière -->
                                 <td>{{ $recour->objet }}</td>
                                 <td>{{ $recour->session_year }}</td>

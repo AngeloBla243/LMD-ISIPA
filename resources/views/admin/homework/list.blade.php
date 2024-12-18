@@ -177,7 +177,7 @@ button.download-btn:active {
                       @forelse($getRecord as $value)
                         <tr>
                           <td>{{ $value->id }}</td>
-                          <td>{{ $value->class_name }}</td>
+                          <td style="min-width: 200px;">{{ $value->class_name }} {{ $value->class_opt }}</td>
                           <td>{{ $value->subject_name }}</td>
                           <td>{{ date('d-m-Y', strtotime($value->homework_date)) }}</td>
                           <td>{{ date('d-m-Y', strtotime($value->submission_date)) }}</td>

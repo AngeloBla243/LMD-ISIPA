@@ -19,7 +19,7 @@ class HomeworkModel extends Model
 
     static public function getRecord()
     {
-        $return = HomeworkModel::select('homework.*', 'class.name as class_name', 'subject.name as subject_name', 'users.name as created_by_name')
+        $return = HomeworkModel::select('homework.*', 'class.name as class_name', 'class.opt as class_opt', 'subject.name as subject_name', 'users.name as created_by_name')
             ->join('users', 'users.id', '=', 'homework.created_by')
             ->join('class', 'class.id', '=', 'homework.class_id')
             ->join('subject', 'subject.id', '=', 'homework.subject_id')
@@ -139,6 +139,7 @@ class HomeworkModel extends Model
         return HomeworkModel::select(
             'homework.*',
             'class.name as class_name',
+            'class.opt as class_opt',
             'subject.name as subject_name',
             'users.name as created_by_name'
         )

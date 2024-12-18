@@ -184,7 +184,7 @@
                                 <tr>
                                   <td>{{ $value->student_id }}</td>
                                   <td>{{ $value->student_name }} {{ $value->student_last_name }}</td>
-                                  <td>{{ $value->class_name }}</td>
+                                  <td>{{ $value->class_name }} {{ $value->class_opt }}</td>
                                   <td>
                                         @if($value->attendance_type == 1)
                                         <b class="present">P</b>

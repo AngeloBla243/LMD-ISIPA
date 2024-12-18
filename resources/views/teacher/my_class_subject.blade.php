@@ -102,7 +102,7 @@
 
                     @foreach($getRecord as $value)
                         <tr>
-                          <td>{{ $value->class_name }}</td>
+                          <td>{{ $value->class_name }} {{ $value->class_opt }}</td>
                           <td style="min-width: 300px;">{{ $value->subject_name }}</td>
                           <td>{{ $value->subject_type }}</td>
                           <td style="min-width: 200px;">

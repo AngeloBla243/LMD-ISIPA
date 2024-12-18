@@ -89,7 +89,7 @@
                     <select class="form-control getClass" name="class_id" required>
                         <option value="">Select</option>
                         @foreach($getClass as $class)
-                          <option {{ (Request::get('class_id') == $class->id) ? 'selected' : '' }} value="{{ $class->id }}">{{ $class->name }}</option>
+                          <option {{ (Request::get('class_id') == $class->id) ? 'selected' : '' }} value="{{ $class->id }}">{{ $class->name }} {{ $class->opt }}</option>
                         @endforeach
                     </select>
 
