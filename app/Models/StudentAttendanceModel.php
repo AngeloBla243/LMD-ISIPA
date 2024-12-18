@@ -21,7 +21,7 @@ class StudentAttendanceModel extends Model
 
     static public function getRecord($remove_pagination = 0)
     {
-        $return =  StudentAttendanceModel::select('student_attendance.*', 'class.name as class_name', 'student.name as student_name', 'student.last_name as student_last_name', 'createdby.name as created_name')
+        $return =  StudentAttendanceModel::select('student_attendance.*', 'class.name as class_name', 'class.opt as class_opt', 'student.name as student_name', 'student.last_name as student_last_name', 'createdby.name as created_name')
                     ->join('class', 'class.id', '=', 'student_attendance.class_id')
                     ->join('users as student', 'student.id', '=', 'student_attendance.student_id')
                     ->join('users as createdby', 'createdby.id', '=', 'student_attendance.created_by');
@@ -82,7 +82,7 @@ class StudentAttendanceModel extends Model
     {
         if(!empty($class_ids))
         {
-            $return =  StudentAttendanceModel::select('student_attendance.*', 'class.name as class_name', 'student.name as student_name', 'student.last_name as student_last_name', 'createdby.name as created_name')
+            $return =  StudentAttendanceModel::select('student_attendance.*', 'class.name as class_name', 'class.opt as class_opt', 'student.name as student_name', 'student.last_name as student_last_name', 'createdby.name as created_name')
                     ->join('class', 'class.id', '=', 'student_attendance.class_id')
                     ->join('users as student', 'student.id', '=', 'student_attendance.student_id')
                     ->join('users as createdby', 'createdby.id', '=', 'student_attendance.created_by')

@@ -13,11 +13,7 @@ use App\Models\AssignClassTeacherModel;
 use App\Models\User;
 use App\Models\MarksGradeModel;
 use App\Models\SettingModel;
-
-
-
-
-
+use App\Models\SubjectModel;
 
 class ExaminationsController extends Controller
 {
@@ -437,6 +433,7 @@ class ExaminationsController extends Controller
             $totals_score = $total_score * $exam['ponde'];
 
             $dataS = array();
+            $dataS['subject_code'] = $exam['subject_code'];
             $dataS['subject_name'] = $exam['subject_name'];
             $dataS['class_work'] = $exam['class_work'];
             $dataS['exam'] = $exam['exam'];
@@ -453,6 +450,60 @@ class ExaminationsController extends Controller
         return view('exam_result_print', $data);
     }
 
+    public function printClassResults(Request $request)
+    {
+        $exam_id = $request->input('exam_id');
+        $class_id = $request->input('class_id');
+
+        $getSetting= SettingModel::getSingle();
+
+        // Vérifiez que les paramètres existent
+        if (!$exam_id || !$class_id) {
+            return redirect()->back()->with('error', 'Paramètres manquants.');
+        }
+
+        // Récupérez les données nécessaires (exemple)
+        $class = ClassModel::find($class_id); // Récupération de la classe
+        // Vérifier si la classe existe
+        if (!$class) {
+            return redirect()->back()->with('error', 'Classe non trouvée.');
+        }
+
+        // Récupérer les matières associées à la classe
+        $subjects = $class->subjects; // Cela récupère toutes les matières associées à la classe
+
+
+
+
+        // Récupérer les étudiants de la classe depuis la table 'users' avec 'type = 3'
+        $students = User::getStudentClass($request->get('class_id'));
+
+        // Récupérer les résultats avec les informations nécessaires
+        $results = MarksRegisterModel::select(
+            'marks_register.class_work',
+            'marks_register.exam',
+            'marks_register.ponde',
+            'marks_register.subject_id',
+            // 'subject.name as subject_name',
+            'marks_register.student_id',
+            'marks_register.class_id',
+            'marks_register.exam_id'
+        )
+            ->join('subject', 'subject.id', '=', 'marks_register.subject_id')  // Jointure avec la table 'subject' pour récupérer le nom du cours
+            ->where('marks_register.exam_id', $exam_id)
+            ->where('marks_register.class_id', $class_id)
+            ->get(); // Résultats pour l'examen et la classe
+        // Relier les résultats aux étudiants
+
+        foreach ($students as $student) {
+            // Récupérer tous les résultats de l'étudiant
+            $student->results = $results->where('student_id', $student->id);
+        }
+
+        // Transmettez les données à la vue d'impression
+        return view('result_print', compact('class', 'getSetting' , 'students', 'subjects', 'results', 'exam_id'));
+    }
+
     // teacher side work
 
 
@@ -465,6 +516,7 @@ class ExaminationsController extends Controller
         foreach ($getClass as $class) {
             $dataC = [];
             $dataC['class_name'] = $class->class_name;
+            $dataC['class_opt'] = $class->class_opt;
             $classId = $class->class_id; // On récupère l'ID de la classe
 
             // Vérifie si la classe a déjà été ajoutée au résultat
@@ -499,6 +551,7 @@ class ExaminationsController extends Controller
         $data['header_title'] = "My Exam Timetable";
         return view('teacher.my_exam_timetable', $data);
     }
+
 
 
     // parent side

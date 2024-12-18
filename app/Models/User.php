@@ -8,7 +8,8 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Support\Facades\Request;
-use Cache;
+use Illuminate\Support\Facades\Cache;
+// use Cache;
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
@@ -57,6 +58,18 @@ class User extends Authenticatable
     {
         return $this->belongsTo(ClassModel::class, 'class_id');
     }
+
+    static public function getStudentsInClass($class_id)
+{
+    // On récupère les étudiants de la classe donnée
+    $students = User::select('users.*')
+                    ->join('class', 'class.user.id', '=', 'users.id') // Si vous avez une table de relation entre étudiants et classes
+                    ->where('class.id', $class_id)  // Assurez-vous que class_user a bien la colonne class_id
+                    ->where('users.user_type', 3) // Pour récupérer seulement les étudiants (type 3)
+                    ->get();
+
+    return $students;
+}
 
     static public function getTotalUser($user_type)
     {
@@ -222,7 +235,7 @@ class User extends Authenticatable
 
     static public function getStudent($remove_pagination = 0)
     {
-        $return = self::select('users.*', 'class.name as class_name', 'parent.name as parent_name', 'parent.last_name as parent_last_name')
+        $return = self::select('users.*', 'class.name as class_name', 'class.opt as class_opt', 'parent.name as parent_name', 'parent.last_name as parent_last_name')
                         ->join('users as parent','parent.id', '=', 'users.parent_id', 'left')
                         ->join('class', 'class.id', '=', 'users.class_id', 'left')
                         ->where('users.user_type','=',3)
@@ -414,7 +427,7 @@ class User extends Authenticatable
 
     static public function getTeacherStudent($teacher_id)
     {
-        $return = self::select('users.*', 'class.name as class_name')
+        $return = self::select('users.*', 'class.name as class_name', 'class.opt as class_opt')
                         ->join('class', 'class.id', '=', 'users.class_id')
                         ->join('assign_class_teacher', 'assign_class_teacher.class_id', '=', 'class.id')
                         ->where('assign_class_teacher.teacher_id', '=', $teacher_id)

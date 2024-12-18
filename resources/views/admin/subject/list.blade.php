@@ -91,6 +91,11 @@
                     <input type="text" class="form-control" value="{{ Request::get('name') }}" name="name"  placeholder="Name">
                   </div>
 
+                  <div class="form-group col-md-3">
+                    <label>Code</label>
+                    <input type="text" class="form-control" value="{{ Request::get('code') }}" name="code"  placeholder="Code">
+                  </div>
+
 
                   <div class="form-group col-md-3">
                      <label>Subject Type</label>
@@ -136,6 +141,7 @@
                     <tr>
                       <th>#</th>
                       <th style="min-width: 200px;">Subject Name</th>
+                      <th style="min-width: 200px;">Subject Code</th>
                       <th style="min-width: 200px;">Subject Type</th>
                       <th>Status</th>
                       <th style="min-width: 200px;">Created By</th>
@@ -148,6 +154,7 @@
                         <tr>
                             <td style="min-width: 100px;">{{ ($getRecord->currentPage() - 1) * $getRecord->perPage() + $loop->iteration }}</td>
                           <td style="min-width: 100px;">{{ $value->name }}</td>
+                          <td style="min-width: 100px;">{{ $value->code }}</td>
                           <td style="min-width: 100px;">{{ $value->type }}</td>
                           <td style="min-width: 100px;">
                             @if($value->status == 0)
@@ -158,7 +165,7 @@
                           </td>
                           <td style="min-width: 100px;">{{ $value->created_by_name }}</td>
                           <td style="min-width: 100px;">{{ date('d-m-Y H:i A', strtotime($value->created_at)) }}</td>
-                          <td style="min-width: 200PX;">
+                          <td style="min-width: 250PX;">
                              <a href="{{ url('admin/subject/edit/'.$value->id) }}" class="btn btn-info"> <i class="fas fa-pencil-alt"></i> Edit</a>
                             <a href="{{ url('admin/subject/delete/'.$value->id) }}" class="btn btn-danger"><i class="fas fa-trash"></i> Delete</a>
 

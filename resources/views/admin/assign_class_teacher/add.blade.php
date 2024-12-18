@@ -111,7 +111,7 @@
                                         <select class="form-control" name="class_id" id="class_id" required>
                                             <option value="">Sélectionner une classe</option>
                                             @foreach ($getClass as $class)
-                                                <option value="{{ $class->id }}">{{ $class->name }}</option>
+                                                <option value="{{ $class->id }}">{{ $class->name }} {{ $class->opt }}</option>
                                             @endforeach
                                         </select>
                                     </div>

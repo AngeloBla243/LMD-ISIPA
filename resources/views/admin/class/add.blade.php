@@ -10,7 +10,7 @@
           <div class="col-sm-6">
             <h1>Add New Class</h1>
           </div>
-    
+
         </div>
       </div><!-- /.container-fluid -->
     </section>
@@ -30,6 +30,23 @@
                     <input type="text" class="form-control" name="name" required placeholder="Class Name">
                   </div>
 
+                  <div class="form-group">
+                    <label>Option</label>
+                    <select class="form-control" name="opt">
+                        <option value="Administration Réseau et Telecommunication">Administration Réseau et Télécommunication</option>
+                        <option value="Administration des Bases de données">Administration des Bases de données</option>
+                        <option value="Intelligence artificielle">Intelligence artificielle</option>
+                        <option value="Génie Logiciel">Génie Logiciel</option>
+                        <option value="Fiscalité">Fiscalité</option>
+                        <option value="Gestion Financière">Gestion Financière</option>
+                        <option value="Commerce extérieur">Commerce extérieur</option>
+                        <option value="Communication numérique">Communication numérique</option>
+                        <option value="Science informatique">Science informatique</option>
+
+                    </select>
+
+                  </div>
+
 
                   <div class="form-group">
                     <label>Amount ($)</label>
@@ -43,10 +60,10 @@
                         <option value="0">Active</option>
                         <option value="1">Inactive</option>
                     </select>
-                    
+
                   </div>
-              
-                
+
+
                 </div>
                 <!-- /.card-body -->
 
@@ -55,12 +72,12 @@
                 </div>
               </form>
             </div>
-         
+
 
           </div>
           <!--/.col (left) -->
           <!-- right column -->
-       
+
           <!--/.col (right) -->
         </div>
         <!-- /.row -->

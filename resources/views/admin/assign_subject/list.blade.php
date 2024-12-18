@@ -121,6 +121,7 @@
                     <tr>
                       <th>#</th>
                       <th>Class Name</th>
+                      <th>Subject Code</th>
                       <th>Subject Name</th>
                       <th>Status</th>
                       <th style="min-width: 200px;">Created By</th>
@@ -132,7 +133,8 @@
                       @foreach($getRecord as $value)
                         <tr>
                           <td style="min-width: 50px;">{{ $value->id }}</td>
-                          <td style="min-width: 200px;">{{ $value->class_name }}</td>
+                          <td style="min-width: 200px;">{{ $value->class_name }} {{ $value->class_opt }}</td>
+                          <td style="min-width: 200px;">{{ $value->subject_code }}</td>
                           <td style="min-width: 200px;">{{ $value->subject_name }}</td>
                           <td style="min-width: 100px;">
                             @if($value->status == 0)

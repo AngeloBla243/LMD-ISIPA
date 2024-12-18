@@ -10,7 +10,7 @@
           <div class="col-sm-6">
             <h1>Edit Assign Subject</h1>
           </div>
-    
+
         </div>
       </div><!-- /.container-fluid -->
     </section>
@@ -41,7 +41,7 @@
                      <select class="form-control" name="subject_id" required>
                         <option value="">Select Subject</option>
                         @foreach($getSubject as $subject)
-                          <option {{ ($getRecord->subject_id == $subject->id) ? 'selected' : '' }} value="{{ $subject->id }}">{{ $subject->name }}</option>
+                          <option {{ ($getRecord->subject_id == $subject->id) ? 'selected' : '' }} value="{{ $subject->id }}">{{ $subject->name }} / {{ $subject->code }}</option>
                         @endforeach
                     </select>
                   </div>
@@ -53,10 +53,10 @@
                         <option {{ ($getRecord->status == 0) ? 'selected' : '' }} value="0">Active</option>
                         <option {{ ($getRecord->status == 1) ? 'selected' : '' }} value="1">Inactive</option>
                     </select>
-                    
+
                   </div>
-              
-                
+
+
                 </div>
                 <!-- /.card-body -->
 
@@ -65,12 +65,12 @@
                 </div>
               </form>
             </div>
-         
+
 
           </div>
           <!--/.col (left) -->
           <!-- right column -->
-       
+
           <!--/.col (right) -->
         </div>
         <!-- /.row -->

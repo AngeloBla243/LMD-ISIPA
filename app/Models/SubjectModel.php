@@ -26,6 +26,11 @@ class SubjectModel extends Model
                         $return = $return->where('subject.name', 'like', '%'.Request::get('name').'%');
                     }
 
+                    if(!empty(Request::get('code')))
+                    {
+                        $return = $return->where('subject.code', 'like', '%'.Request::get('code').'%');
+                    }
+
                     if(!empty(Request::get('type')))
                     {
                         $return = $return->where('subject.type', '=', Request::get('type'));

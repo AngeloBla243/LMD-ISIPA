@@ -99,7 +99,7 @@
                     <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Nom de l'Étudiant</th>
+                            <th style="min-width: 250px;">Nom de l'Étudiant</th>
                             <th>Classe</th>
                             <th>Matière</th>
                             <th>Objet</th>
@@ -111,17 +111,17 @@
                         @foreach($recours as $recour)
                             <tr>
                                 <td>{{ $recour->id }}</td>
-                                <td>{{ $recour->student->name }}</td> <!-- Nom de l'étudiant -->
-                                <td>{{ $recour->class->name }}</td> <!-- Nom de la classe -->
+                                <td style="min-width: 250px;">{{ $recour->student->name }}</td> <!-- Nom de l'étudiant -->
+                                <td style="min-width: 150px;">{{ $recour->class->name }} {{ $recour->class->opt }}</td> <!-- Nom de la classe -->
                                 <td>{{ $recour->subject->name }}</td> <!-- Nom de la matière -->
-                                <td>{{ $recour->objet }}</td>
-                                <td>{{ $recour->session_year }}</td>
+                                <td style="min-width: 250px;">{{ $recour->objet }}</td>
+                                <td style="min-width: 100px;">{{ $recour->session_year }}</td>
                                 {{-- <td> <a href="{{ url('admin/examinations/marks_register?class_id=' . $recour->class->id) }}" target="_blank" class="btn btn-info  ">
                                     <i class="fas fa-pencil-alt"></i>
                                     Traité
                                 </a></td> --}}
 
-                                <td>
+                                <td style="min-width: 150px;">
                                     <a href="{{ url('admin/examinations/marks_register?class_id=' . $recour->class->id . '&exam_id=' . $recour->exam_id) }}" target="_blank" class="btn btn-info">
                                         <i class="fas fa-pencil-alt"></i>
                                         Traité

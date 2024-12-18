@@ -20,21 +20,19 @@ class ClassModel extends Model
     static public function getRecord()
     {
         $return = ClassModel::select('class.*', 'users.name as created_by_name')
-                    ->join('users', 'users.id', 'class.created_by');
+            ->join('users', 'users.id', 'class.created_by');
 
-                    if(!empty(Request::get('name')))
-                    {
-                        $return = $return->where('class.name', 'like', '%'.Request::get('name').'%');
-                    }
+        if (!empty(Request::get('name'))) {
+            $return = $return->where('class.name', 'like', '%' . Request::get('name') . '%');
+        }
 
-                    if(!empty(Request::get('date')))
-                    {
-                        $return = $return->whereDate('class.created_at','=', Request::get('date'));
-                    }
+        if (!empty(Request::get('date'))) {
+            $return = $return->whereDate('class.created_at', '=', Request::get('date'));
+        }
 
-                    $return = $return->where('class.is_delete', '=', 0)
-                    ->orderBy('class.id', 'asc')
-                    ->paginate(20);
+        $return = $return->where('class.is_delete', '=', 0)
+            ->orderBy('class.id', 'asc')
+            ->paginate(20);
 
         return $return;
     }
@@ -42,11 +40,11 @@ class ClassModel extends Model
     static public function getClass()
     {
         $return = ClassModel::select('class.*')
-                    ->join('users', 'users.id', 'class.created_by')
-                    ->where('class.is_delete', '=', 0)
-                    ->where('class.status', '=', 0)
-                    ->orderBy('class.name', 'asc')
-                    ->get();
+            ->join('users', 'users.id', 'class.created_by')
+            ->where('class.is_delete', '=', 0)
+            ->where('class.status', '=', 0)
+            ->orderBy('class.name', 'asc')
+            ->get();
 
         return $return;
     }
@@ -54,14 +52,16 @@ class ClassModel extends Model
     static public function getTotalClass()
     {
         $return = ClassModel::select('class.id')
-                    ->join('users', 'users.id', 'class.created_by')
-                    ->where('class.is_delete', '=', 0)
-                    ->where('class.status', '=', 0)
-                    ->count();
+            ->join('users', 'users.id', 'class.created_by')
+            ->where('class.is_delete', '=', 0)
+            ->where('class.status', '=', 0)
+            ->count();
 
         return $return;
     }
 
-
-
+    public function subjects()
+    {
+        return $this->belongsToMany(SubjectModel::class, 'class_subject', 'class_id', 'subject_id');
+    }
 }

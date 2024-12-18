@@ -68,6 +68,7 @@ class AssignClassTeacherModel extends Model
             'teacher.name as teacher_name',
             'teacher.last_name as teacher_last_name',
             'users.name as created_by_name',
+            'subject.code as subject_code',
             'subject.name as subject_name'  // Ajout du nom de la matière
         )
             ->join('users as teacher', 'teacher.id', '=', 'assign_class_teacher.teacher_id')
@@ -146,7 +147,7 @@ class AssignClassTeacherModel extends Model
 
     public static function getMyClassSubject($teacher_id)
     {
-        return self::select('assign_class_teacher.*', 'class.name as class_name', 'subject.name as subject_name')
+        return self::select('assign_class_teacher.*', 'class.name as class_name', 'class.opt as class_opt', 'subject.name as subject_name', 'subject.code as subject_code')
             ->join('class', 'assign_class_teacher.class_id', '=', 'class.id')
             ->join('subject', 'assign_class_teacher.subject_id', '=', 'subject.id')
             ->where('assign_class_teacher.teacher_id', $teacher_id)
@@ -172,8 +173,10 @@ class AssignClassTeacherModel extends Model
         return AssignClassTeacherModel::select(
             'assign_class_teacher.*',
             'class.name as class_name',
+            'class.opt as class_opt',
             'class.id as class_id',
-            'subject.name as subject_name',  // Ajout du nom de la matière
+            'subject.name as subject_name',
+            'subject.code as subject_code',  // Ajout du nom de la matière
             'subject.id as subject_id'       // Ajout de l'ID de la matière
         )
             ->join('class', 'assign_class_teacher.class_id', '=', 'class.id')
@@ -187,7 +190,7 @@ class AssignClassTeacherModel extends Model
 
     static public function getCalendarTeacher($teacher_id)
     {
-        return AssignClassTeacherModel::select('class_subject_timetable.*', 'class.name as class_name', 'subject.name as subject_name', 'week.name as week_name', 'week.fullcalendar_day')
+        return AssignClassTeacherModel::select('class_subject_timetable.*', 'class.name as class_name', 'class.opt as class_opt', 'subject.name as subject_name', 'week.name as week_name', 'week.fullcalendar_day')
             ->join('class', 'class.id', '=', 'assign_class_teacher.class_id')
             ->join('class_subject', 'class_subject.class_id', '=', 'class.id')
             ->join('class_subject_timetable', 'class_subject_timetable.subject_id', '=', 'class_subject.subject_id')

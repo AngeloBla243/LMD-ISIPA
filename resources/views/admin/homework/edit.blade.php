@@ -12,12 +12,12 @@
           <div class="col-sm-6">
             <h1>Edit Homework</h1>
           </div>
-    
+
         </div>
       </div>
     </section>
 
-    
+
     <section class="content">
       <div class="container-fluid">
         <div class="row">
@@ -33,7 +33,7 @@
                     <select class="form-control" id="getClass" name="class_id" required>
                         <option value="">Select Class</option>
                         @foreach($getClass as $class)
-                          <option {{ ($getRecord->class_id == $class->id) ? 'selected' : '' }} value="{{ $class->id }}">{{ $class->name }}</option>
+                          <option {{ ($getRecord->class_id == $class->id) ? 'selected' : '' }} value="{{ $class->id }}">{{ $class->name }} {{ $class->opt }}</option>
                         @endforeach
                     </select>
                   </div>
@@ -72,14 +72,14 @@
                     <label>Description <span style="color:red">*</span></label>
                     <textarea id="compose-textarea" name="description" class="form-control" style="height: 300px">{{ $getRecord->description }}</textarea>
                   </div>
-                
+
                 </div>
                 <div class="card-footer">
                   <button type="submit" class="btn btn-primary">Update</button>
                 </div>
               </form>
             </div>
-         
+
 
           </div>
         </div>
@@ -95,15 +95,15 @@
 
 	<script src="{{ url('public/plugins/summernote/summernote-bs4.min.js') }}"></script>
 
-	<script type="text/javascript">	
-	
+	<script type="text/javascript">
+
 		  $(function () {
 
-      
+
 	  	$('#compose-textarea').summernote({
 			  height: 200
 			});
-		    
+
       $('#getClass').change(function() {
           var class_id = $(this).val();
           $.ajax({
@@ -111,7 +111,7 @@
               url: "{{ url('admin/ajax_get_subject') }}",
               data : {
                  "_token": "{{ csrf_token() }}",
-                class_id : class_id,            
+                class_id : class_id,
               },
               dataType : "json",
               success: function(data) {
@@ -120,7 +120,7 @@
           });
 
       });
-		  
+
 	  });
 
 	</script>

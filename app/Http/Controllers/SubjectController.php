@@ -33,6 +33,7 @@ class SubjectController extends Controller
     {
         $save = new SubjectModel;
         $save->name = trim($request->name);
+        $save->code = trim($request->code);
         $save->type = trim($request->type);
         $save->status = trim($request->status);
         $save->created_by = Auth::user()->id;
@@ -56,6 +57,7 @@ class SubjectController extends Controller
     {
         $save = SubjectModel::getSingle($id);
         $save->name = trim($request->name);
+        $save->code = trim($request->code);
         $save->type = trim($request->type);
         $save->status = trim($request->status);
         $save->save();

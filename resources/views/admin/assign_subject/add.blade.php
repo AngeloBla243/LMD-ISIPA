@@ -10,7 +10,7 @@
           <div class="col-sm-6">
             <h1>Add New Assign Subject</h1>
           </div>
-    
+
         </div>
       </div><!-- /.container-fluid -->
     </section>
@@ -30,7 +30,7 @@
                      <select class="form-control" name="class_id" required>
                         <option value="">Select Class</option>
                         @foreach($getClass as $class)
-                          <option value="{{ $class->id }}">{{ $class->name }}</option>
+                          <option value="{{ $class->id }}">{{ $class->name }} {{ $class->opt }}</option>
                         @endforeach
                     </select>
 
@@ -42,7 +42,7 @@
                         @foreach($getSubject as $subject)
                         <div>
                           <label style="font-weight: normal;">
-                            <input type="checkbox" value="{{ $subject->id }}" name="subject_id[]"> {{ $subject->name }}
+                            <input type="checkbox" value="{{ $subject->id }}" name="subject_id[]"> {{ $subject->name }} / {{ $subject->code }}
                           </label>
                           </div>
                         @endforeach
@@ -54,10 +54,10 @@
                         <option value="0">Active</option>
                         <option value="1">Inactive</option>
                     </select>
-                    
+
                   </div>
-              
-                
+
+
                 </div>
                 <!-- /.card-body -->
 
@@ -66,12 +66,12 @@
                 </div>
               </form>
             </div>
-         
+
 
           </div>
           <!--/.col (left) -->
           <!-- right column -->
-       
+
           <!--/.col (right) -->
         </div>
         <!-- /.row -->

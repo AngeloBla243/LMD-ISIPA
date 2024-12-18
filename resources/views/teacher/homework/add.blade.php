@@ -40,7 +40,7 @@
                                         <select class="form-control" id="getClass" name="class_id" required>
                                             <option value="">Select Class</option>
                                             @foreach ($getClass as $class)
-                                                <option value="{{ $class->class_id }}">{{ $class->class_name }}</option>
+                                                <option value="{{ $class->class_id }}">{{ $class->class_name }} {{ $class->class_opt }}</option>
                                             @endforeach
                                         </select>
                                     </div>

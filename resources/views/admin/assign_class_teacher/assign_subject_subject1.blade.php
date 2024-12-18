@@ -40,7 +40,7 @@
                                         <option value="">Sélectionnez une matière</option>
                                         @foreach ($subjects as $classSubject)
                                             <option value="{{ $classSubject->subject->id }}">
-                                                {{ $classSubject->subject->name }}</option>
+                                                {{ $classSubject->subject->name }} / {{ $classSubject->subject->code }}</option>
                                         @endforeach
                                     </select>
                                 </div>

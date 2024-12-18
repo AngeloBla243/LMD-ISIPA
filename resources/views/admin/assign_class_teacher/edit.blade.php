@@ -10,7 +10,7 @@
           <div class="col-sm-6">
             <h1>Edit Assign Class Teacher</h1>
           </div>
-    
+
         </div>
       </div><!-- /.container-fluid -->
     </section>
@@ -30,7 +30,7 @@
                      <select class="form-control" name="class_id" required>
                         <option value="">Select Class</option>
                         @foreach($getClass as $class)
-                          <option {{ ($getRecord->class_id == $class->id) ? 'selected' : '' }} value="{{ $class->id }}">{{ $class->name }}</option>
+                          <option {{ ($getRecord->class_id == $class->id) ? 'selected' : '' }} value="{{ $class->id }}">{{ $class->name }} {{ $class->opt }}</option>
                         @endforeach
                     </select>
 
@@ -43,13 +43,13 @@
                         <div>
                           <label style="font-weight: normal;">
                             @php
-                              $checked = '';                             
+                              $checked = '';
                             @endphp
 
                             @foreach($getAssignTeacherID as $teacherID)
                               @if($teacherID->teacher_id == $teacher->id)
                                 @php
-                                  $checked = 'checked';                             
+                                  $checked = 'checked';
                                 @endphp
                               @endif
                             @endforeach
@@ -65,10 +65,10 @@
                         <option  {{ ($getRecord->status == 0) ? 'selected' : '' }} value="0">Active</option>
                         <option  {{ ($getRecord->status == 1) ? 'selected' : '' }} value="1">Inactive</option>
                     </select>
-                    
+
                   </div>
-              
-                
+
+
                 </div>
                 <!-- /.card-body -->
 
@@ -77,12 +77,12 @@
                 </div>
               </form>
             </div>
-         
+
 
           </div>
           <!--/.col (left) -->
           <!-- right column -->
-       
+
           <!--/.col (right) -->
         </div>
         <!-- /.row -->
