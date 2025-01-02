@@ -19,24 +19,18 @@ class SettingModel extends Model
 
     public function getLogo()
     {
-        if(!empty($this->logo) && file_exists('upload/setting/'.$this->logo))
-        {
-            return url('upload/setting/'.$this->logo);
-        }
-        else
-        {
+        if (!empty($this->logo) && file_exists('upload/setting/' . $this->logo)) {
+            return url('upload/setting/' . $this->logo);
+        } else {
             return '';
         }
     }
 
     public function getFevicon()
     {
-        if(!empty($this->fevicon_icon) && file_exists('upload/setting/'.$this->fevicon_icon))
-        {
-            return url('upload/setting/'.$this->fevicon_icon);
-        }
-        else
-        {
+        if (!empty($this->fevicon_icon) && file_exists('upload/setting/' . $this->fevicon_icon)) {
+            return url('upload/setting/' . $this->fevicon_icon);
+        } else {
             return '';
         }
     }

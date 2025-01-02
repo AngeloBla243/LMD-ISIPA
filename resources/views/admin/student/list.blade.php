@@ -138,9 +138,25 @@
 
 
                                         <div class="form-group col-md-2">
-                                            <label>Caste</label>
-                                            <input type="text" class="form-control" name="caste"
-                                                value="{{ Request::get('caste') }}" placeholder="Caste">
+                                            <label>Département</label>
+                                            <select class="form-control" name="departement">
+                                                <option value="">Select Département</option>
+                                                <option {{ Request::get('departement') == 'Informatique de gestion' ? 'selected' : '' }}
+                                                    value="Male">Informatique de gestion
+                                                </option>
+                                                <option {{ Request::get('departement') == 'Techniques de Maintenance' ? 'selected' : '' }}
+                                                    value="Techniques de Maintenance">Techniques de Maintenance
+                                                </option>
+                                                <option {{ Request::get('departement') == 'Communication numérique' ? 'selected' : '' }}
+                                                    value="Other">Communication numérique
+                                                </option>
+                                                    <option {{ Request::get('departement') == 'Gestion financière' ? 'selected' : '' }}
+                                                    value="Gestion financière">Gestion financière
+                                                </option>
+                                                    <option {{ Request::get('departement') == 'Gestion Douanière et Accises' ? 'selected' : '' }}
+                                                    value="Gestion Douanière et Accises">Gestion Douanière et Accises
+                                                </option>
+                                            </select>
                                         </div>
 
                                         <div class="form-group col-md-2">
@@ -226,6 +242,7 @@
                                     <input type="hidden" name="name" value="{{ Request::get('name') }}">
                                     <input type="hidden" name="last_name" value="{{ Request::get('last_name') }}">
                                     <input type="hidden" name="email" value="{{ Request::get('email') }}">
+                                    <input type="hidden" name="departement" value="{{ Request::get('departement') }}">
                                     <input type="hidden" name="admission_number"
                                         value="{{ Request::get('admission_number') }}">
                                     <input type="hidden" name="roll_number" value="{{ Request::get('roll_number') }}">
@@ -251,6 +268,7 @@
                                             <th>#</th>
                                             <th>Profile Pic</th>
                                             <th style="min-width: 150px;">Student Name</th>
+                                            <th style="min-width: 150px;">Département</th>
                                             <th style="min-width: 150px;">Parent Name</th>
                                             <th>Email</th>
                                             <th style="min-width: 200px;">Admission Number</th>
@@ -283,8 +301,8 @@
                                                     @endif
                                                 </td>
 
-                                                <td style="min-width: 100px;">{{ $value->name }} {{ $value->last_name }}
-                                                </td>
+                                                <td style="min-width: 100px;">{{ $value->name }} {{ $value->last_name }}</td>
+                                                <td style="min-width: 100px;">{{ $value->departement }}</td>
                                                 <td style="min-width: 100px;">{{ $value->parent_name }}
                                                     {{ $value->parent_last_name }}</td>
                                                 <td style="min-width: 100px;">{{ $value->email }}</td>

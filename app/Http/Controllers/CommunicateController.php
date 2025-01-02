@@ -9,6 +9,7 @@ use App\Models\NoticeBoardMessageModel;
 use App\Mail\SendEmailUserMail;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
+
 class CommunicateController extends Controller
 {
 
@@ -21,30 +22,22 @@ class CommunicateController extends Controller
     public function SearchUser(Request $request)
     {
         $json = array();
-        if(!empty($request->search))
-        {
+        if (!empty($request->search)) {
             $getUser = User::SearchUser($request->search);
             foreach ($getUser as $value) {
                 $type = '';
-                if($value->user_type == 1)
-                {
+                if ($value->user_type == 1) {
                     $type = 'Admin';
-                }
-                else if($value->user_type == 2)
-                {
+                } else if ($value->user_type == 2) {
                     $type = 'Teacher';
-                }
-                else if($value->user_type == 3)
-                {
+                } else if ($value->user_type == 3) {
                     $type = 'Student';
-                }
-                else if($value->user_type == 4)
-                {
+                } else if ($value->user_type == 4) {
                     $type = 'Parent';
                 }
 
-                $name = $value->name.' '.$value->last_name.' - '. $type;
-                $json[] = ['id'=> $value->id, 'text'=> $name];
+                $name = $value->name . ' ' . $value->last_name . ' - ' . $type;
+                $json[] = ['id' => $value->id, 'text' => $name];
             }
         }
 
@@ -55,8 +48,7 @@ class CommunicateController extends Controller
     {
 
 
-        if(!empty($request->user_id))
-        {
+        if (!empty($request->user_id)) {
             $user = User::getSingle($request->user_id);
             $user->send_message = $request->message;
             $user->send_subject = $request->subject;
@@ -64,13 +56,10 @@ class CommunicateController extends Controller
             Mail::to($user->email)->send(new SendEmailUserMail($user));
         }
 
-        if(!empty($request->message_to))
-        {
-            foreach($request->message_to as $user_type)
-            {
+        if (!empty($request->message_to)) {
+            foreach ($request->message_to as $user_type) {
                 $getUser = User::getUser($user_type);
-                foreach ($getUser as $user)
-                {
+                foreach ($getUser as $user) {
                     $user->send_message = $request->message;
                     $user->send_subject = $request->subject;
 
@@ -107,10 +96,8 @@ class CommunicateController extends Controller
         $save->created_by = Auth::user()->id;
         $save->save();
 
-        if(!empty($request->message_to))
-        {
-            foreach ($request->message_to as $message_to)
-            {
+        if (!empty($request->message_to)) {
+            foreach ($request->message_to as $message_to) {
                 $message = new NoticeBoardMessageModel;
                 $message->notice_board_id = $save->id;
                 $message->message_to  = $message_to;
@@ -142,10 +129,8 @@ class CommunicateController extends Controller
 
         NoticeBoardMessageModel::DeleteRecord($id);
 
-        if(!empty($request->message_to))
-        {
-            foreach ($request->message_to as $message_to)
-            {
+        if (!empty($request->message_to)) {
+            foreach ($request->message_to as $message_to) {
                 $message = new NoticeBoardMessageModel;
                 $message->notice_board_id = $save->id;
                 $message->message_to  = $message_to;
@@ -203,8 +188,4 @@ class CommunicateController extends Controller
         $data['header_title'] = 'My Notice Board';
         return view('parent.my_student_notice_board', $data);
     }
-
-
-
 }
-

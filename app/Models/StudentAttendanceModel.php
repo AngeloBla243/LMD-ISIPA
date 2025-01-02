@@ -141,7 +141,7 @@ class StudentAttendanceModel extends Model
 
     static public function getRecordStudent($student_id)
     {
-        $return =  StudentAttendanceModel::select('student_attendance.*', 'class.name as class_name')
+        $return =  StudentAttendanceModel::select('student_attendance.*', 'class.name as class_name', 'class.opt as class_opt')
                     ->join('class', 'class.id', '=', 'student_attendance.class_id')
                     ->where('student_attendance.student_id', '=', $student_id);
 
@@ -191,7 +191,7 @@ class StudentAttendanceModel extends Model
 
     static public function getClassStudent($student_id)
     {
-        return StudentAttendanceModel::select('student_attendance.*', 'class.name as class_name')
+        return StudentAttendanceModel::select('student_attendance.*', 'class.name as class_name', 'class.opt as class_opt')
                     ->join('class', 'class.id', '=', 'student_attendance.class_id')
                     ->where('student_attendance.student_id', '=', $student_id)
                     ->groupBy('student_attendance.class_id')

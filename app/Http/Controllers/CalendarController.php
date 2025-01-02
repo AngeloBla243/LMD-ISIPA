@@ -11,6 +11,7 @@ use App\Models\AssignClassTeacherModel;
 use App\Models\User;
 
 use Illuminate\Support\Facades\Auth;
+
 class CalendarController extends Controller
 {
     public function MyCalendar()
@@ -20,7 +21,7 @@ class CalendarController extends Controller
         $data['getExamTimetable'] = $this->getExamTimetable(Auth::user()->class_id);
 
         $data['header_title'] = "My Calendar";
-        return view('student.my_calendar',$data);
+        return view('student.my_calendar', $data);
     }
 
 
@@ -28,14 +29,12 @@ class CalendarController extends Controller
     {
         $getExam = ExamScheduleModel::getExam($class_id);
         $result = array();
-        foreach($getExam as $value)
-        {
+        foreach ($getExam as $value) {
             $dataE = array();
             $dataE['name'] = $value->exam_name;
             $getExamTimetable = ExamScheduleModel::getExamTimetable($value->exam_id, $class_id);
             $resultS = array();
-            foreach($getExamTimetable as $valueS)
-            {
+            foreach ($getExamTimetable as $valueS) {
                 $dataS = array();
                 $dataS['subject_name'] = $valueS->subject_name;
                 $dataS['exam_date'] = $valueS->exam_date;
@@ -58,22 +57,19 @@ class CalendarController extends Controller
     {
         $result = array();
         $getRecord = ClassSubjectModel::MySubject($class_id);
-        foreach($getRecord as $value)
-        {
+        foreach ($getRecord as $value) {
             $dataS['name'] = $value->subject_name;
 
             $getWeek = WeekModel::getRecord();
             $week = array();
-            foreach($getWeek as $valueW)
-            {
+            foreach ($getWeek as $valueW) {
                 $dataW = array();
                 $dataW['week_name'] = $valueW->name;
                 $dataW['fullcalendar_day'] = $valueW->fullcalendar_day;
 
-                $ClassSubject = ClassSubjectTimetableModel::getRecordClassSubject($value->class_id,$value->subject_id,$valueW->id);
+                $ClassSubject = ClassSubjectTimetableModel::getRecordClassSubject($value->class_id, $value->subject_id, $valueW->id);
 
-                if(!empty($ClassSubject))
-                {
+                if (!empty($ClassSubject)) {
                     $dataW['start_time'] = $ClassSubject->start_time;
                     $dataW['end_time'] = $ClassSubject->end_time;
                     $dataW['room_number'] = $ClassSubject->room_number;
@@ -86,7 +82,6 @@ class CalendarController extends Controller
         }
 
         return $result;
-
     }
 
     // parent side
@@ -113,5 +108,4 @@ class CalendarController extends Controller
         $data['header_title'] = "My Calendar";
         return view('teacher.my_calendar', $data);
     }
-
 }

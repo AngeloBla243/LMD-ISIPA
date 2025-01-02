@@ -19,7 +19,7 @@ class ClassSubjectModel extends Model
 
     static public function getRecord()
     {
-        $return = self::select('class_subject.*', 'class.name as class_name', 'class.opt as class_opt', 'subject.name as subject_name','subject.code as subject_code', 'users.name as created_by_name')
+        $return = self::select('class_subject.*', 'class.name as class_name', 'class.opt as class_opt', 'subject.name as subject_name', 'subject.code as subject_code', 'users.name as created_by_name')
             ->join('subject', 'subject.id', '=', 'class_subject.subject_id')
             ->join('class', 'class.id', '=', 'class_subject.class_id')
             ->join('users', 'users.id', '=', 'class_subject.created_by')

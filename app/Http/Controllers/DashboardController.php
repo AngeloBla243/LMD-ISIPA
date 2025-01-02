@@ -25,8 +25,7 @@ class DashboardController extends Controller
     public function dashboard()
     {
         $data['header_title'] = 'Dashboard';
-        if(Auth::user()->user_type == 1)
-        {
+        if (Auth::user()->user_type == 1) {
             $data['getTotalFees'] = StudentAddFeesModel::getTotalFees();
             $data['getTotalTodayFees'] = StudentAddFeesModel::getTotalTodayFees();
 
@@ -40,17 +39,13 @@ class DashboardController extends Controller
             $data['TotalSubject'] = SubjectModel::getTotalSubject();
 
             return view('admin.dashboard', $data);
-        }
-        else if(Auth::user()->user_type == 2)
-        {
+        } else if (Auth::user()->user_type == 2) {
             $data['TotalStudent'] = User::getTeacherStudentCount(Auth::user()->id);
             $data['TotalClass'] = AssignClassTeacherModel::getMyClassSubjectGroupCount(Auth::user()->id);
             $data['TotalSubject'] = AssignClassTeacherModel::getMyClassSubjectCount(Auth::user()->id);
             $data['TotalNoticeBoard'] = NoticeBoardModel::getRecordUserCount(Auth::user()->user_type);
             return view('teacher.dashboard', $data);
-        }
-        else if(Auth::user()->user_type == 3)
-        {
+        } else if (Auth::user()->user_type == 3) {
             $data['TotalPaidAmount'] = StudentAddFeesModel::TotalPaidAmountStudent(Auth::user()->id);
             $data['TotalSubject'] = ClassSubjectModel::MySubjectTotal(Auth::user()->class_id);
             $data['TotalNoticeBoard'] = NoticeBoardModel::getRecordUserCount(Auth::user()->user_type);
@@ -63,21 +58,16 @@ class DashboardController extends Controller
 
 
             return view('student.dashboard', $data);
-        }
-        else if(Auth::user()->user_type == 4)
-        {
+        } else if (Auth::user()->user_type == 4) {
             $student_ids = User::getMyStudentIds(Auth::user()->id);
             $class_ids = User::getMyStudentClassIds(Auth::user()->id);
 
-            if(!empty($student_ids))
-            {
+            if (!empty($student_ids)) {
                 $data['TotalPaidAmount'] = StudentAddFeesModel::TotalPaidAmountStudentParent($student_ids);
                 $data['TotalAttendance'] = StudentAttendanceModel::getRecordStudentParentCount($student_ids);
 
                 $data['TotalSubmittedHomework'] = HomeworkSubmitModel::getRecordStudentParentCount($student_ids);
-            }
-            else
-            {
+            } else {
                 $data['TotalPaidAmount'] = 0;
                 $data['TotalAttendance'] = 0;
                 $data['TotalSubmittedHomework'] = 0;

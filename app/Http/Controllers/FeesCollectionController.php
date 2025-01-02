@@ -16,86 +16,79 @@ use Maatwebsite\Excel\Facades\Excel;
 class FeesCollectionController extends Controller
 {
 
-     public function collect_fees(Request $request)
-     {
+    public function collect_fees(Request $request)
+    {
         $data['getClass'] = ClassModel::getClass();
 
-        if(!empty($request->all()))
-        {
+        if (!empty($request->all())) {
             $data['getRecord'] = User::getCollectFeesStudent();
         }
 
         $data['header_title'] = "Collect Fees";
         return view('admin.fees_collection.collect_fees', $data);
-     }
+    }
 
 
-     public function collect_fees_report()
-     {
+    public function collect_fees_report()
+    {
 
         $data['getClass'] = ClassModel::getClass();
         $data['getRecord'] = StudentAddFeesModel::getRecord();
         $data['header_title'] = "Collect Fees Report";
         return view('admin.fees_collection.collect_fees_report', $data);
-     }
+    }
 
-     public function export_collect_fees_report(Request $request)
-     {
-         return Excel::download(new ExportCollectFees, 'CollectFeesReport_'.date('d-m-Y').'.xls');
-     }
+    public function export_collect_fees_report(Request $request)
+    {
+        return Excel::download(new ExportCollectFees, 'CollectFeesReport_' . date('d-m-Y') . '.xls');
+    }
 
-     public function collect_fees_add($student_id)
-     {
+    public function collect_fees_add($student_id)
+    {
         $data['getFees'] = StudentAddFeesModel::getFees($student_id);
         $getStudent = User::getSingleClass($student_id);
         $data['getStudent'] = $getStudent;
         $data['header_title'] = "Add Collect Fees";
         $data['paid_amount'] = StudentAddFeesModel::getPaidAmount($student_id, $getStudent->class_id);
         return view('admin.fees_collection.add_collect_fees', $data);
-     }
+    }
 
 
-     public function collect_fees_insert($student_id, Request $request)
-     {
+    public function collect_fees_insert($student_id, Request $request)
+    {
         $getStudent = User::getSingleClass($student_id);
         $paid_amount = StudentAddFeesModel::getPaidAmount($student_id, $getStudent->class_id);
-        if(!empty($request->amount))
-        {
+        if (!empty($request->amount)) {
             $RemaningAmount = $getStudent->amount - $paid_amount;
-           if($RemaningAmount >= $request->amount)
-           {
-              $remaning_amount_user =  $RemaningAmount - $request->amount;
+            if ($RemaningAmount >= $request->amount) {
+                $remaning_amount_user =  $RemaningAmount - $request->amount;
 
-              $payment = new StudentAddFeesModel;
-              $payment->student_id = $student_id;
-              $payment->class_id = $getStudent->class_id;
-              $payment->paid_amount = $request->amount;
-              $payment->total_amount = $RemaningAmount;
-              $payment->remaning_amount = $remaning_amount_user;
-              $payment->payment_type = $request->payment_type;
-              $payment->remark = $request->remark;
-              $payment->created_by = Auth::user()->id;
-              $payment->is_payment = 1;
-              $payment->save();
+                $payment = new StudentAddFeesModel;
+                $payment->student_id = $student_id;
+                $payment->class_id = $getStudent->class_id;
+                $payment->paid_amount = $request->amount;
+                $payment->total_amount = $RemaningAmount;
+                $payment->remaning_amount = $remaning_amount_user;
+                $payment->payment_type = $request->payment_type;
+                $payment->remark = $request->remark;
+                $payment->created_by = Auth::user()->id;
+                $payment->is_payment = 1;
+                $payment->save();
 
-              return redirect()->back()->with('success', "Fees Successfully Add");
-           }
-           else
-           {
-               return redirect()->back()->with('error', "Your amount go to greather than remaning amount");
-           }
-        }
-        else
-        {
+                return redirect()->back()->with('success', "Fees Successfully Add");
+            } else {
+                return redirect()->back()->with('error', "Your amount go to greather than remaning amount");
+            }
+        } else {
             return redirect()->back()->with('error', "You need add your amount atleast $1");
         }
-     }
+    }
 
 
-     // studen side work
+    // studen side work
 
-     public function CollectFeesStudent(Request $request)
-     {
+    public function CollectFeesStudent(Request $request)
+    {
         $student_id = Auth::user()->id;
 
         $data['getFees'] = StudentAddFeesModel::getFees($student_id);
@@ -108,18 +101,16 @@ class FeesCollectionController extends Controller
         $data['paid_amount'] = StudentAddFeesModel::getPaidAmount(Auth::user()->id, Auth::user()->class_id);
 
         return view('student.my_fees_collection', $data);
-     }
+    }
 
-     public function CollectFeesStudentPayment(Request $request)
-     {
+    public function CollectFeesStudentPayment(Request $request)
+    {
         $getStudent = User::getSingleClass(Auth::user()->id);
         $paid_amount = StudentAddFeesModel::getPaidAmount(Auth::user()->id, Auth::user()->class_id);
 
-        if(!empty($request->amount))
-        {
+        if (!empty($request->amount)) {
             $RemaningAmount = $getStudent->amount - $paid_amount;
-            if($RemaningAmount >= $request->amount)
-            {
+            if ($RemaningAmount >= $request->amount) {
                 $remaning_amount_user =  $RemaningAmount - $request->amount;
 
                 $payment = new StudentAddFeesModel;
@@ -135,8 +126,7 @@ class FeesCollectionController extends Controller
 
                 $getSetting = SettingModel::getSingle();
 
-                if($request->payment_type == 'Paypal')
-                {
+                if ($request->payment_type == 'Paypal') {
                     $query = array();
                     $query['business']      = $getSetting->paypal_email;
                     $query['cmd']           = '_xclick';
@@ -153,9 +143,7 @@ class FeesCollectionController extends Controller
                     // header('Location: https://www.paypal.com/cgi-bin/webscr?' . $query_string);
                     header('Location: https://www.sandbox.paypal.com/cgi-bin/webscr?' . $query_string);
                     exit();
-                }
-                else if($request->payment_type == 'Stripe')
-                {
+                } else if ($request->payment_type == 'Stripe') {
                     $setPublicKey   = $getSetting->stripe_key;
                     $setApiKey      = $getSetting->stripe_secret;
 
@@ -168,7 +156,7 @@ class FeesCollectionController extends Controller
                         'line_items'    => [[
                             'name'      => 'Student Fees',
                             'description' => 'Student Fees',
-                            'images'    => [url('public/dist/img/user2-160x160.jpg') ],
+                            'images'    => [url('public/dist/img/user2-160x160.jpg')],
                             'amount'    => intval($finalprice),
                             'currency'  => 'INR',
                             'quantity'  => 1,
@@ -187,21 +175,16 @@ class FeesCollectionController extends Controller
 
                     return view('stripe_charge', $data);
                 }
-            }
-            else
-            {
+            } else {
                 return redirect()->back()->with('error', "Your amount go to greather than remaning amount");
             }
-        }
-        else
-        {
+        } else {
             return redirect()->back()->with('error', "You need add your amount atleast $1");
         }
+    }
 
-     }
-
-     public function PaymentSuccessStripe(Request $request)
-     {
+    public function PaymentSuccessStripe(Request $request)
+    {
 
         $getSetting = SettingModel::getSingle();
         $setPublicKey   = $getSetting->stripe_key;
@@ -214,8 +197,7 @@ class FeesCollectionController extends Controller
         $getdata = \Stripe\Checkout\Session::retrieve($trans_id);
 
 
-        if (!empty($getdata->id) && $getdata->id == $trans_id && !empty($getFee) && $getdata->status == 'complete' && $getdata->payment_status == 'paid')
-        {
+        if (!empty($getdata->id) && $getdata->id == $trans_id && !empty($getFee) && $getdata->status == 'complete' && $getdata->payment_status == 'paid') {
             $getFee->is_payment = 1;
             $getFee->payment_data = json_encode($getdata);
             $getFee->save();
@@ -223,50 +205,40 @@ class FeesCollectionController extends Controller
             Session::forget('stripe_session_id');
 
             return redirect('student/fees_collection')->with('success', "Your Payment Successfully");
-
+        } else {
+            return redirect('student/fees_collection')->with('error', "Due to some error please try again");
         }
-        else
-        {
-             return redirect('student/fees_collection')->with('error', "Due to some error please try again");
-        }
+    }
 
-     }
-
-     public function PaymentError()
-     {
-         return redirect('student/fees_collection')->with('error', "Due to some error please try again");
-     }
+    public function PaymentError()
+    {
+        return redirect('student/fees_collection')->with('error', "Due to some error please try again");
+    }
 
 
-     public function PaymentSuccess(Request $request)
-     {
-        if(!empty($request->item_number) && !empty($request->st) && $request->st == 'Completed')
-        {
+    public function PaymentSuccess(Request $request)
+    {
+        if (!empty($request->item_number) && !empty($request->st) && $request->st == 'Completed') {
             $fees = StudentAddFeesModel::getSingle($request->item_number);
-            if(!empty($fees))
-            {
+            if (!empty($fees)) {
                 $fees->is_payment = 1;
                 $fees->payment_data = json_encode($request->all());
                 $fees->save();
 
                 return redirect('student/fees_collection')->with('success', "Your Payment Successfully");
-            }
-            else
-            {
+            } else {
                 return redirect('student/fees_collection')->with('error', "Due to some error please try again");
             }
-        }
-        else
-        {
+        } else {
             return redirect('student/fees_collection')->with('error', "Due to some error please try again");
         }
-     }
+    }
 
 
-     // parent side work
+    // parent side work
 
-     public function CollectFeesStudentParent($student_id, Request $request)
-     {
+    public function CollectFeesStudentParent($student_id, Request $request)
+    {
         $data['getFees'] = StudentAddFeesModel::getFees($student_id);
 
         $getStudent = User::getSingleClass($student_id);
@@ -277,7 +249,7 @@ class FeesCollectionController extends Controller
         $data['paid_amount'] = StudentAddFeesModel::getPaidAmount($student_id, $getStudent->class_id);
 
         return view('parent.my_fees_collection', $data);
-     }
+    }
 
 
     public function CollectFeesStudentPaymentParent($student_id, Request $request)
@@ -286,11 +258,9 @@ class FeesCollectionController extends Controller
 
         $paid_amount = StudentAddFeesModel::getPaidAmount($student_id, $getStudent->class_id);
 
-        if(!empty($request->amount))
-        {
+        if (!empty($request->amount)) {
             $RemaningAmount = $getStudent->amount - $paid_amount;
-            if($RemaningAmount >= $request->amount)
-            {
+            if ($RemaningAmount >= $request->amount) {
                 $remaning_amount_user =  $RemaningAmount - $request->amount;
 
                 $payment = new StudentAddFeesModel;
@@ -306,8 +276,7 @@ class FeesCollectionController extends Controller
 
                 $getSetting = SettingModel::getSingle();
 
-                if($request->payment_type == 'Paypal')
-                {
+                if ($request->payment_type == 'Paypal') {
                     $query = array();
                     $query['business']      = $getSetting->paypal_email;
                     $query['cmd']           = '_xclick';
@@ -316,17 +285,15 @@ class FeesCollectionController extends Controller
                     $query['item_number']   = $payment->id;
                     $query['amount']        = $request->amount;
                     $query['currency_code'] = 'USD';
-                    $query['cancel_return'] = url('parent/paypal/payment-error/'.$student_id);
-                    $query['return']        = url('parent/paypal/payment-success/'.$student_id);
+                    $query['cancel_return'] = url('parent/paypal/payment-error/' . $student_id);
+                    $query['return']        = url('parent/paypal/payment-success/' . $student_id);
 
                     $query_string = http_build_query($query);
 
                     // header('Location: https://www.paypal.com/cgi-bin/webscr?' . $query_string);
                     header('Location: https://www.sandbox.paypal.com/cgi-bin/webscr?' . $query_string);
                     exit();
-                }
-                else if($request->payment_type == 'Stripe')
-                {
+                } else if ($request->payment_type == 'Stripe') {
                     $setPublicKey   = $getSetting->stripe_key;
                     $setApiKey      = $getSetting->stripe_secret;
 
@@ -339,13 +306,13 @@ class FeesCollectionController extends Controller
                         'line_items'    => [[
                             'name'      => 'Student Fees',
                             'description' => 'Student Fees',
-                            'images'    => [url('public/dist/img/user2-160x160.jpg') ],
+                            'images'    => [url('public/dist/img/user2-160x160.jpg')],
                             'amount'    => intval($finalprice),
                             'currency'  => 'INR',
                             'quantity'  => 1,
                         ]],
-                        'success_url' => url('parent/stripe/payment-success/'.$student_id),
-                        'cancel_url' => url('parent/stripe/payment-error/'.$student_id),
+                        'success_url' => url('parent/stripe/payment-success/' . $student_id),
+                        'cancel_url' => url('parent/stripe/payment-error/' . $student_id),
                     ]);
 
 
@@ -358,46 +325,35 @@ class FeesCollectionController extends Controller
 
                     return view('stripe_charge', $data);
                 }
-            }
-            else
-            {
+            } else {
                 return redirect()->back()->with('error', "Your amount go to greather than remaning amount");
             }
-        }
-        else
-        {
+        } else {
             return redirect()->back()->with('error', "You need add your amount atleast $1");
         }
-
-     }
+    }
 
 
     public function PaymentErrorParent($student_id)
     {
-        return redirect('parent/my_student/fees_collection/'.$student_id)->with('error', "Due to some error please try again");
+        return redirect('parent/my_student/fees_collection/' . $student_id)->with('error', "Due to some error please try again");
     }
 
     public function PaymentSuccessParent($student_id, Request $request)
     {
-        if(!empty($request->item_number) && !empty($request->st) && $request->st == 'Completed')
-        {
+        if (!empty($request->item_number) && !empty($request->st) && $request->st == 'Completed') {
             $fees = StudentAddFeesModel::getSingle($request->item_number);
-            if(!empty($fees))
-            {
+            if (!empty($fees)) {
                 $fees->is_payment = 1;
                 $fees->payment_data = json_encode($request->all());
                 $fees->save();
 
-                return redirect('parent/my_student/fees_collection/'.$student_id)->with('success', "Your Payment Successfully");
+                return redirect('parent/my_student/fees_collection/' . $student_id)->with('success', "Your Payment Successfully");
+            } else {
+                return redirect('parent/my_student/fees_collection/' . $student_id)->with('error', "Due to some error please try again");
             }
-            else
-            {
-                return redirect('parent/my_student/fees_collection/'.$student_id)->with('error', "Due to some error please try again");
-            }
-        }
-        else
-        {
-            return redirect('parent/my_student/fees_collection/'.$student_id)->with('error', "Due to some error please try again");
+        } else {
+            return redirect('parent/my_student/fees_collection/' . $student_id)->with('error', "Due to some error please try again");
         }
     }
 
@@ -415,23 +371,16 @@ class FeesCollectionController extends Controller
         $getdata = \Stripe\Checkout\Session::retrieve($trans_id);
 
 
-        if (!empty($getdata->id) && $getdata->id == $trans_id && !empty($getFee) && $getdata->status == 'complete' && $getdata->payment_status == 'paid')
-        {
+        if (!empty($getdata->id) && $getdata->id == $trans_id && !empty($getFee) && $getdata->status == 'complete' && $getdata->payment_status == 'paid') {
             $getFee->is_payment = 1;
             $getFee->payment_data = json_encode($getdata);
             $getFee->save();
 
             Session::forget('stripe_session_id');
 
-            return redirect('parent/my_student/fees_collection/'.$student_id)->with('success', "Your Payment Successfully");
+            return redirect('parent/my_student/fees_collection/' . $student_id)->with('success', "Your Payment Successfully");
+        } else {
+            return redirect('parent/my_student/fees_collection/' . $student_id)->with('error', "Due to some error please try again");
         }
-        else
-        {
-             return redirect('parent/my_student/fees_collection/'.$student_id)->with('error', "Due to some error please try again");
-        }
-
-     }
-
-
-
+    }
 }

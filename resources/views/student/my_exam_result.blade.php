@@ -134,8 +134,7 @@
 
                                             <tr>
                                                 <td colspan="1">
-                                                    <canvas id="creditsChart" width="50"
-                                                        height="50"></canvas>
+                                                    <canvas id="creditsChart" width="50" height="50"></canvas>
                                                 </td>
                                                 <td colspan="3">
                                                     <b>Grand Total: {{ $credits_obtenus }}/{{ $full_marks }}</b>
@@ -161,7 +160,7 @@
 @endsection
 
 @section('script')
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             var ctx = document.getElementById('creditsChart').getContext('2d');

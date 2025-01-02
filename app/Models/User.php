@@ -250,6 +250,11 @@ class User extends Authenticatable
                             $return = $return->where('users.last_name','like', '%'.Request::get('last_name').'%');
                         }
 
+                        if(!empty(Request::get('departement')))
+                        {
+                            $return = $return->where('users.departement','=', Request::get('departement'));
+                        }
+
                         if(!empty(Request::get('email')))
                         {
                             $return = $return->where('users.email','like', '%'.Request::get('email').'%');
@@ -517,7 +522,7 @@ class User extends Authenticatable
 
     static public function getMyStudent($parent_id)
     {
-        $return = self::select('users.*', 'class.name as class_name','parent.name as parent_name')
+        $return = self::select('users.*', 'class.name as class_name', 'class.opt as class_opt','parent.name as parent_name')
                         ->join('users as parent','parent.id', '=', 'users.parent_id')
                         ->join('class', 'class.id', '=', 'users.class_id', 'left')
                         ->where('users.user_type','=',3)

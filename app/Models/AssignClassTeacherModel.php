@@ -225,6 +225,4 @@ class AssignClassTeacherModel extends Model
         $getWeek = WeekModel::getWeekUsingName(date('l'));
         return ClassSubjectTimetableModel::getRecordClassSubject($class_id, $subject_id, $getWeek->id);
     }
-
-
 }

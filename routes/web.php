@@ -198,8 +198,8 @@ Route::group(['middleware' => 'admin'], function () {
 
     Route::get('admin/assign_class_teacher/assign_subject_subject1/{teacher_id}/{class_id}', [AssignClassTeacherController::class, 'assign_subject1'])->name('admin.assign_class_teacher.assign_subject_subject1');
 
-// Route pour traiter la soumission du formulaire d'assignation des matières avec AJAX
-Route::post('admin/assign_class_teacher/assign_subject_subject1', [AssignClassTeacherController::class, 'insert_assign_subject1'])->name('admin.assign_class_teacher.assign_subject_subject1');
+    // Route pour traiter la soumission du formulaire d'assignation des matières avec AJAX
+    Route::post('admin/assign_class_teacher/assign_subject_subject1', [AssignClassTeacherController::class, 'insert_assign_subject1'])->name('admin.assign_class_teacher.assign_subject_subject1');
 
 
 

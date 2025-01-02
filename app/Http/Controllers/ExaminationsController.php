@@ -455,7 +455,7 @@ class ExaminationsController extends Controller
         $exam_id = $request->input('exam_id');
         $class_id = $request->input('class_id');
 
-        $getSetting= SettingModel::getSingle();
+        $getSetting = SettingModel::getSingle();
 
         // Vérifiez que les paramètres existent
         if (!$exam_id || !$class_id) {
@@ -501,7 +501,7 @@ class ExaminationsController extends Controller
         }
 
         // Transmettez les données à la vue d'impression
-        return view('result_print', compact('class', 'getSetting' , 'students', 'subjects', 'results', 'exam_id'));
+        return view('result_print', compact('class', 'getSetting', 'students', 'subjects', 'results', 'exam_id'));
     }
 
     // teacher side work
