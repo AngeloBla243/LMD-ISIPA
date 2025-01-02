@@ -29,24 +29,22 @@ class UserController extends Controller
         $setting->school_name = trim($request->school_name);
         $setting->exam_description = trim($request->exam_description);
 
-        if(!empty($request->file('logo')))
-        {
+        if (!empty($request->file('logo'))) {
             $ext = $request->file('logo')->getClientOriginalExtension();
             $file = $request->file('logo');
-            $randomStr = date('Ymdhis').Str::random(10);
-            $filename = strtolower($randomStr).'.'.$ext;
+            $randomStr = date('Ymdhis') . Str::random(10);
+            $filename = strtolower($randomStr) . '.' . $ext;
             $file->move('upload/setting/', $filename);
 
             $setting->logo = $filename;
         }
 
 
-        if(!empty($request->file('fevicon_icon')))
-        {
+        if (!empty($request->file('fevicon_icon'))) {
             $ext = $request->file('fevicon_icon')->getClientOriginalExtension();
             $file = $request->file('fevicon_icon');
-            $randomStr = date('Ymdhis').Str::random(10);
-            $fevicon_icon = strtolower($randomStr).'.'.$ext;
+            $randomStr = date('Ymdhis') . Str::random(10);
+            $fevicon_icon = strtolower($randomStr) . '.' . $ext;
             $file->move('upload/setting/', $fevicon_icon);
 
             $setting->fevicon_icon = $fevicon_icon;
@@ -63,30 +61,22 @@ class UserController extends Controller
     {
         $data['getRecord'] = User::getSingle(Auth::user()->id);
         $data['header_title'] = "My Account";
-        if(Auth::user()->user_type == 1)
-        {
+        if (Auth::user()->user_type == 1) {
             return view('admin.my_account', $data);
-        }
-        else if(Auth::user()->user_type == 2)
-        {
+        } else if (Auth::user()->user_type == 2) {
             return view('teacher.my_account', $data);
-        }
-        else if(Auth::user()->user_type == 3)
-        {
+        } else if (Auth::user()->user_type == 3) {
             return view('student.my_account', $data);
-        }
-        else if(Auth::user()->user_type == 4)
-        {
+        } else if (Auth::user()->user_type == 4) {
             return view('parent.my_account', $data);
         }
-
     }
 
     public function UpdateMyAccountAdmin(Request $request)
     {
         $id = Auth::user()->id;
         request()->validate([
-            'email' => 'required|email|unique:users,email,'.$id
+            'email' => 'required|email|unique:users,email,' . $id
         ]);
 
         $admin = User::getSingle($id);
@@ -102,7 +92,7 @@ class UserController extends Controller
         $id = Auth::user()->id;
 
         request()->validate([
-            'email' => 'required|email|unique:users,email,'.$id,
+            'email' => 'required|email|unique:users,email,' . $id,
             'mobile_number' => 'max:15|min:8',
             'marital_status' => 'max:50',
         ]);
@@ -113,17 +103,15 @@ class UserController extends Controller
         $teacher->last_name = trim($request->last_name);
         $teacher->gender = trim($request->gender);
 
-        if(!empty($request->date_of_birth))
-        {
+        if (!empty($request->date_of_birth)) {
             $teacher->date_of_birth = trim($request->date_of_birth);
         }
 
-        if(!empty($request->file('profile_pic')))
-        {
+        if (!empty($request->file('profile_pic'))) {
             $ext = $request->file('profile_pic')->getClientOriginalExtension();
             $file = $request->file('profile_pic');
-            $randomStr = date('Ymdhis').Str::random(20);
-            $filename = strtolower($randomStr).'.'.$ext;
+            $randomStr = date('Ymdhis') . Str::random(20);
+            $filename = strtolower($randomStr) . '.' . $ext;
             $file->move('upload/profile/', $filename);
 
             $teacher->profile_pic = $filename;
@@ -146,7 +134,7 @@ class UserController extends Controller
         $id = Auth::user()->id;
 
         request()->validate([
-            'email' => 'required|email|unique:users,email,'.$id,
+            'email' => 'required|email|unique:users,email,' . $id,
             'weight' => 'max:10',
             'blood_group' => 'max:10',
             'mobile_number' => 'max:15|min:8',
@@ -162,22 +150,19 @@ class UserController extends Controller
         $student->last_name = trim($request->last_name);
         $student->gender = trim($request->gender);
 
-        if(!empty($request->date_of_birth))
-        {
+        if (!empty($request->date_of_birth)) {
             $student->date_of_birth = trim($request->date_of_birth);
         }
 
-        if(!empty($request->file('profile_pic')))
-        {
-            if(!empty($student->getProfile()))
-            {
-                unlink('upload/profile/'.$student->profile_pic);
+        if (!empty($request->file('profile_pic'))) {
+            if (!empty($student->getProfile())) {
+                unlink('upload/profile/' . $student->profile_pic);
             }
 
             $ext = $request->file('profile_pic')->getClientOriginalExtension();
             $file = $request->file('profile_pic');
-            $randomStr = date('Ymdhis').Str::random(20);
-            $filename = strtolower($randomStr).'.'.$ext;
+            $randomStr = date('Ymdhis') . Str::random(20);
+            $filename = strtolower($randomStr) . '.' . $ext;
             $file->move('upload/profile/', $filename);
             $student->profile_pic = $filename;
         }
@@ -199,7 +184,7 @@ class UserController extends Controller
         $id = Auth::user()->id;
 
         request()->validate([
-            'email' => 'required|email|unique:users,email,'.$id,
+            'email' => 'required|email|unique:users,email,' . $id,
             'mobile_number' => 'max:15|min:8',
             'address' => 'max:255',
             'occupation' => 'max:255'
@@ -214,17 +199,15 @@ class UserController extends Controller
         $parent->occupation = trim($request->occupation);
         $parent->address = trim($request->address);
 
-        if(!empty($request->file('profile_pic')))
-        {
-            if(!empty($parent->getProfile()))
-            {
-                unlink('upload/profile/'.$parent->profile_pic);
+        if (!empty($request->file('profile_pic'))) {
+            if (!empty($parent->getProfile())) {
+                unlink('upload/profile/' . $parent->profile_pic);
             }
 
             $ext = $request->file('profile_pic')->getClientOriginalExtension();
             $file = $request->file('profile_pic');
-            $randomStr = date('Ymdhis').Str::random(20);
-            $filename = strtolower($randomStr).'.'.$ext;
+            $randomStr = date('Ymdhis') . Str::random(20);
+            $filename = strtolower($randomStr) . '.' . $ext;
             $file->move('upload/profile/', $filename);
 
             $parent->profile_pic = $filename;
@@ -248,14 +231,11 @@ class UserController extends Controller
     public function update_change_password(Request $request)
     {
         $user = User::getSingle(Auth::user()->id);
-        if(Hash::check($request->old_password, $user->password))
-        {
+        if (Hash::check($request->old_password, $user->password)) {
             $user->password = Hash::make($request->new_password);
             $user->save();
             return redirect()->back()->with('success', "Password successfully updated");
-        }
-        else
-        {
+        } else {
             return redirect()->back()->with('error', "Old Password is not Currect");
         }
     }

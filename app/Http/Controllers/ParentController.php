@@ -15,20 +15,20 @@ class ParentController extends Controller
 {
     public function export_excel(Request $request)
     {
-         return Excel::download(new ExportParent, 'Parent_'.date('d-m-Y').'.xls');
+        return Excel::download(new ExportParent, 'Parent_' . date('d-m-Y') . '.xls');
     }
 
     public function list()
     {
         $data['getRecord'] = User::getParent();
         $data['header_title'] = "Parent List";
-        return view('admin.parent.list',$data);
+        return view('admin.parent.list', $data);
     }
 
     public function add()
     {
         $data['header_title'] = "Add New Parent";
-        return view('admin.parent.add',$data);
+        return view('admin.parent.add', $data);
     }
 
     public function insert(Request $request)
@@ -48,12 +48,11 @@ class ParentController extends Controller
         $student->occupation = trim($request->occupation);
         $student->address = trim($request->address);
 
-        if(!empty($request->file('profile_pic')))
-        {
+        if (!empty($request->file('profile_pic'))) {
             $ext = $request->file('profile_pic')->getClientOriginalExtension();
             $file = $request->file('profile_pic');
-            $randomStr = date('Ymdhis').Str::random(20);
-            $filename = strtolower($randomStr).'.'.$ext;
+            $randomStr = date('Ymdhis') . Str::random(20);
+            $filename = strtolower($randomStr) . '.' . $ext;
             $file->move('upload/profile/', $filename);
 
             $student->profile_pic = $filename;
@@ -73,22 +72,18 @@ class ParentController extends Controller
     public function edit($id)
     {
         $data['getRecord'] = User::getSingle($id);
-        if(!empty($data['getRecord']))
-        {
+        if (!empty($data['getRecord'])) {
             $data['header_title'] = "Edit Parent";
-            return view('admin.parent.edit',$data);
-        }
-        else
-        {
+            return view('admin.parent.edit', $data);
+        } else {
             abort(404);
         }
-
     }
 
     public function update($id, Request $request)
     {
-         request()->validate([
-            'email' => 'required|email|unique:users,email,'.$id,
+        request()->validate([
+            'email' => 'required|email|unique:users,email,' . $id,
             'mobile_number' => 'max:15|min:8',
             'address' => 'max:255',
             'occupation' => 'max:255'
@@ -103,17 +98,15 @@ class ParentController extends Controller
         $student->occupation = trim($request->occupation);
         $student->address = trim($request->address);
 
-        if(!empty($request->file('profile_pic')))
-        {
-            if(!empty($student->getProfile()))
-            {
-                unlink('upload/profile/'.$student->profile_pic);
+        if (!empty($request->file('profile_pic'))) {
+            if (!empty($student->getProfile())) {
+                unlink('upload/profile/' . $student->profile_pic);
             }
 
             $ext = $request->file('profile_pic')->getClientOriginalExtension();
             $file = $request->file('profile_pic');
-            $randomStr = date('Ymdhis').Str::random(20);
-            $filename = strtolower($randomStr).'.'.$ext;
+            $randomStr = date('Ymdhis') . Str::random(20);
+            $filename = strtolower($randomStr) . '.' . $ext;
             $file->move('upload/profile/', $filename);
 
             $student->profile_pic = $filename;
@@ -122,8 +115,7 @@ class ParentController extends Controller
         $student->mobile_number = trim($request->mobile_number);
         $student->status = trim($request->status);
         $student->email = trim($request->email);
-        if(!empty($request->password))
-        {
+        if (!empty($request->password)) {
             $student->password = Hash::make($request->password);
         }
 
@@ -135,16 +127,13 @@ class ParentController extends Controller
 
     public function delete($id)
     {
-         $getRecord = User::getSingle($id);
-        if(!empty($getRecord))
-        {
+        $getRecord = User::getSingle($id);
+        if (!empty($getRecord)) {
             $getRecord->is_delete = 1;
             $getRecord->save();
 
             return redirect()->back()->with('success', "Parent Successfully Deleted");
-        }
-        else
-        {
+        } else {
             abort(404);
         }
     }
@@ -157,7 +146,7 @@ class ParentController extends Controller
         $data['getRecord'] = User::getMyStudent($id);
 
         $data['header_title'] = "Parent Student List";
-        return view('admin.parent.my_student',$data);
+        return view('admin.parent.my_student', $data);
     }
 
 
@@ -188,8 +177,6 @@ class ParentController extends Controller
         $data['getRecord'] = User::getMyStudent($id);
 
         $data['header_title'] = "My Student";
-        return view('parent.my_student',$data);
+        return view('parent.my_student', $data);
     }
-
-
 }

@@ -201,6 +201,7 @@
             .table-container {
                 overflow: visible !important;
             }
+
             /* Forcer les couleurs d'impression */
             body {
                 -webkit-print-color-adjust: exact;
@@ -240,33 +241,33 @@
             <h2>INSTITUT SUPERIEUR D'INFORMATIQUE <br>PROGRAMMATION ET ANALYSE</h2>
             <h2>I.S.I.P.A</h2>
             <h3>SECRÉTARIAT GÉNÉRAL ACADÉMIQUE</h3>
-            <h3>SCIENCES INFORMATIQUES</h3>
+            <h3>{{ $getStudent->departement }}</h3>
             <h3>OPTION: {{ $getClass->class_opt }}</h3>
             <h3>{{ $getClass->class_name ?? 'Inconnu' }}, ANNÉE ACADÉMIQUE {{ now()->year }}</h3>
             <h2>Examen : {{ $getExam->name }}</h2>
         </div>
 
         @php
-    $zeroScoreFound = false;
-    $moyenne = 0;
+            $zeroScoreFound = false;
+            $moyenne = 0;
 
-    // Calcul de la moyenne et vérification des scores nuls
-    foreach ($getExamMark as $exam) {
-        $total_score = $exam['total_score'] ?? 0;
+            // Calcul de la moyenne et vérification des scores nuls
+            foreach ($getExamMark as $exam) {
+                $total_score = $exam['total_score'] ?? 0;
 
-        if ($total_score === 0) {
-            $zeroScoreFound = true;
-        }
+                if ($total_score === 0) {
+                    $zeroScoreFound = true;
+                }
 
-        if ($total_score >= 0 && $total_score <= 20) {
-            $moyenne += $total_score;
-        }
-    }
+                if ($total_score >= 0 && $total_score <= 20) {
+                    $moyenne += $total_score;
+                }
+            }
 
-    // Calcul de la moyenne en prenant en compte uniquement les scores valides
-    $moyenne = $zeroScoreFound ? 0 : min(round($moyenne / count($getExamMark), 2), 20);
+            // Calcul de la moyenne en prenant en compte uniquement les scores valides
+            $moyenne = $zeroScoreFound ? 0 : min(round($moyenne / count($getExamMark), 2), 20);
 
-@endphp
+        @endphp
 
         <p><strong>Étudiant : {{ $getStudent->name }} {{ $getStudent->last_name }}</strong></p>
 

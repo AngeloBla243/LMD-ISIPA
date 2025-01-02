@@ -107,6 +107,7 @@
         }
 
         @media print {
+
             /* Masquer le bouton lors de l'impression */
             button {
                 display: none;
@@ -125,6 +126,7 @@
         }
 
         @media (max-width: 768px) {
+
             table,
             th,
             td {

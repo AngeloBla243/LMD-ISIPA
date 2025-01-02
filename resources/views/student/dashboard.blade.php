@@ -192,7 +192,7 @@
                         <h3 class="profile-username text-center card-title mt-2">{{ Auth::user()->name }}
                             {{ Auth::user()->last_name }}</h3>
 
-                        <p class="text-muted text-center">Software Engineer</p>
+                        <p class="text-muted text-center">{{ Auth::user()->departement }}</p>
 
                         <ul class="list-group list-group-unbordered mb-3">
                             <b style="text-align: center"><i class="fa-solid fa-envelope"></i> {{ Auth::user()->email }}</b>

@@ -121,7 +121,7 @@
                           <td>{{ $value->email }}</td>
                           <td>{{ $value->admission_number }}</td>
                           <td>{{ $value->roll_number }}</td>
-                          <td>{{ $value->class_name }}</td>
+                          <td>{{ $value->class_name }} {{ $value->class_OPT }}</td>
 
 
                           <td>

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Request;
+
 class ExamModel extends Model
 {
     use HasFactory;
@@ -20,20 +21,18 @@ class ExamModel extends Model
     static public function getRecord()
     {
         $return = self::select('exam.*', 'users.name as created_name')
-                ->join('users','users.id','=','exam.created_by');
+            ->join('users', 'users.id', '=', 'exam.created_by');
 
-                if(!empty(Request::get('name')))
-                {
-                    $return = $return->where('exam.name', 'like', '%'.Request::get('name').'%');
-                }
-                if(!empty(Request::get('date')))
-                {
-                    $return = $return->whereDate('exam.created_at', '=', Request::get('date'));
-                }
+        if (!empty(Request::get('name'))) {
+            $return = $return->where('exam.name', 'like', '%' . Request::get('name') . '%');
+        }
+        if (!empty(Request::get('date'))) {
+            $return = $return->whereDate('exam.created_at', '=', Request::get('date'));
+        }
 
-                $return = $return->where('exam.is_delete', '=', 0)
-                ->orderBy('exam.id', 'asc')
-                ->paginate(50);
+        $return = $return->where('exam.is_delete', '=', 0)
+            ->orderBy('exam.id', 'asc')
+            ->paginate(50);
         return $return;
     }
 
@@ -41,10 +40,10 @@ class ExamModel extends Model
     static public function getExam()
     {
         $return = self::select('exam.*')
-                ->join('users','users.id','=','exam.created_by')
-                ->where('exam.is_delete', '=', 0)
-                ->orderBy('exam.name', 'asc')
-                ->get();
+            ->join('users', 'users.id', '=', 'exam.created_by')
+            ->where('exam.is_delete', '=', 0)
+            ->orderBy('exam.name', 'asc')
+            ->get();
         return $return;
     }
 
@@ -52,9 +51,9 @@ class ExamModel extends Model
     static public function getTotalExam()
     {
         $return = self::select('exam.id')
-                ->join('users','users.id','=','exam.created_by')
-                ->where('exam.is_delete', '=', 0)
-                ->count();
+            ->join('users', 'users.id', '=', 'exam.created_by')
+            ->where('exam.is_delete', '=', 0)
+            ->count();
         return $return;
     }
 }

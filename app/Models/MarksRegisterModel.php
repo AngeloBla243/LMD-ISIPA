@@ -39,7 +39,7 @@ class MarksRegisterModel extends Model
 
     static public function getClass($exam_id, $student_id)
     {
-        return MarksRegisterModel::select('class.name as class_name', 'class.opt as class_opt' )
+        return MarksRegisterModel::select('class.name as class_name', 'class.opt as class_opt')
             ->join('exam', 'exam.id', '=', 'marks_register.exam_id')
             ->join('class', 'class.id', '=', 'marks_register.class_id')
             ->join('subject', 'subject.id', '=', 'marks_register.subject_id')

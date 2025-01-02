@@ -47,9 +47,23 @@
 
 
                     <div class="form-group col-md-6">
-                      <label>Roll Number <span style="color: red;"></span></label>
+                      <label>Roll Number <span style="color: red;"></span>*</label>
                       <input type="text" class="form-control" value="{{ old('roll_number') }}" name="roll_number" placeholder="Roll Number">
                       <div style="color:red">{{ $errors->first('roll_number') }}</div>
+                    </div>
+
+                    <div class="form-group col-md-6">
+                        <label>Département <span style="color: red;">*</span></label>
+                        <select class="form-control" name="departement">
+                            <option value="">Choisir le département</option>
+                            <option value="Informatique de gestion">Informatique de gestion</option>
+                            <option value="Techniques de Maintenance">Techniques de Maintenance</option>
+                            <option value="Gestion financière">Gestion financière</option>
+                            <option value="Communication numérique">Communication numérique</option>
+                            <option value="Gestion Douanière et Accises">Gestion Douanière et Accises</option>
+
+                        </select>
+                        <div style="color:red">{{ $errors->first('departement') }}</div>
                     </div>
 
                     <div class="form-group col-md-6">

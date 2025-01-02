@@ -33,6 +33,7 @@
                   <div class="form-group">
                     <label>Option</label>
                     <select class="form-control" name="opt">
+                        <option value="">Sélectionnez une option</option>
                         <option value="Administration Réseau et Telecommunication">Administration Réseau et Télécommunication</option>
                         <option value="Administration des Bases de données">Administration des Bases de données</option>
                         <option value="Intelligence artificielle">Intelligence artificielle</option>

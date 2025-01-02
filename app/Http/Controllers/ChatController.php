@@ -17,11 +17,9 @@ class ChatController extends Controller
 
         $sender_id = Auth::user()->id;
 
-        if(!empty($request->receiver_id))
-        {
+        if (!empty($request->receiver_id)) {
             $receiver_id = base64_decode($request->receiver_id);
-            if($receiver_id == $sender_id)
-            {
+            if ($receiver_id == $sender_id) {
                 return redirect()->back()->with('error', 'Due to some error please try again');
                 exit();
             }
@@ -30,15 +28,13 @@ class ChatController extends Controller
             $data['receiver_id'] = $receiver_id;
             $data['getReceiver'] = User::getSingle($receiver_id);
             $data['getChat'] = ChatModel::getChat($receiver_id, $sender_id);
-        }
-        else
-        {
+        } else {
             $data['receiver_id'] = '';
         }
 
         $data['getChatUser'] = ChatModel::getChatUser($sender_id);
 
-        return view('chat.list',$data);
+        return view('chat.list', $data);
     }
 
     public function submit_message(Request $request)
@@ -50,12 +46,11 @@ class ChatController extends Controller
         $chat->message = $request->message;
         $chat->created_date = time();
 
-        if(!empty($request->file('file_name')))
-        {
+        if (!empty($request->file('file_name'))) {
             $ext = $request->file('file_name')->getClientOriginalExtension();
             $file = $request->file('file_name');
-            $randomStr = date('Ymdhis').Str::random(20);
-            $filename = strtolower($randomStr).'.'.$ext;
+            $randomStr = date('Ymdhis') . Str::random(20);
+            $filename = strtolower($randomStr) . '.' . $ext;
             $file->move('upload/chat/', $filename);
 
             $chat->file = $filename;
@@ -63,14 +58,14 @@ class ChatController extends Controller
 
         $chat->save();
 
-        $getChat = ChatModel::where('id','=',$chat->id)->get();
+        $getChat = ChatModel::where('id', '=', $chat->id)->get();
 
         return response()->json([
             "status" => true,
             "success" => view('chat._single', [
                 "getChat" => $getChat
             ])->render(),
-        ],200);
+        ], 200);
     }
 
     public function get_chat_windows(Request $request)
@@ -91,8 +86,7 @@ class ChatController extends Controller
                 "getReceiver" => $getReceiver,
                 "getChat" => $getChat,
             ])->render(),
-        ],200);
-
+        ], 200);
     }
 
     public function get_chat_search_user(Request $request)
@@ -107,6 +101,6 @@ class ChatController extends Controller
                 "getChatUser" => $getChatUser,
                 "receiver_id" => $receiver_id,
             ])->render(),
-        ],200);
+        ], 200);
     }
 }

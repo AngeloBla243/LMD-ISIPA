@@ -18,8 +18,7 @@ class AttendanceController extends Controller
     {
         $data['getClass'] = ClassModel::getClass();
 
-        if(!empty($request->get('class_id')) && !empty($request->get('attendance_date')))
-        {
+        if (!empty($request->get('class_id')) && !empty($request->get('attendance_date'))) {
             $data['getStudent'] = User::getStudentClass($request->get('class_id'));
         }
 
@@ -32,12 +31,9 @@ class AttendanceController extends Controller
 
         $check_attendance = StudentAttendanceModel::CheckAlreadyAttendance($request->student_id, $request->class_id, $request->attendance_date);
 
-        if(!empty($check_attendance))
-        {
+        if (!empty($check_attendance)) {
             $attendance = $check_attendance;
-        }
-        else
-        {
+        } else {
             $attendance = new StudentAttendanceModel;
             $attendance->student_id = $request->student_id;
             $attendance->class_id = $request->class_id;
@@ -64,7 +60,7 @@ class AttendanceController extends Controller
 
     public function AttendanceReportExportExcel(Request $request)
     {
-        return Excel::download(new ExportAttendance, 'AttendanceReport_'.date('d-m-Y').'.xls');
+        return Excel::download(new ExportAttendance, 'AttendanceReport_' . date('d-m-Y') . '.xls');
     }
 
     // teacher side
@@ -73,8 +69,7 @@ class AttendanceController extends Controller
     {
         $data['getClass'] = AssignClassTeacherModel::getMyClassSubjectGroup(Auth::user()->id);
 
-        if(!empty($request->get('class_id')) && !empty($request->get('attendance_date')))
-        {
+        if (!empty($request->get('class_id')) && !empty($request->get('attendance_date'))) {
             $data['getStudent'] = User::getStudentClass($request->get('class_id'));
         }
 
@@ -88,8 +83,7 @@ class AttendanceController extends Controller
     {
         $getClass = AssignClassTeacherModel::getMyClassSubjectGroup(Auth::user()->id);
         $classarrray = array();
-        foreach($getClass as $value)
-        {
+        foreach ($getClass as $value) {
             $classarrray[] = $value->class_id;
         }
 

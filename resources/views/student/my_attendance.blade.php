@@ -101,7 +101,7 @@
                       <select class="form-control" name="class_id" >
                           <option value="">Select</option>
                           @foreach($getClass as $class)
-                            <option {{ (Request::get('class_id') == $class->class_id) ? 'selected' : '' }} value="{{ $class->class_id }}">{{ $class->class_name }}</option>
+                            <option {{ (Request::get('class_id') == $class->class_id) ? 'selected' : '' }} value="{{ $class->class_id }}">{{ $class->class_name }} {{ $class->class_opt }}</option>
                           @endforeach
                       </select>
                     </div>
@@ -160,7 +160,7 @@
                         <tbody>
                           @forelse($getRecord as $value)
                               <tr>
-                                <td>{{ $value->class_name }}</td>
+                                <td>{{ $value->class_name }} {{ $value->class_opt }}</td>
                                 <td>
                                     @if($value->attendance_type == 1)
                                      <b class="present">P</b>

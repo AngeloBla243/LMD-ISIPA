@@ -350,8 +350,8 @@ class AssignClassTeacherController extends Controller
             }
 
             $status = AssignClassTeacherModel::where('teacher_id', $teacher_id)
-            ->where('class_id', $class_id)
-            ->value('status');
+                ->where('class_id', $class_id)
+                ->value('status');
 
 
             // Vérifier si l'assignation existe déjà pour cette matière

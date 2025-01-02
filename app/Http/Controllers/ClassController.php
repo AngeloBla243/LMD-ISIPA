@@ -38,13 +38,10 @@ class ClassController extends Controller
     public function edit($id)
     {
         $data['getRecord'] = ClassModel::getSingle($id);
-        if(!empty($data['getRecord']))
-        {
+        if (!empty($data['getRecord'])) {
             $data['header_title'] = "Edit Class";
             return view('admin.class.edit', $data);
-        }
-        else
-        {
+        } else {
             abort(404);
         }
     }
