@@ -91,7 +91,8 @@
                                                 <option value="">Select</option>
                                                 @foreach ($getClass as $class)
                                                     <option {{ Request::get('class_id') == $class->id ? 'selected' : '' }}
-                                                        value="{{ $class->id }}">{{ $class->name }} {{ $class->opt }}</option>
+                                                        value="{{ $class->id }}">{{ $class->name }} {{ $class->opt }}
+                                                    </option>
                                                 @endforeach
                                             </select>
                                         </div>
@@ -163,11 +164,18 @@
                                                                 $pass_fail_vali = 0;
                                                                 $fail_count = 0;
                                                             @endphp
+
                                                             @foreach ($getSubject as $subject)
                                                                 @php
                                                                     $totalMark = 0;
-                                                                    $credit += $subject->ponde;
                                                                     $totalMarks = 0;
+
+                                                                    // Vérifiez que $subject->ponde est valide
+                                                                    $credit += is_numeric($subject->ponde)
+                                                                        ? $subject->ponde
+                                                                        : 0;
+
+                                                                    // Appelez la méthode getMark
                                                                     $getMark = $subject->getMark(
                                                                         $student->id,
                                                                         Request::get('exam_id'),
@@ -175,24 +183,23 @@
                                                                         $subject->subject_id,
                                                                     );
 
-                                                                    if (!empty($getMark)) {
+                                                                    // Vérifiez que $getMark et ses propriétés sont valides
+                                                                    if (
+                                                                        !empty($getMark) &&
+                                                                        is_numeric($getMark->class_work) &&
+                                                                        is_numeric($getMark->exam)
+                                                                    ) {
                                                                         $totalMark =
                                                                             $getMark->class_work + $getMark->exam;
                                                                         $totalMarks = $totalMark;
-                                                                        $totalPass =
-                                                                            $subject->passing_mark * $subject->ponde;
-                                                                        if ($totalMark >= 10) {
-                                                                            $cred = $subject->ponde ?? 0;
-                                                                        } else {
-                                                                            $cred = 0;
-                                                                        }
-                                                                    }
-
-                                                                    $totalStudentMark = $totalMarks;
-                                                                    if ($totalStudentMark >= 10) {
-                                                                        $credits_obtenus += $subject->ponde ?? 0;
+                                                                    } else {
+                                                                        $totalMark = 0; // Valeur par défaut si données non valides
                                                                     }
                                                                 @endphp
+
+                                                                <!-- Autres calculs ou affichages ici -->
+
+
                                                                 <td>
                                                                     <div style="margin-bottom: 10px;">
                                                                         class Work
@@ -245,7 +252,7 @@
 
                                                                     @if (!empty($getMark))
                                                                         <div style="margin-bottom: 10px;">
-                                                                            <b>Credit obtenu : {{ $cred }}</b>
+                                                                            {{-- <b>Credit obtenu : {{ $credits_obtenus }}</b> --}}
                                                                             <br />
                                                                             <b>Total Crédit : {{ $subject->ponde }}</b>
                                                                             <br />
