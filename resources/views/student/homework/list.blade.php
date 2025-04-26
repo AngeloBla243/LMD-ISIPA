@@ -190,6 +190,7 @@
                                             <th>Description</th>
                                             <th style="min-width: 200px;">Created By</th>
                                             <th style="min-width: 200px;">Created Date</th>
+                                            <th style="min-width: 200px;">Jour restant</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
@@ -219,11 +220,74 @@
                                                 </td>
                                                 <td style="min-width: 200px;">{{ $value->created_by_name }}</td>
                                                 <td style="min-width: 200px;">
-                                                    {{ date('d-m-Y', strtotime($value->created_at)) }}</td>
+                                                    {{ date('d-m-Y', strtotime($value->created_at)) }}
+                                                </td>
+                                                {{-- @php
+                                                    $homeworkDate = \Carbon\Carbon::parse($value->homework_date);
+                                                    $submissionDate = \Carbon\Carbon::parse($value->submission_date);
+                                                    $daysLeft = $homeworkDate->diffInDays($submissionDate, false); // false pour avoir un nombre négatif si la date est passée
+                                                @endphp
+                                                @php
+                                                    $now = \Carbon\Carbon::now();
+                                                    $submission = \Carbon\Carbon::parse(
+                                                        $value->submission_date,
+                                                    )->endOfDay();
+                                                    $diff = $now->diff($submission);
+
+                                                    // Vérifie si la date de soumission est passée
+                                                    $isTermine = $now->greaterThan($submission);
+                                                @endphp --}}
+
+                                                {{-- <td>
+                                                    @if ($daysLeft >= 0)
+                                                        {{ $daysLeft }} jour(s) restant(s)
+                                                    @else
+                                                        Terminé
+                                                    @endif
+                                                </td>
+                                                <td>
+                                                    @if ($isTermine)
+                                                        <span class="text-danger" style="font-weight: bold;">Terminé</span>
+                                                    @else
+                                                        <span class="text-success" style="font-weight: bold;">
+                                                            {{ $diff->d }} jour(s)
+                                                            {{ $diff->h }} heure(s)
+                                                            restant(s)
+                                                        </span>
+                                                    @endif
+                                                </td> --}}
+
+                                                @php
+                                                    $now = \Carbon\Carbon::now();
+                                                    $submission = \Carbon\Carbon::parse(
+                                                        $value->submission_date,
+                                                    )->endOfDay();
+
+                                                    // Calcul du nombre total de secondes restantes
+                                                    $diffInSeconds = $now->diffInSeconds($submission, false);
+
+                                                    if ($diffInSeconds > 0) {
+                                                        $days = floor($diffInSeconds / 86400);
+                                                        $hours = floor(($diffInSeconds % 86400) / 3600);
+                                                        $minutes = floor(($diffInSeconds % 3600) / 60);
+                                                    } else {
+                                                        $days = $hours = $minutes = 0;
+                                                    }
+                                                @endphp
+                                                <td>
+                                                    @if ($diffInSeconds <= 0)
+                                                        <span class="text-danger" style="font-weight: bold;">Terminé</span>
+                                                    @else
+                                                        <span class="text-success" style="font-weight: bold;">
+                                                            {{ $days }} jour(s)
+                                                            {{ $hours }} heure(s)
+                                                            {{ $minutes }} minute(s)
+                                                            restant(s)
+                                                        </span>
+                                                    @endif
+                                                </td>
+
                                                 {{-- <td style="min-width: 300px;">
-                             <a href="{{ url('student/my_homework/submit_homework/'.$value->id)  }}" class="btn btn-success"><i class="fas fa-download"></i> Submit Homework</a>
-                          </td> --}}
-                                                <td style="min-width: 300px;">
                                                     @php
                                                         $submissionDate = \Carbon\Carbon::parse(
                                                             $value->submission_date,
@@ -243,7 +307,40 @@
                                                             <i class="fas fa-upload"></i> Soumettre le devoir
                                                         </a>
                                                     @endif
+                                                </td> --}}
+
+
+                                                <td style="min-width: 300px;">
+                                                    @php
+                                                        $submissionDate = \Carbon\Carbon::parse(
+                                                            $value->submission_date,
+                                                        )->startOfDay();
+                                                        $today = \Carbon\Carbon::now()->startOfDay();
+                                                        $isExpired = $submissionDate->lt($today);
+                                                        $isSubmitted = in_array(
+                                                            $value->id,
+                                                            $submittedHomeworkIds ?? [],
+                                                        );
+                                                    @endphp
+
+                                                    @if ($isSubmitted)
+                                                        <button class="btn btn-secondary" disabled
+                                                            title="Devoir déjà soumis">
+                                                            <i class="fas fa-check-circle"></i> Devoir Soumis
+                                                        </button>
+                                                    @elseif ($isExpired)
+                                                        <button class="btn btn-secondary" disabled
+                                                            title="La date limite de soumission est dépassée">
+                                                            <i class="fas fa-clock"></i> Date limite dépassée
+                                                        </button>
+                                                    @else
+                                                        <a href="{{ url('student/my_homework/submit_homework/' . $value->id) }}"
+                                                            class="btn btn-success">
+                                                            <i class="fas fa-upload"></i> Soumettre le devoir
+                                                        </a>
+                                                    @endif
                                                 </td>
+
 
                                             </tr>
                                         @empty
