@@ -455,54 +455,189 @@ class ExaminationsController extends Controller
         $exam_id = $request->input('exam_id');
         $class_id = $request->input('class_id');
 
-        $getSetting = SettingModel::getSingle();
-
         // Vérifiez que les paramètres existent
         if (!$exam_id || !$class_id) {
             return redirect()->back()->with('error', 'Paramètres manquants.');
         }
 
-        // Récupérez les données nécessaires (exemple)
-        $class = ClassModel::find($class_id); // Récupération de la classe
+        // Récupérez les données nécessaires
+        $class = ClassModel::find($class_id);
+
         // Vérifier si la classe existe
         if (!$class) {
             return redirect()->back()->with('error', 'Classe non trouvée.');
         }
 
-        // Récupérer les matières associées à la classe
-        $subjects = $class->subjects; // Cela récupère toutes les matières associées à la classe
+        // Récupérer les matières associées à la classe (Utiliser les Models pour ne pas devoir refaire le code)
+        $subjects = ExamScheduleModel::getSubject($exam_id, $class_id);  // Utilisation du Model
 
+        // Récupérer les étudiants de la classe
+        $students = User::getStudentClass($class_id);
 
+        $getSetting = SettingModel::getSingle();
 
-
-        // Récupérer les étudiants de la classe depuis la table 'users' avec 'type = 3'
-        $students = User::getStudentClass($request->get('class_id'));
-
-        // Récupérer les résultats avec les informations nécessaires
+        // Récupérer les résultats pour tous les étudiants de la classe
         $results = MarksRegisterModel::select(
             'marks_register.class_work',
             'marks_register.exam',
             'marks_register.ponde',
             'marks_register.subject_id',
-            // 'subject.name as subject_name',
             'marks_register.student_id',
             'marks_register.class_id',
             'marks_register.exam_id'
         )
-            ->join('subject', 'subject.id', '=', 'marks_register.subject_id')  // Jointure avec la table 'subject' pour récupérer le nom du cours
             ->where('marks_register.exam_id', $exam_id)
             ->where('marks_register.class_id', $class_id)
-            ->get(); // Résultats pour l'examen et la classe
-        // Relier les résultats aux étudiants
+            ->get();
 
+        // Relier les résultats aux étudiants
         foreach ($students as $student) {
-            // Récupérer tous les résultats de l'étudiant
             $student->results = $results->where('student_id', $student->id);
         }
 
+        // Récupérer l'option de la classe
+        $opt = $class->opt;
+
+        // Préparer les données pour la vue
+        $data = [
+            'class' => $class,
+            'getSetting' => $getSetting,
+            'students' => $students,
+            'subjects' => $subjects,
+            'results' => $results,
+            'exam_id' => $exam_id,
+            'opt' => $opt
+        ];
+
         // Transmettez les données à la vue d'impression
-        return view('result_print', compact('class', 'getSetting', 'students', 'subjects', 'results', 'exam_id'));
+        return view('result_print', $data);
     }
+
+    // public function printClassResults(Request $request)
+    // {
+    //     $exam_id = $request->input('exam_id');
+    //     $class_id = $request->input('class_id');
+    //     // Vérifiez que les paramètres existent
+    //     if (!$exam_id || !$class_id) {
+    //         return redirect()->back()->with('error', 'Paramètres manquants.');
+    //     }
+
+    //     // Récupérez les données nécessaires
+    //     $class = ClassModel::find($class_id);
+
+    //     // Vérifier si la classe existe
+    //     if (!$class) {
+    //         return redirect()->back()->with('error', 'Classe non trouvée.');
+    //     }
+
+    //     // Récupérer les matières associées à la classe (Utiliser les Models pour ne pas devoir refaire le code)
+    //     $subjects = ExamScheduleModel::getSubject($exam_id, $class_id); // Utilisation du model
+
+    //     // Récupérer les étudiants de la classe
+    //     $students = User::getStudentClass($class_id);
+
+    //     $getSetting = SettingModel::getSingle();
+
+    //     // Récupérer les résultats pour tous les étudiants de la classe
+    //     $results = MarksRegisterModel::select(
+    //         'marks_register.class_work',
+    //         'marks_register.exam',
+    //         'marks_register.ponde',
+    //         'marks_register.subject_id',
+    //         'marks_register.student_id',
+    //         'marks_register.class_id',
+    //         'marks_register.exam_id',
+    //         'subject.code as subject_code'
+
+    //     )
+
+    //         ->where('marks_register.exam_id', $exam_id)
+    //         ->where('marks_register.class_id', $class_id)
+    //         ->get();
+
+    //     // Relier les résultats aux étudiants
+    //     foreach ($students as $student) {
+    //         $student->results = $results->where('student_id', $student->id);
+    //     }
+
+    //     // Préparer les données pour la vue
+    //     $data = [
+    //         'class' => $class,
+    //         'getSetting' => $getSetting,
+    //         'students' => $students,
+    //         'subjects' => $subjects, // Utilisez les données récupérées de la table "examschedule"
+    //         'results' => $results,
+    //         'exam_id' => $exam_id
+    //     ];
+
+    //     // Transmettez les données à la vue d'impression
+    //     return view('result_print', $data);
+    // }
+
+
+
+
+    // public function printClassResults(Request $request)
+    // {
+    //     $exam_id = $request->input('exam_id');
+    //     $class_id = $request->input('class_id');
+
+    //     // Vérifiez que les paramètres existent
+    //     if (!$exam_id || !$class_id) {
+    //         return redirect()->back()->with('error', 'Paramètres manquants.');
+    //     }
+
+    //     // Récupérez les données nécessaires
+    //     $class = ClassModel::find($class_id);
+
+    //     // Vérifier si la classe existe
+    //     if (!$class) {
+    //         return redirect()->back()->with('error', 'Classe non trouvée.');
+    //     }
+
+    //     // Récupérer les matières associées à la classe
+    //     $subjects = ClassSubjectModel::MySubject($class_id);
+
+    //     // Récupérer les étudiants de la classe
+    //     $students = User::getStudentClass($class_id);
+
+    //     $getSetting = SettingModel::getSingle();
+
+    //     // Récupérer les résultats pour tous les étudiants de la classe et ajouter le nom, le code et le ponde
+    //     $results = MarksRegisterModel::select(
+    //         'marks_register.class_work',
+    //         'marks_register.exam',
+    //         'marks_register.ponde',
+    //         'marks_register.subject_id',
+    //         'marks_register.student_id',
+    //         'marks_register.class_id',
+    //         'marks_register.exam_id',
+    //         'subject.name as subject_name',
+    //         'subject.code as subject_code'
+    //     )
+    //         ->join('subject', 'subject.id', '=', 'marks_register.subject_id')
+    //         ->where('marks_register.exam_id', $exam_id)
+    //         ->where('marks_register.class_id', $class_id)
+    //         ->get();
+
+    //     // Relier les résultats aux étudiants
+    //     foreach ($students as $student) {
+    //         $student->results = $results->where('student_id', $student->id);
+    //     }
+
+    //     // Préparer les données pour la vue
+    //     $data = [
+    //         'class' => $class,
+    //         'getSetting' => $getSetting,
+    //         'students' => $students,
+    //         'subjects' => $subjects,
+    //         'results' => $results,
+    //         'exam_id' => $exam_id,
+    //     ];
+
+    //     // Transmettez les données à la vue d'impression
+    //     return view('result_print', $data);
+    // }
 
     // teacher side work
 

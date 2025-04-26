@@ -73,7 +73,7 @@ class ExamScheduleModel extends Model
     }
     static public function getSubject($exam_id, $class_id)
     {
-        return ExamScheduleModel::select('exam_schedule.*', 'subject.name as subject_name', 'subject.type as subject_type')
+        return ExamScheduleModel::select('exam_schedule.*', 'subject.name as subject_name', 'subject.type as subject_type', 'subject.code as subject_code')
             ->join('subject', 'subject.id', '=', 'exam_schedule.subject_id')
             ->where('exam_schedule.exam_id', '=', $exam_id)
             ->where('exam_schedule.class_id', '=', $class_id)

@@ -283,12 +283,32 @@ class HomeworkController extends Controller
 
     // student side work
 
+    // public function HomeworkStudent()
+    // {
+    //     $data['getRecord'] = HomeworkModel::getRecordStudent(Auth::user()->class_id, Auth::user()->id);
+    //     $data['header_title'] = 'My Homework';
+    //     return view('student.homework.list', $data);
+    // }
+
     public function HomeworkStudent()
     {
-        $data['getRecord'] = HomeworkModel::getRecordStudent(Auth::user()->class_id, Auth::user()->id);
+        $studentId = Auth::user()->id;
+        $classId = Auth::user()->class_id;
+
+        $getRecord = HomeworkModel::getRecordStudent($classId, $studentId);
+
+        // Récupérer les IDs des devoirs déjà soumis par l'étudiant
+        $submittedHomeworkIds = HomeworkSubmitModel::where('student_id', $studentId)
+            ->pluck('homework_id')
+            ->toArray();
+
+        $data['getRecord'] = $getRecord;
         $data['header_title'] = 'My Homework';
+        $data['submittedHomeworkIds'] = $submittedHomeworkIds; // Passer les IDs à la vue
         return view('student.homework.list', $data);
     }
+
+
 
     public function SubmitHomework($homework_id)
     {
