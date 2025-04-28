@@ -43,4 +43,44 @@ class PlagiarismChecker
         $normB = sqrt(array_sum(array_map(fn($x) => $x ** 2, $vector2)));
         return ($normA * $normB) > 0 ? $dotProduct / ($normA * $normB) : 0;
     }
+
+    public function findSimilarSentences(string $text)
+    {
+        $phrases = preg_split('/(?<=[.!?])\s+/', $text, -1, PREG_SPLIT_NO_EMPTY);
+        $documents = \App\Models\Document::all();
+        $results = [];
+
+        foreach ($phrases as $phrase) {
+            $bestMatch = null;
+            $bestScore = 0;
+            $bestDocId = null;
+            $bestDocSentence = '';
+
+            foreach ($documents as $doc) {
+                $docSentences = preg_split('/(?<=[.!?])\s+/', $doc->content, -1, PREG_SPLIT_NO_EMPTY);
+                foreach ($docSentences as $docSentence) {
+                    $similarity = $this->cosineSimilarity(
+                        $this->tfidf($phrase),
+                        $this->tfidf($docSentence)
+                    );
+                    if ($similarity > $bestScore) {
+                        $bestScore = $similarity;
+                        $bestDocId = $doc->id;
+                        $bestDocSentence = $docSentence;
+                    }
+                }
+            }
+
+            // On ne garde que les phrases vraiment similaires (> seuil, ex 0.5)
+            if ($bestScore > 0.5) {
+                $results[] = [
+                    'phrase' => $phrase,
+                    'similarity' => round($bestScore * 100, 2),
+                    'document_id' => $bestDocId,
+                    'matched_sentence' => $bestDocSentence,
+                ];
+            }
+        }
+        return $results;
+    }
 }
