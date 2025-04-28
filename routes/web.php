@@ -21,6 +21,9 @@ use App\Http\Controllers\HomeworkController;
 use App\Http\Controllers\FeesCollectionController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\RecoursController;
+use App\Http\Controllers\ThesisController;
+use App\Http\Controllers\AdminThesisController;
+
 
 
 
@@ -78,6 +81,30 @@ Route::group(['middleware' => 'common'], function () {
 
 
 
+
+Route::group(['middleware' => 'admin', 'prefix' => 'admin'], function () {
+    // Route pour la liste des soumissions de mémoire (admin)
+    Route::get('/theses', [AdminThesisController::class, 'index'])->name('admin.theses');
+
+    // Route pour la gestion des paramètres (dates d'ouverture/fermeture) (admin)
+    Route::get('/theses/settings', [AdminThesisController::class, 'settings'])->name('admin.theses.settings');
+    Route::post('/theses/settings', [AdminThesisController::class, 'updateSettings']);
+});
+
+Route::group(['middleware' => 'student'], function () {
+    // Route pour le formulaire de dépôt (étudiant)
+    Route::get('student/thesis', [ThesisController::class, 'create'])->name('thesis.submit');
+    Route::post('student/thesis', [ThesisController::class, 'store']);
+
+    // Route pour afficher le résultat (étudiant)
+    Route::get('student/result/{id}', [ThesisController::class, 'result'])->name('thesis.result');
+
+    // // Route pour télécharger le rapport
+    Route::get('student/thesis/download/{id}', [ThesisController::class, 'downloadReport'])->name('thesis.download');
+
+    // Route::get('student/thesis/download/{id}', [ThesisController::class, 'downloadReport'])
+    //     ->name('thesis.download');
+});
 Route::group(['middleware' => 'admin'], function () {
 
     Route::get('admin/dashboard', [DashboardController::class, 'dashboard']);

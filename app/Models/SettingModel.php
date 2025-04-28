@@ -26,6 +26,19 @@ class SettingModel extends Model
         }
     }
 
+    // Retourne le chemin local absolu vers le fichier image logo
+    public function getLogoLocalPath()
+    {
+        // Chemin absolu vers l'image sur le disque
+        $path = public_path('upload/setting/' . $this->logo);
+        if (!empty($this->logo) && file_exists($path)) {
+            return $path;
+        }
+        return '';
+    }
+
+
+
     public function getFevicon()
     {
         if (!empty($this->fevicon_icon) && file_exists('upload/setting/' . $this->fevicon_icon)) {
