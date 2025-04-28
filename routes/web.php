@@ -100,7 +100,7 @@ Route::group(['middleware' => 'student'], function () {
     Route::get('student/result/{id}', [ThesisController::class, 'result'])->name('thesis.result');
 
     // // Route pour télécharger le rapport
-    Route::get('student/thesis/download/{id}', [ThesisController::class, 'downloadReport'])->name('thesis.download');
+    Route::get('student/thesis/download/{id}', [ThesisController::class, 'downloadReport'])->name('downloadReport');
 
     // Route::get('student/thesis/download/{id}', [ThesisController::class, 'downloadReport'])
     //     ->name('thesis.download');
