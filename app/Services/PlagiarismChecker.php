@@ -72,7 +72,7 @@ class PlagiarismChecker
             }
 
             // On ne garde que les phrases vraiment similaires (> seuil, ex 0.5)
-            if ($bestScore > 0.5) {
+            if ($bestScore > 0.7) {
                 $results[] = [
                     'phrase' => $phrase,
                     'similarity' => round($bestScore * 100, 2),
