@@ -82,13 +82,14 @@ Route::group(['middleware' => 'common'], function () {
 
 
 
-Route::group(['middleware' => 'admin', 'prefix' => 'admin'], function () {
-    // Route pour la liste des soumissions de mémoire (admin)
-    Route::get('/theses', [AdminThesisController::class, 'index'])->name('admin.theses');
-
-    // Route pour la gestion des paramètres (dates d'ouverture/fermeture) (admin)
-    Route::get('/theses/settings', [AdminThesisController::class, 'settings'])->name('admin.theses.settings');
-    Route::post('/theses/settings', [AdminThesisController::class, 'updateSettings']);
+Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin']], function () {
+    Route::get('theses', [AdminThesisController::class, 'index'])->name('admin.theses.index');
+    Route::get('theses/{id}', [AdminThesisController::class, 'show'])->name('admin.theses.show');
+    Route::post('theses/{id}/update', [AdminThesisController::class, 'update'])->name('admin.theses.update');
+    Route::delete('/admin/theses/{id}', [AdminThesisController::class, 'destroy'])->name('admin.theses.destroy');
+    Route::put('admin/theses/{id}', [AdminThesisController::class, 'update'])->name('admin.theses.update');
+    Route::get('admin/theses/{id}/download', [AdminThesisController::class, 'downloadReport'])
+        ->name('admin.theses.download');
 });
 
 Route::group(['middleware' => 'student'], function () {

@@ -79,6 +79,8 @@
                     </li>
 
 
+
+
                     <li class="nav-item">
                         <a href="{{ url('admin/teacher/list') }}"
                             class="nav-link @if (Request::segment(2) == 'teacher') active @endif">
@@ -99,17 +101,8 @@
                         </a>
                     </li>
 
-                    <li class="nav-item">
-                        <a href="{{ route('admin.theses') }}"
-                            class="nav-link @if (Request::segment(2) == 'student') active @endif">
-                            <i class="nav-icon fa fa-list-alt"></i>
-                            <p>
-                                Gestion des thèses (Admin)
-                            </p>
-                        </a>
-                    </li>
 
-                    <li class="nav-item">
+                    {{-- <li class="nav-item">
                         <a href="{{ route('admin.theses.settings') }}"
                             class="nav-link @if (Request::segment(2) == 'student') active @endif">
                             <i class="nav-icon fa fa-list-alt"></i>
@@ -117,7 +110,7 @@
                                 Paramètres des thèses (Admin)
                             </p>
                         </a>
-                    </li>
+                    </li> --}}
 
 
                     <li class="nav-item">
@@ -161,6 +154,14 @@
                                     <p>Subject</p>
                                 </a>
                             </li>
+                            <li class="nav-item">
+                                <a href="{{ route('admin.theses.index') }}"
+                                    class="nav-link @if (Request::segment(2) == 'subject') active @endif">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Espace Mémoire</p>
+                                </a>
+                            </li>
+
                             <li class="nav-item">
                                 <a href="{{ url('admin/assign_subject/list') }}"
                                     class="nav-link @if (Request::segment(2) == 'assign_subject') active @endif">

@@ -51,3 +51,57 @@
     </div>
 
 @endsection
+
+@section('script')
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log("Script SweetAlert2 prêt...");
+
+            const downloadBtn = document.getElementById('downloadButton');
+            if (!downloadBtn) {
+                console.error('Bouton téléchargement introuvable');
+                return;
+            }
+
+            const plagiarismRate = {{ $submission->plagiarism_rate }};
+            console.log("Taux de plagiat:", plagiarismRate);
+
+            downloadBtn.addEventListener('click', function() {
+                if (plagiarismRate < 20) {
+                    Swal.fire({
+                        icon: 'question',
+                        title: 'Confirmer le téléchargement',
+                        text: "Voulez-vous vraiment télécharger l'autorisation ?",
+                        showCancelButton: true,
+                        confirmButtonText: 'Oui, télécharger',
+                        cancelButtonText: 'Annuler',
+                        reverseButtons: true
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Téléchargement en cours',
+                                text: "Votre autorisation est bien téléchargée.",
+                                timer: 1800,
+                                timerProgressBar: true,
+                                showConfirmButton: false,
+                                willClose: () => {
+                                    const url = downloadBtn.getAttribute('data-url');
+                                    window.location.href = url;
+                                }
+                            });
+                        }
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Téléchargement refusé',
+                        text: "Vous avez dépassé le taux de plagiat requis, veuillez refaire votre travail avec vos propres mots.",
+                        confirmButtonText: 'OK'
+                    });
+                }
+            });
+        });
+    </script>
+@endsection
