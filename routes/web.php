@@ -23,6 +23,7 @@ use App\Http\Controllers\ChatController;
 use App\Http\Controllers\RecoursController;
 use App\Http\Controllers\ThesisController;
 use App\Http\Controllers\AdminThesisController;
+use App\Http\Controllers\AcademicYearController;
 
 
 
@@ -51,6 +52,8 @@ use App\Http\Controllers\AdminThesisController;
 // Route::get('/', function () {
 //     return view('welcome');
 // });
+
+
 
 Route::get('/', [AuthController::class, 'login']);
 Route::post('login', [AuthController::class, 'AuthLogin']);
@@ -106,6 +109,19 @@ Route::group(['middleware' => 'student'], function () {
     // Route::get('student/thesis/download/{id}', [ThesisController::class, 'downloadReport'])
     //     ->name('thesis.download');
 });
+
+
+
+Route::prefix('admin/academic-years')->name('admin.academic-years.')->group(function () {
+    Route::get('/', [AcademicYearController::class, 'index'])->name('index');
+    Route::get('/create', [AcademicYearController::class, 'create'])->name('create');
+    Route::post('/', [AcademicYearController::class, 'store'])->name('store');
+    Route::get('/{academicYear}/edit', [AcademicYearController::class, 'edit'])->name('edit');
+    Route::put('/{academicYear}', [AcademicYearController::class, 'update'])->name('update');
+    Route::delete('/{academicYear}', [AcademicYearController::class, 'destroy'])->name('destroy');
+    Route::get('/{academicYear}/set-active', [AcademicYearController::class, 'setActive'])->name('set-active');
+});
+
 Route::group(['middleware' => 'admin'], function () {
 
     Route::get('admin/dashboard', [DashboardController::class, 'dashboard']);
@@ -189,10 +205,23 @@ Route::group(['middleware' => 'admin'], function () {
     Route::get('admin/assign_subject/edit_single/{id}', [ClassSubjectController::class, 'edit_single']);
     Route::post('admin/assign_subject/edit_single/{id}', [ClassSubjectController::class, 'update_single']);
 
+    Route::get('admin/assign_subject/get-classes-subjects', [ClassSubjectController::class, 'getClassesSubjects'])->name('admin.assign_subject.get_classes_subjects');
+
+    Route::get('admin/assign_subject/get-classes/{yearId}', [ClassSubjectController::class, 'getClassesByYear']);
+    Route::get('admin/assign_subject/get-subjects/{yearId}', [ClassSubjectController::class, 'getSubjectsByYear']);
+
 
     Route::get('admin/class_timetable/list', [ClassTimetableController::class, 'list']);
     Route::post('admin/class_timetable/get_subject', [ClassTimetableController::class, 'get_subject']);
     Route::post('admin/class_timetable/add', [ClassTimetableController::class, 'insert_update']);
+
+
+
+    Route::get('/admin/class-timetable/get-classes/{yearId}', [ClassTimetableController::class, 'getClassesByYear']);
+
+
+
+
 
 
 

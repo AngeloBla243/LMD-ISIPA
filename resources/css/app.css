@@ -1,0 +1,10 @@
+.card-shadow {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+.table-hover tbody tr:hover {
+    background-color: #f8f9fa;
+}
+.badge-status {
+    padding: 0.5em 0.75em;
+    border-radius: 1rem;
+}

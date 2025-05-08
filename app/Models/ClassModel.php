@@ -12,6 +12,16 @@ class ClassModel extends Model
 
     protected $table = 'class';
 
+    protected $fillable = [
+        'name',
+        'opt',
+        'amount',
+        'status',
+        'academic_year_id', // Ajouter cette ligne
+        'created_by'
+    ];
+
+
     static public function getSingle($id)
     {
         return self::find($id);
@@ -63,5 +73,26 @@ class ClassModel extends Model
     public function subjects()
     {
         return $this->belongsToMany(SubjectModel::class, 'class_subject', 'class_id', 'subject_id');
+    }
+    public function academicYear()
+    {
+        return $this->belongsTo(AcademicYear::class, 'academic_year_id');
+    }
+
+    public static function getClassesByYear($yearId)
+    {
+        return self::where('academic_year_id', $yearId)
+            ->where('is_delete', 0)
+            ->get(['id', 'name', 'opt']);
+    }
+
+    public static function getClass1($academicYearId = null)
+    {
+        return self::when($academicYearId, function ($query) use ($academicYearId) {
+            $query->where('academic_year_id', $academicYearId);
+        })
+            ->where('is_delete', 0)
+            ->orderBy('name', 'asc')
+            ->get();
     }
 }

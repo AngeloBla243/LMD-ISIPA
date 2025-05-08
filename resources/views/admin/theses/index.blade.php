@@ -8,6 +8,12 @@
                 <div class="row mb-2">
                     <div class="col-sm-6">
                         <h1>Soumissions de mémoires</h1>
+                        {{-- @if ($activeYear)
+                            <h2>Année active : {{ $activeYear->name }}</h2>
+                        @else
+                            <h2>Aucune année active sélectionnée</h2>
+                        @endif --}}
+
                     </div>
 
                 </div>
@@ -24,6 +30,19 @@
                     </div>
                 </div>
             </form>
+
+            {{-- <div class="form-group">
+                <label for="academic_year_id">Année Académique</label>
+                <select name="academic_year_id" id="academic_year_id" class="form-control">
+                    <option value="">Sélectionner une année</option>
+                    @foreach ($academicYears as $year)
+                        <option value="{{ $year->id }}"
+                            {{ isset($thesis) && $thesis->academic_year_id == $year->id ? 'selected' : '' }}>
+                            {{ $year->name }}</option>
+                    @endforeach
+                </select>
+            </div> --}}
+
 
         </section>
 

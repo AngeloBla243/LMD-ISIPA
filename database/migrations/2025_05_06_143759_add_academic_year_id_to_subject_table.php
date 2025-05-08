@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('thesis1_submissions', function (Blueprint $table) {
-            $table->string('status')->default('pending');
-            $table->text('admin_comment')->nullable();
+        Schema::table('subject', function (Blueprint $table) {
+            $table->foreignId('academic_year_id')
+                ->nullable()
+                ->constrained('academic_years')
+                ->onDelete('set null');
         });
     }
 
@@ -23,7 +25,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('thesis_submissions', function (Blueprint $table) {
+        Schema::table('subject', function (Blueprint $table) {
             //
         });
     }
