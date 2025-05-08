@@ -9,54 +9,137 @@ use App\Models\ClassSubjectModel;
 use App\Models\WeekModel;
 use App\Models\ClassSubjectTimetableModel;
 use App\Models\User;
+use App\Models\AcademicYear;
 use Illuminate\Support\Facades\Auth;
 
 
 
 class ClassTimetableController extends Controller
 {
+    // public function list(Request $request)
+    // {
+    //     $data['getClass'] = ClassModel::getClass();
+
+    //     if (!empty($request->class_id)) {
+    //         $data['getSubject'] = ClassSubjectModel::MySubject($request->class_id);
+    //     }
+
+
+
+    //     $getWeek = WeekModel::getRecord();
+    //     $week = array();
+    //     foreach ($getWeek as $value) {
+    //         $dataW = array();
+    //         $dataW['week_id'] = $value->id;
+    //         $dataW['week_name'] = $value->name;
+
+    //         if (!empty($request->class_id) && !empty($request->subject_id)) {
+    //             $ClassSubject = ClassSubjectTimetableModel::getRecordClassSubject($request->class_id, $request->subject_id, $value->id);
+    //             if (!empty($ClassSubject)) {
+    //                 $dataW['start_time'] = $ClassSubject->start_time;
+    //                 $dataW['end_time'] = $ClassSubject->end_time;
+    //                 $dataW['room_number'] = $ClassSubject->room_number;
+    //             } else {
+    //                 $dataW['start_time'] = '';
+    //                 $dataW['end_time'] = '';
+    //                 $dataW['room_number'] = '';
+    //             }
+    //         } else {
+    //             $dataW['start_time'] = '';
+    //             $dataW['end_time'] = '';
+    //             $dataW['room_number'] = '';
+    //         }
+
+    //         $week[] = $dataW;
+    //     }
+
+    //     $data['week'] = $week;
+
+    //     $data['header_title'] = "Class Timetable";
+    //     return view('admin.class_timetable.list', $data);
+    // }
+
     public function list(Request $request)
     {
-        $data['getClass'] = ClassModel::getClass();
+        // Charger toutes les années académiques pour le filtre
+        $data['academicYears'] = AcademicYear::orderBy('start_date', 'desc')->get();
 
-        if (!empty($request->class_id)) {
+        // Charger les classes filtrées si année sélectionnée
+        $classesQuery = ClassModel::where('is_delete', 0);
+        if ($request->filled('academic_year_id')) {
+            $classesQuery->where('academic_year_id', $request->academic_year_id);
+        }
+        $data['getClass'] = $classesQuery->get();
+
+        // Charger les matières si une classe est sélectionnée
+        if ($request->filled('class_id')) {
             $data['getSubject'] = ClassSubjectModel::MySubject($request->class_id);
-        }
 
-
-
-        $getWeek = WeekModel::getRecord();
-        $week = array();
-        foreach ($getWeek as $value) {
-            $dataW = array();
-            $dataW['week_id'] = $value->id;
-            $dataW['week_name'] = $value->name;
-
-            if (!empty($request->class_id) && !empty($request->subject_id)) {
-                $ClassSubject = ClassSubjectTimetableModel::getRecordClassSubject($request->class_id, $request->subject_id, $value->id);
-                if (!empty($ClassSubject)) {
-                    $dataW['start_time'] = $ClassSubject->start_time;
-                    $dataW['end_time'] = $ClassSubject->end_time;
-                    $dataW['room_number'] = $ClassSubject->room_number;
-                } else {
-                    $dataW['start_time'] = '';
-                    $dataW['end_time'] = '';
-                    $dataW['room_number'] = '';
-                }
-            } else {
-                $dataW['start_time'] = '';
-                $dataW['end_time'] = '';
-                $dataW['room_number'] = '';
+            // Vérifier la cohérence entre classe et année sélectionnée
+            $selectedClass = ClassModel::find($request->class_id);
+            if ($selectedClass && $request->filled('academic_year_id') && $selectedClass->academic_year_id != $request->academic_year_id) {
+                return redirect()->back()->with('error', 'La classe ne correspond pas à l\'année sélectionnée');
             }
-
-            $week[] = $dataW;
         }
 
-        $data['week'] = $week;
+        // Préparer les plages horaires de la semaine
+        $weeks = WeekModel::getRecord();
+        $data['week'] = [];
 
-        $data['header_title'] = "Class Timetable";
+        foreach ($weeks as $week) {
+            $entry = [
+                'week_id' => $week->id,
+                'week_name' => $week->name,
+                'start_time' => '',
+                'end_time' => '',
+                'room_number' => ''
+            ];
+
+            if ($request->filled('class_id') && $request->filled('subject_id')) {
+                $timetable = ClassSubjectTimetableModel::getRecordClassSubject($request->class_id, $request->subject_id, $week->id);
+                if ($timetable) {
+                    $entry['start_time'] = $timetable->start_time;
+                    $entry['end_time'] = $timetable->end_time;
+                    $entry['room_number'] = $timetable->room_number;
+                }
+            }
+            $data['week'][] = $entry;
+        }
+
+        $data['header_title'] = "Emploi du temps des classes";
+
         return view('admin.class_timetable.list', $data);
     }
+
+
+
+    // Méthode API pour le chargement dynamique
+    public function getClassesByYear($yearId)
+    {
+        try {
+            $classes = ClassModel::with('academicYear')
+                ->where('academic_year_id', $yearId)
+                ->where('is_delete', 0)
+                ->get(['id', 'name', 'opt', 'academic_year_id']);
+
+            return response()->json([
+                'success' => true,
+                'data' => $classes->map(function ($class) {
+                    return [
+                        'id' => $class->id,
+                        'name' => $class->name . ' (' . ($class->academicYear->name ?? 'N/A') . ')'
+                    ];
+                })
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors du chargement des classes'
+            ], 500);
+        }
+    }
+
+
 
     public function get_subject(Request $request)
     {

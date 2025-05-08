@@ -127,11 +127,15 @@
                             Request::segment(2) == 'subject' ||
                             Request::segment(2) == 'assign_subject' ||
                             Request::segment(2) == 'assign_class_teacher' ||
+                            Request::segment(2) == 'academic-years' ||
+                            Request::segment(2) == 'theses' ||
                             Request::segment(2) == 'class_timetable') menu-is-opening menu-open @endif">
                         <a href="#" class="nav-link  @if (Request::segment(2) == 'class' ||
                                 Request::segment(2) == 'subject' ||
                                 Request::segment(2) == 'assign_subject' ||
                                 Request::segment(2) == 'assign_class_teacher' ||
+                                Request::segment(2) == 'academic-years' ||
+                                Request::segment(2) == 'theses' ||
                                 Request::segment(2) == 'class_timetable') active @endif">
                             <i class="nav-icon fa-solid fa-calendar-days"></i>
                             <p>
@@ -140,6 +144,15 @@
                             </p>
                         </a>
                         <ul class="nav nav-treeview">
+
+                            <li class="nav-item">
+                                <a href="{{ route('admin.academic-years.index') }}"
+                                    class="nav-link @if (Request::segment(2) == 'academic-years') active @endif">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    Années académiques
+                                </a>
+                            </li>
+
                             <li class="nav-item">
                                 <a href="{{ url('admin/class/list') }}"
                                     class="nav-link @if (Request::segment(2) == 'class') active @endif">
@@ -147,6 +160,8 @@
                                     <p>Class</p>
                                 </a>
                             </li>
+
+
                             <li class="nav-item">
                                 <a href="{{ url('admin/subject/list') }}"
                                     class="nav-link @if (Request::segment(2) == 'subject') active @endif">
@@ -154,13 +169,15 @@
                                     <p>Subject</p>
                                 </a>
                             </li>
+
                             <li class="nav-item">
                                 <a href="{{ route('admin.theses.index') }}"
-                                    class="nav-link @if (Request::segment(2) == 'subject') active @endif">
+                                    class="nav-link @if (Request::segment(2) == 'theses') active @endif">
                                     <i class="far fa-circle nav-icon"></i>
                                     <p>Espace Mémoire</p>
                                 </a>
                             </li>
+
 
                             <li class="nav-item">
                                 <a href="{{ url('admin/assign_subject/list') }}"

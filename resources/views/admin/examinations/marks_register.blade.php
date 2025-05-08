@@ -13,7 +13,6 @@
             background-color: rgba(0, 0, 0, 0.4);
         }
 
-
         .modal-content {
             background-color: #fefefe;
             margin: auto;

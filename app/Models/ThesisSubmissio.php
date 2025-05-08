@@ -20,7 +20,8 @@ class ThesisSubmissio extends Model
         'plagiarism_rate',
         'plagiarism_results',
         'plagiarism_rate',
-        'annotations'
+        'annotations',
+        'academic_year_id',
     ];
 
     public function student()
@@ -66,5 +67,9 @@ class ThesisSubmissio extends Model
     public function submission()
     {
         return $this->belongsTo(ThesisSubmissio::class);
+    }
+    public function academicYear()
+    {
+        return $this->belongsTo(AcademicYear::class);
     }
 }

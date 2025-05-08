@@ -24,6 +24,20 @@
                             <form method="post" action="">
                                 {{ csrf_field() }}
                                 <div class="card-body">
+
+                                    <div class="form-group">
+                                        <label>Année Académique</label>
+                                        <select name="academic_year_id" class="form-control" required>
+                                            <option value="">Sélectionner</option>
+                                            @foreach ($academicYears as $year)
+                                                <option value="{{ $year->id }}"
+                                                    {{ old('academic_year_id') == $year->id ? 'selected' : '' }}>
+                                                    {{ $year->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+
                                     <div class="form-group">
                                         <label>Subject Name</label>
                                         <input type="text" class="form-control" name="name" required

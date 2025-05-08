@@ -11,16 +11,61 @@ class SubjectModel extends Model
     use HasFactory;
 
     protected $table = 'subject';
+    protected $fillable = [
+        'name',
+        'code',
+        'type',
+        'academic_year_id', // Ajouté
+        'status',
+        'created_by'
+    ];
+
+
 
     static public function getSingle($id)
     {
         return self::find($id);
     }
 
+    // static public function getRecord()
+    // {
+    //     $return = SubjectModel::select('subject.*', 'users.name as created_by_name')
+    //         ->join('users', 'users.id', 'subject.created_by');
+
+    //     if (!empty(Request::get('name'))) {
+    //         $return = $return->where('subject.name', 'like', '%' . Request::get('name') . '%');
+    //     }
+
+    //     if (!empty(Request::get('code'))) {
+    //         $return = $return->where('subject.code', 'like', '%' . Request::get('code') . '%');
+    //     }
+
+    //     if (!empty(Request::get('type'))) {
+    //         $return = $return->where('subject.type', '=', Request::get('type'));
+    //     }
+
+
+    //     if (!empty(Request::get('date'))) {
+    //         $return = $return->whereDate('subject.created_at', '=', Request::get('date'));
+    //     }
+
+    //     $return = $return->where('subject.is_delete', '=', 0)
+    //         ->orderBy('subject.id', 'asc')
+    //         ->paginate(20);
+
+    //     return $return;
+    // }
+
+
     static public function getRecord()
     {
-        $return = SubjectModel::select('subject.*', 'users.name as created_by_name')
-            ->join('users', 'users.id', 'subject.created_by');
+        $return = SubjectModel::select(
+            'subject.*',
+            'users.name as created_by_name',
+            'academic_years.name as academic_year_name'
+        )
+            ->join('users', 'users.id', 'subject.created_by')
+            ->leftJoin('academic_years', 'academic_years.id', '=', 'subject.academic_year_id'); // <-- Ajout
 
         if (!empty(Request::get('name'))) {
             $return = $return->where('subject.name', 'like', '%' . Request::get('name') . '%');
@@ -34,7 +79,6 @@ class SubjectModel extends Model
             $return = $return->where('subject.type', '=', Request::get('type'));
         }
 
-
         if (!empty(Request::get('date'))) {
             $return = $return->whereDate('subject.created_at', '=', Request::get('date'));
         }
@@ -46,6 +90,8 @@ class SubjectModel extends Model
         return $return;
     }
 
+
+
     static public function getSubject()
     {
         $return = SubjectModel::select('subject.*')
@@ -56,6 +102,13 @@ class SubjectModel extends Model
             ->get();
 
         return $return;
+    }
+
+    public static function getSubjectsByYear($yearId)
+    {
+        return self::where('academic_year_id', $yearId)
+            ->where('is_delete', 0)
+            ->get(['id', 'name', 'code']);
     }
 
 
@@ -73,5 +126,10 @@ class SubjectModel extends Model
     public function classSubjects()
     {
         return $this->hasMany(ClassSubjectModel::class, 'subject_id');
+    }
+
+    public function academicYear()
+    {
+        return $this->belongsTo(AcademicYear::class, 'academic_year_id');
     }
 }
