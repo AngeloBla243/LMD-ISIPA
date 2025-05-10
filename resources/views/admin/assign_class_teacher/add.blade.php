@@ -1,87 +1,3 @@
-{{-- @extends('layouts.app')
-
-@section('content')
-
- <div class="content-wrapper">
-    <!-- Content Header (Page header) -->
-    <section class="content-header">
-      <div class="container-fluid">
-        <div class="row mb-2">
-          <div class="col-sm-6">
-            <h1>Add New Assign Class Teacher</h1>
-          </div>
-        </div>
-      </div><!-- /.container-fluid -->
-    </section>
-
-    <!-- Main content -->
-    <section class="content">
-      <div class="container-fluid">
-        <div class="row">
-          <!-- left column -->
-          <div class="col-md-12">
-            <div class="card card-primary">
-              <form method="post" action="">
-                 {{ csrf_field() }}
-                <div class="card-body">
-                  <div class="form-group">
-                    <label>Class Name</label>
-                     <select class="form-control" name="class_id" required>
-                        <option value="">Select Class</option>
-                        @foreach ($getClass as $class)
-                          <option value="{{ $class->id }}">{{ $class->name }}</option>
-                        @endforeach
-                    </select>
-
-                  </div>
-
-
-                   <div class="form-group">
-                    <label>Teacher Name</label>
-                        @foreach ($getTeacher as $teacher)
-                        <div>
-                          <label style="font-weight: normal;">
-                            <input type="checkbox" value="{{ $teacher->id }}" name="teacher_id[]"> {{ $teacher->name }} {{ $teacher->last_name }}
-                          </label>
-                          </div>
-                        @endforeach
-                  </div>
-
-
-                  <div class="form-group">
-                    <label>Status</label>
-                    <select class="form-control" name="status">
-                        <option value="0">Active</option>
-                        <option value="1">Inactive</option>
-                    </select>
-
-                  </div>
-
-
-                </div>
-                <!-- /.card-body -->
-
-                <div class="card-footer">
-                  <button type="submit" class="btn btn-primary">Submit</button>
-                </div>
-              </form>
-            </div>
-
-
-          </div>
-          <!--/.col (left) -->
-          <!-- right column -->
-
-          <!--/.col (right) -->
-        </div>
-        <!-- /.row -->
-      </div><!-- /.container-fluid -->
-    </section>
-    <!-- /.content -->
-  </div>
-
-@endsection --}}
-
 @extends('layouts.app')
 
 @section('content')
@@ -102,19 +18,34 @@
                     <div class="col-md-12">
                         <div class="card card-primary">
                             @include('_message')
-                            <form id="assignClassForm" enctype="multipart/form-data">
+                            <form id="assignClassForm" method="POST"
+                                action="{{ route('admin.assign_class_teacher.add') }}">
                                 {{ csrf_field() }}
                                 <div class="card-body">
-                                    <!-- Sélectionner une classe -->
                                     <div class="form-group">
-                                        <label for="class_id">Sélectionner une classe</label>
-                                        <select class="form-control" name="class_id" id="class_id" required>
-                                            <option value="">Sélectionner une classe</option>
-                                            @foreach ($getClass as $class)
-                                                <option value="{{ $class->id }}">{{ $class->name }} {{ $class->opt }}</option>
+                                        <label>Année académique</label>
+                                        <select name="academic_year_id" id="academicYear" class="form-control" required>
+                                            <option value="">Sélectionner une année</option>
+                                            @foreach ($academicYears as $year)
+                                                <option value="{{ $year->id }}">{{ $year->name }}</option>
                                             @endforeach
                                         </select>
                                     </div>
+
+                                    {{-- <div class="form-group">
+                                        <label>Classe</label>
+                                        <select name="class_id" id="classSelect" class="form-control" required disabled>
+                                            <option value="">Choisissez d'abord une année</option>
+                                        </select>
+                                    </div> --}}
+
+                                    <div class="form-group">
+                                        <label>Classe</label>
+                                        <select name="class_id" id="classSelect" class="form-control" required>
+                                            <option value="">Choisissez d'abord une année</option>
+                                        </select>
+                                    </div>
+
 
                                     <!-- Sélectionner un ou plusieurs enseignants -->
                                     <div class="form-group">
@@ -140,10 +71,12 @@
                                 </div>
 
                                 <div class="card-footer">
-                                    <button type="button" id="submitAssignClass" class="btn btn-primary">Assigner la
-                                        classe</button>
+                                    <button type="submit" class="btn btn-primary">Assigner la classe</button>
+
                                 </div>
                             </form>
+
+
                         </div>
                     </div>
                 </div>
@@ -153,41 +86,42 @@
 @endsection
 
 @section('script')
-    <!-- Script pour gérer la soumission Ajax -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-
     <script>
-        $(document).ready(function() {
-            $('#submitAssignClass').click(function(e) {
-                e.preventDefault();
+        document.getElementById('academicYear').addEventListener('change', function() {
+            const yearId = this.value;
+            const classSelect = document.getElementById('classSelect');
 
-                // Récupérer les données du formulaire
-                let formData = $('#assignClassForm').serialize();
+            classSelect.innerHTML = '<option value="">Chargement...</option>';
+            classSelect.disabled = true;
 
-                // Envoyer les données avec Ajax
-                $.ajax({
-                    type: 'POST',
-                    url: '{{ route('admin.assign_class_teacher.add') }}', // Route nommée pour assign_subject1
-                    data: formData,
-                    success: function(response) {
-                        if (response.success) {
-                            // Rediriger vers la page d'assignation des matières
-                            let teacher_id = response.teacher_id;
-                            let status = response.status;
-                            let class_id = response.class_id;
-                            window.location.href =
-                                '{{ url('admin/assign_class_teacher/assign_subject_subject1') }}/' +
-                                teacher_id + '/' + class_id ;
-                        } else {
-                            alert(response.error);
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        let err = JSON.parse(xhr.responseText);
-                        alert(err.message);
+            if (!yearId) {
+                classSelect.innerHTML = '<option value="">Veuillez d\'abord choisir une année</option>';
+                return;
+            }
+
+            // Génération dynamique de l'URL avec la fonction Laravel url()
+            const url = "{{ url('/admin/assign_class_teacher/get-classes') }}/" + yearId;
+
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Erreur HTTP : ' + response.status);
                     }
+                    return response.json();
+                })
+                .then(data => {
+                    classSelect.innerHTML = '<option value="">Sélectionner une classe</option>';
+                    data.forEach(cls => {
+                        classSelect.innerHTML +=
+                            `<option value="${cls.id}">${cls.name} ${cls.opt ? '(' + cls.opt + ')' : ''}</option>`;
+                    });
+                    classSelect.disabled = false;
+                })
+                .catch(error => {
+                    console.error('Erreur lors du chargement des classes :', error);
+                    classSelect.innerHTML = `<option value="">Erreur de chargement (${error.message})</option>`;
+                    classSelect.disabled = true;
                 });
-            });
         });
     </script>
 @endsection

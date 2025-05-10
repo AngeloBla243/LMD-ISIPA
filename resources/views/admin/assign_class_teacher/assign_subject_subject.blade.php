@@ -1,7 +1,6 @@
 @extends('layouts.app')
 
 @section('content')
-
     <div class="content-wrapper">
         <!-- Content Header (Page header) -->
         <section class="content-header">
@@ -26,42 +25,66 @@
                         <div class="card card-primary">
 
                             @include('_message')
-                            <form method="post" action="" id="yourFormId" enctype="multipart/form-data">
-                                {{ csrf_field() }}
-                                <div class="card-body">
+                            <div class="card-body">
+                                <form method="post"
+                                    action="{{ route('admin.assign_class_teacher.assign_subject.submit') }}">
+                                    @csrf
+
                                     <div class="form-group">
-                                        <label for="teacher_id">Sélectionner un enseignant</label>
-                                        <select id="teacherSelect" name="teacher_id" class="form-control" required>
-                                            @if ($teachers && count($teachers) > 0)
-                                                @foreach ($teachers as $teacher)
-                                                    <option value="{{ $teacher->id }}">{{ $teacher->name }}
-                                                        {{ $teacher->last_name }}</option>
-                                                @endforeach
-                                            @else
-                                                <option value="">Aucun enseignant disponible</option>
-                                            @endif
-                                        </select>
+                                        <label>Enseignant</label>
+                                        <input type="text" class="form-control"
+                                            value="{{ $selectedTeacher->name }} {{ $selectedTeacher->last_name }}" readonly>
+                                        <input type="hidden" name="teacher_id" value="{{ $selectedTeacher->id }}">
                                     </div>
 
                                     <div class="form-group">
-                                        <label for="subject_ids">Sélectionner les matières</label>
+                                        <label>Classe Assignée</label>
+                                        @if ($classes->count() > 1)
+                                            <select name="class_id" id="classSelect" class="form-control" required
+                                                onchange="window.location.href='?class_id='+this.value">
+                                                @foreach ($classes as $c)
+                                                    <option value="{{ $c->id }}"
+                                                        {{ $selectedClass->id == $c->id ? 'selected' : '' }}>
+                                                        {{ $c->name }} {{ $c->opt }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        @else
+                                            <input type="text" class="form-control"
+                                                value="{{ $selectedClass->name }} {{ $selectedClass->opt }}" readonly>
+                                            <input type="hidden" name="class_id" value="{{ $selectedClass->id }}">
+                                        @endif
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Année Académique</label>
+                                        <input type="text" class="form-control" value="{{ $academicYear->name }}"
+                                            readonly>
+                                        <input type="hidden" name="academic_year_id" value="{{ $academicYear->id }}">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Matières Disponibles</label>
                                         <select name="subject_ids[]" class="form-control" multiple required>
-                                            @if ($subjects && count($subjects) > 0)
-                                                @foreach ($subjects as $subject)
-                                                    <option value="{{ $subject->id }}">{{ $subject->name }} / {{ $subject->code }}</option>
-                                                @endforeach
-                                            @else
-                                                <option value="">Aucune matière disponible</option>
-                                            @endif
+                                            @foreach ($subjects as $subject)
+                                                @php $isAssigned = in_array($subject->id, $assignedSubjectIds) @endphp
+                                                <option value="{{ $subject->id }}" {{ $isAssigned ? 'selected' : '' }}>
+                                                    {{ $subject->name }} ({{ $subject->code }})
+                                                    @if ($isAssigned)
+                                                        - Déjà assigné
+                                                    @endif
+                                                </option>
+                                            @endforeach
                                         </select>
+                                        <small class="text-muted">Les matières déjà assignées sont présélectionnées</small>
                                     </div>
-                                </div>
-                                <!-- /.card-body -->
 
-                                <div class="card-footer">
-                                    <button type="submit" class="btn btn-primary">Submit</button>
-                                </div>
-                            </form>
+
+
+                                    <button type="submit" class="btn btn-primary">Assigner</button>
+                                </form>
+                            </div>
+
                         </div>
 
                         <div id="customModal" class="modal">
@@ -75,6 +98,7 @@
 
 
                     </div>
+
                     <!--/.col (left) -->
                     <!-- right column -->
 
@@ -85,7 +109,6 @@
         </section>
         <!-- /.content -->
     </div>
-
 @endsection
 
 
@@ -97,11 +120,12 @@
                 event.preventDefault(); // Empêche le rechargement de la page
 
                 $.ajax({
-                    url: '{{ url("admin/assign_class_teacher/assign_subject_subject") }}',
+                    url: '{{ url('admin/assign_class_teacher/assign_subject_subject') }}',
                     type: 'POST',
-                    data: $(this).serialize(), // Utilisation de $(this) pour s'assurer que nous avons accès à jQuery
+                    data: $(this)
+                        .serialize(), // Utilisation de $(this) pour s'assurer que nous avons accès à jQuery
                     dataType: 'json',
-                    success: function(response) {// Afficher la réponse pour débogage
+                    success: function(response) { // Afficher la réponse pour débogage
                         if (response.success) {
                             Swal.fire({
                                 icon: 'success',
@@ -119,7 +143,7 @@
                                 icon: 'error',
                                 title: 'Erreur',
                                 text: response
-                                .error, // Affichage d'une erreur si nécessaire
+                                    .error, // Affichage d'une erreur si nécessaire
                                 confirmButtonText: 'OK'
                             });
                         }
@@ -129,7 +153,7 @@
                             icon: 'error',
                             title: 'Erreur',
                             text: xhr.responseJSON.error ||
-                            'Une erreur est survenue.', // Afficher l'erreur
+                                'Une erreur est survenue.', // Afficher l'erreur
                             confirmButtonText: 'OK'
                         });
                     }
@@ -158,6 +182,86 @@
                     // Si aucun enseignant n'est sélectionné, désactiver le lien ou réinitialiser l'URL
                     editLink.href = "#";
                 }
+            });
+        });
+    </script>
+
+    <script>
+        function loadTeacherDetails(teacherId) {
+            if (!teacherId) return;
+
+            const academicYearInput = document.getElementById('academicYear');
+            const assignedClassInput = document.getElementById('assignedClass');
+            const subjectSelect = document.getElementById('subjectSelect');
+
+            academicYearInput.value = '';
+            assignedClassInput.value = '';
+            subjectSelect.innerHTML = '<option value="">Chargement...</option>';
+            subjectSelect.disabled = true;
+
+            fetch("{{ url('admin/assign_class_teacher/get-teacher-details') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({
+                        teacher_id: teacherId
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        alert(data.error);
+                        academicYearInput.value = 'N/A';
+                        assignedClassInput.value = 'N/A';
+                        subjectSelect.innerHTML = '<option value="">Aucune matière disponible</option>';
+                        subjectSelect.disabled = true;
+                        return;
+                    }
+
+                    academicYearInput.value = data.academic_year_name || 'N/A';
+                    assignedClassInput.value = data.class_name || 'N/A';
+
+                    if (data.subjects && data.subjects.length > 0) {
+                        subjectSelect.innerHTML = '';
+                        data.subjects.forEach(subject => {
+                            const option = document.createElement('option');
+                            option.value = subject.id;
+                            option.textContent = subject.name;
+                            subjectSelect.appendChild(option);
+                        });
+                        subjectSelect.disabled = false;
+                    } else {
+                        subjectSelect.innerHTML = '<option value="">Aucune matière disponible</option>';
+                        subjectSelect.disabled = true;
+                    }
+                })
+                .catch(() => {
+                    alert('Erreur lors de la récupération des données.');
+                });
+        }
+
+        // Au chargement de la page, si un enseignant est sélectionné, charger ses données
+        document.addEventListener('DOMContentLoaded', function() {
+            const teacherSelect = document.getElementById('teacherSelect');
+            if (teacherSelect.value) {
+                loadTeacherDetails(teacherSelect.value);
+            }
+
+            // Aussi charger quand on change la sélection
+            teacherSelect.addEventListener('change', function() {
+                loadTeacherDetails(this.value);
+            });
+        });
+    </script>
+
+    <script>
+        document.querySelectorAll('option[disabled]').forEach(option => {
+            option.addEventListener('click', (e) => {
+                e.preventDefault();
+                alert('Cette matière est déjà assignée !');
+                return false;
             });
         });
     </script>

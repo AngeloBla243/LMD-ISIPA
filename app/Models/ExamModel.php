@@ -20,8 +20,9 @@ class ExamModel extends Model
 
     static public function getRecord()
     {
-        $return = self::select('exam.*', 'users.name as created_name')
-            ->join('users', 'users.id', '=', 'exam.created_by');
+        $return = self::select('exam.*', 'academic_years.name as academic_year_name', 'users.name as created_name')
+            ->join('users', 'users.id', '=', 'exam.created_by')
+            ->leftJoin('academic_years', 'academic_years.id', '=', 'exam.academic_year_id');
 
         if (!empty(Request::get('name'))) {
             $return = $return->where('exam.name', 'like', '%' . Request::get('name') . '%');
@@ -56,4 +57,10 @@ class ExamModel extends Model
             ->count();
         return $return;
     }
+
+    public function academicYear()
+{
+    return $this->belongsTo(AcademicYear::class, 'academic_year_id');
+}
+
 }

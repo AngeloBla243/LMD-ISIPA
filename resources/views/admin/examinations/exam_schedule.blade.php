@@ -71,38 +71,69 @@
                             <form method="get" action="">
                                 <div class="card-body">
                                     <div class="row">
+                                        <!-- Nouveau sélecteur d'année académique -->
                                         <div class="form-group col-md-3">
-                                            <label>Exam</label>
-                                            <select class="form-control getClass" name="exam_id" required>
-                                                <option value="">Select</option>
-                                                @foreach ($getExam as $exam)
-                                                    <option {{ Request::get('exam_id') == $exam->id ? 'selected' : '' }}
-                                                        value="{{ $exam->id }}">{{ $exam->name }}</option>
+                                            <label>Année Académique</label>
+                                            <select class="form-control" name="academic_year_id" required
+                                                onchange="this.form.submit()">
+                                                <option value="">Sélectionner</option>
+                                                @foreach ($academicYears as $year)
+                                                    <option value="{{ $year->id }}"
+                                                        {{ Request::get('academic_year_id') == $year->id ? 'selected' : '' }}>
+                                                        {{ $year->name }}
+                                                    </option>
                                                 @endforeach
                                             </select>
                                         </div>
 
+                                        <!-- Sélecteur de classe filtré -->
                                         <div class="form-group col-md-3">
-                                            <label>Class</label>
-                                            <select class="form-control getClass" name="class_id" required>
-                                                <option value="">Select</option>
-                                                @foreach ($getClass as $class)
-                                                    <option {{ Request::get('class_id') == $class->id ? 'selected' : '' }}
-                                                        value="{{ $class->id }}">{{ $class->name }} {{ $class->opt }}</option>
+                                            <label>Classe</label>
+                                            <select class="form-control" name="class_id" required
+                                                {{ empty($filteredClasses) ? 'disabled' : '' }}>
+                                                <option value="">Sélectionner</option>
+                                                @foreach ($filteredClasses as $class)
+                                                    <option value="{{ $class->id }}"
+                                                        {{ Request::get('class_id') == $class->id ? 'selected' : '' }}>
+                                                        {{ $class->name }} {{ $class->opt }}
+                                                    </option>
                                                 @endforeach
                                             </select>
                                         </div>
 
+                                        <!-- Sélecteur d'examen filtré -->
                                         <div class="form-group col-md-3">
-                                            <button class="btn btn-primary" type="submit"
-                                                style="margin-top: 30px;"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
+                                            <label>Examen</label>
+                                            <select class="form-control" name="exam_id" required
+                                                {{ empty($filteredExams) ? 'disabled' : '' }}>
+                                                <option value="">Sélectionner</option>
+                                                @foreach ($filteredExams as $exam)
+                                                    <option value="{{ $exam->id }}"
+                                                        {{ Request::get('exam_id') == $exam->id ? 'selected' : '' }}>
+                                                        {{ $exam->name }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+
+                                        <div class="form-group col-md-4">
+                                            <button class="btn btn-primary" type="submit" style="margin-top: 30px;">
+                                                <i class="fa-solid fa-magnifying-glass"></i> Rechercher
+                                            </button>
+                                            <a href="{{ url('admin/examinations/exam_schedule') }}" class="btn btn-success"
+                                                style="margin-top: 30px;">Réinitialiser</a>
+                                        </div>
+
+                                        {{-- <div class="form-group col-md-3">
+                                            <button class="btn btn-primary" type="submit" style="margin-top: 30px;"><i
+                                                    class="fa-solid fa-magnifying-glass"></i> Search</button>
                                             <a href="{{ url('admin/examinations/exam_schedule') }}" class="btn btn-success"
                                                 style="margin-top: 30px;">reset</a>
-                                        </div>
-
+                                        </div> --}}
                                     </div>
                                 </div>
                             </form>
+
                         </div>
 
 
@@ -115,6 +146,7 @@
                                 {{ csrf_field() }}
                                 <input type="hidden" name="exam_id" value="{{ Request::get('exam_id') }}">
                                 <input type="hidden" name="class_id" value="{{ Request::get('class_id') }}">
+                                <input type="hidden" name="academic_year_id" value="{{ $selectedAcademicYearId }}">
 
                                 <div class="card">
                                     <div class="card-header">
