@@ -240,7 +240,7 @@ Route::group(['middleware' => 'admin'], function () {
 
 
 
-    Route::get('admin/assign_class_teacher/list', [AssignClassTeacherController::class, 'list']);
+    Route::get('admin/assign_class_teacher/list', [AssignClassTeacherController::class, 'list'])->name('admin.assign_class_teacher.list');;
     Route::get('admin/assign_class_teacher/add', [AssignClassTeacherController::class, 'add']);
     Route::post('admin/assign_class_teacher/add', [AssignClassTeacherController::class, 'insert'])->name('admin.assign_class_teacher.add');
     Route::get('admin/assign_class_teacher/edit/{id}', [AssignClassTeacherController::class, 'edit']);
@@ -248,15 +248,23 @@ Route::group(['middleware' => 'admin'], function () {
     Route::get('admin/assign_class_teacher/edit_single/{id}', [AssignClassTeacherController::class, 'edit_single']);
     Route::post('admin/assign_class_teacher/edit_single/{id}', [AssignClassTeacherController::class, 'update_single']);
     Route::get('admin/assign_class_teacher/delete/{id}', [AssignClassTeacherController::class, 'delete']);
+    Route::get('admin/assign_class_teacher/get-classes/{yearId}', [AssignClassTeacherController::class, 'getClassesByYear']);
 
     // Route pour assigner un ou plusieurs cours à un enseignant
-    Route::get('admin/assign_class_teacher/assign_subject_subject', [AssignClassTeacherController::class, 'assign_subject']);
-    Route::post('admin/assign_class_teacher/assign_subject_subject', [AssignClassTeacherController::class, 'insert_assign_subject']);
+    // Route::get('admin/assign_class_teacher/assign_subject_subject', [AssignClassTeacherController::class, 'assign_subject']);
+    Route::get('admin/assign_class_teacher/assign_subject_subject/{teacher_id}', [AssignClassTeacherController::class, 'assign_subject'])
+        ->name('admin.assign_class_teacher.assign_subject_subject');
 
+    // Route::post('admin/assign_class_teacher/assign_subject_subject', [AssignClassTeacherController::class, 'insert_assign_subject']);
+    Route::post('admin/assign_class_teacher/assign_subject_subject', [AssignClassTeacherController::class, 'insert_assign_subject'])
+        ->name('admin.assign_class_teacher.assign_subject.submit');
     Route::get('admin/assign_class_teacher/assign_subject_subject1/{teacher_id}/{class_id}', [AssignClassTeacherController::class, 'assign_subject1'])->name('admin.assign_class_teacher.assign_subject_subject1');
 
     // Route pour traiter la soumission du formulaire d'assignation des matières avec AJAX
-    Route::post('admin/assign_class_teacher/assign_subject_subject1', [AssignClassTeacherController::class, 'insert_assign_subject1'])->name('admin.assign_class_teacher.assign_subject_subject1');
+    // Route::post('admin/assign_class_teacher/assign_subject_subject1', [AssignClassTeacherController::class, 'insert_assign_subject1'])->name('admin.assign_class_teacher.assign_subject_subject1');
+    Route::post('/admin/assign_class_teacher/get_subjects', [AssignClassTeacherController::class, 'getSubjectsByTeacher']);
+    // Route::post('/admin/assign_class_teacher/get_teacher_details', [AssignClassTeacherController::class, 'getTeacherDetails']);
+
 
 
 

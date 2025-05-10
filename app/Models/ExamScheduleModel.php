@@ -11,6 +11,28 @@ class ExamScheduleModel extends Model
 
     protected $table = 'exam_schedule';
 
+    protected $fillable = [
+        'exam_id',
+        'class_id',
+        'academic_year_id', // Ajouté
+        'subject_id',
+        'exam_date',
+        'start_time',
+        'end_time',
+        'room_number',
+        'full_marks',
+        'passing_mark',
+        'ponde',
+        'created_by'
+    ];
+
+    // Relation avec l'année académique
+    public function academicYear()
+    {
+        return $this->belongsTo(AcademicYear::class);
+    }
+
+
     static public function getSingle($id)
     {
         return self::find($id);

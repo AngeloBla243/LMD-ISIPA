@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\AssignClassTeacherModel;
 use App\Models\ClassSubjectModel;
 use App\Models\SubjectModel;
+use App\Models\AcademicYear;
 use Illuminate\Support\Facades\Auth;
 
 
@@ -16,13 +17,17 @@ class AssignClassTeacherController extends Controller
     public function list(Request $request)
     {
 
-        $data['getRecord'] = AssignClassTeacherModel::getRecord();
+        $data['academicYears'] = AcademicYear::orderBy('start_date', 'desc')->get();
+
+        $data['getRecord'] = AssignClassTeacherModel::getRecord()->paginate(10);;
         $data['header_title'] = "Assign Class Teacher";
         return view('admin.assign_class_teacher.list', $data);
     }
 
     public function add(Request $request)
     {
+        $data['academicYears'] = AcademicYear::orderBy('start_date', 'desc')->get();
+
         $data['getClass'] = ClassModel::getClass();
         $data['getTeacher'] = User::getTeacherClass();
 
@@ -30,104 +35,128 @@ class AssignClassTeacherController extends Controller
         return view('admin.assign_class_teacher.add', $data);
     }
 
-    // public function insert(Request $request)
-    // {
 
-    //     if (!empty($request->teacher_id)) {
-    //         foreach ($request->teacher_id as $teacher_id) {
-    //             $getAlreadyFirst = AssignClassTeacherModel::getAlreadyFirst($request->class_id, $teacher_id);
-    //             if (!empty($getAlreadyFirst)) {
-    //                 $getAlreadyFirst->status = $request->status;
-    //                 $getAlreadyFirst->save();
-    //             } else {
-    //                 $save = new AssignClassTeacherModel;
-    //                 $save->class_id = $request->class_id;
-    //                 $save->teacher_id = $teacher_id;
-    //                 $save->status = $request->status;
-    //                 $save->created_by = Auth::user()->id;
-    //                 $save->save();
-    //             }
-    //         }
-
-    //         return redirect('admin/assign_class_teacher/list')->with('success', "Assign Class to Teacher Successfully");
-    //     } else {
-    //         return redirect()->back()->with('error', 'Due to some error pls try again');
-    //     }
-    // }
 
     public function insert(Request $request)
     {
-        try {
-            if (!empty($request->teacher_id)) {
-                foreach ($request->teacher_id as $teacher_id) {
-                    $getAlreadyFirst = AssignClassTeacherModel::getAlreadyFirst($request->class_id, $teacher_id);
-                    if (!empty($getAlreadyFirst)) {
-                        $getAlreadyFirst->status = $request->status;
-                        $getAlreadyFirst->save();
-                    } else {
-                        // Enregistrement dans la table AssignClassTeacherModel
-                        $save = new AssignClassTeacherModel;
-                        $save->class_id = $request->class_id;
-                        $save->teacher_id = $teacher_id;
-                        $save->status = $request->status;
-                        $save->created_by = Auth::user()->id;
-                        $save->save();
-                    }
-                }
+        $request->validate([
+            'academic_year_id' => 'required|exists:academic_years,id',
+            'class_id' => 'required|exists:class,id',
+            'teacher_id' => 'required|array',
+            'teacher_id.*' => 'exists:users,id',
+            'status' => 'required|integer',
+        ]);
 
-                // Répondre avec les IDs pour la redirection
-                return response()->json([
-                    'success' => true,
-                    'teacher_id' => $teacher_id,
-                    'class_id' => $request->class_id,
-                ]);
-            } else {
-                return response()->json(['error' => 'Veuillez sélectionner au moins un enseignant.'], 400);
+        try {
+            foreach ($request->teacher_id as $teacher_id) {
+                $existing = AssignClassTeacherModel::getAlreadyFirst(
+                    $request->class_id,
+                    $teacher_id
+                );
+
+                if ($existing) {
+                    $existing->update([
+                        'status' => $request->status,
+                        'academic_year_id' => $request->academic_year_id, // À partir du formulaire
+                    ]);
+                } else {
+                    AssignClassTeacherModel::create([
+                        'class_id' => $request->class_id,
+                        'teacher_id' => $teacher_id,
+                        'status' => $request->status,
+                        'academic_year_id' => $request->academic_year_id, // À partir du formulaire
+                        'created_by' => Auth::id(),
+                    ]);
+                }
             }
+
+            return redirect()->route('admin.assign_class_teacher.list')
+                ->with('success', 'Assignation réussie !');
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Une erreur est survenue lors de l\'assignation.'], 500);
+            return redirect()->back()
+                ->with('error', 'Erreur : ' . $e->getMessage())
+                ->withInput();
         }
     }
+
+
+
+    // public function edit($id)
+    // {
+    //     $getRecord = AssignClassTeacherModel::getSingle($id);
+    //     if (!empty($getRecord)) {
+    //         $data['getRecord'] = $getRecord;
+    //         $data['getAssignTeacherID'] = AssignClassTeacherModel::getAssignTeacherID($getRecord->class_id);
+    //         $data['getClass'] = ClassModel::getClass();
+    //         $data['getTeacher'] = User::getTeacherClass();
+    //         $data['header_title'] = "Edit Assign Class Teacher";
+    //         return view('admin.assign_class_teacher.edit', $data);
+    //     } else {
+    //         abort(404);
+    //     }
+    // }
 
     public function edit($id)
     {
         $getRecord = AssignClassTeacherModel::getSingle($id);
+
         if (!empty($getRecord)) {
-            $data['getRecord'] = $getRecord;
-            $data['getAssignTeacherID'] = AssignClassTeacherModel::getAssignTeacherID($getRecord->class_id);
-            $data['getClass'] = ClassModel::getClass();
-            $data['getTeacher'] = User::getTeacherClass();
-            $data['header_title'] = "Edit Assign Class Teacher";
+            // Récupérer toutes les années académiques
+            $academicYears = AcademicYear::orderBy('start_date', 'desc')->get();
+
+            // Récupérer l'année académique actuelle de l'assignation
+            $selectedAcademicYear = $getRecord->academic_year_id;
+
+            $data = [
+                'getRecord' => $getRecord,
+                'academicYears' => $academicYears,
+                'selectedAcademicYear' => $selectedAcademicYear,
+                'getAssignTeacherID' => AssignClassTeacherModel::getAssignTeacherID($getRecord->class_id),
+                'getClass' => ClassModel::getClass(),
+                'getTeacher' => User::getTeacherClass(),
+                'header_title' => "Modifier l'assignation"
+            ];
+
             return view('admin.assign_class_teacher.edit', $data);
         } else {
             abort(404);
         }
     }
 
+
     public function update($id, Request $request)
     {
-        AssignClassTeacherModel::deleteTeacher($request->class_id);
+        $request->validate([
+            'academic_year_id' => 'required|exists:academic_years,id',
+            'class_id' => 'required|exists:class,id',
+            'teacher_id' => 'required|array',
+            'status' => 'required|integer',
+        ]);
 
+        // Désactive les anciennes assignations de la classe
+        AssignClassTeacherModel::where('class_id', $request->class_id)->update(['is_delete' => 1]);
 
-        if (!empty($request->teacher_id)) {
-            foreach ($request->teacher_id as $teacher_id) {
-                $getAlreadyFirst = AssignClassTeacherModel::getAlreadyFirst($request->class_id, $teacher_id);
-                if (!empty($getAlreadyFirst)) {
-                    $getAlreadyFirst->status = $request->status;
-                    $getAlreadyFirst->save();
-                } else {
-                    $save = new AssignClassTeacherModel;
-                    $save->class_id = $request->class_id;
-                    $save->teacher_id = $teacher_id;
-                    $save->status = $request->status;
-                    $save->created_by = Auth::user()->id;
-                    $save->save();
-                }
-            }
+        // Crée ou met à jour les assignations
+        foreach ($request->teacher_id as $teacher_id) {
+            AssignClassTeacherModel::updateOrCreate(
+                [
+                    'class_id' => $request->class_id,
+                    'teacher_id' => $teacher_id,
+                    'is_delete' => 1 // on cible les assignations désactivées
+                ],
+                [
+                    'academic_year_id' => $request->academic_year_id,
+                    'status' => $request->status,
+                    'is_delete' => 0, // réactive l'assignation
+                    'created_by' => auth()->id(),
+                ]
+            );
         }
 
-        return redirect('admin/assign_class_teacher/list')->with('success', "Assign Class to Teacher Successfully");
+        return redirect()->route('admin.assign_class_teacher.list')
+            ->with('success', "Assignation mise à jour avec succès");
     }
+
 
     public function edit_single($id)
     {
@@ -174,208 +203,178 @@ class AssignClassTeacherController extends Controller
         return redirect()->back()->with('success', "Assign Class to Teacher Successfully Deleted");
     }
 
-    // Assignation des cours aux enseignants
-    public function assign_subject(Request $request)
+    public function getSubjectsByTeacher(Request $request)
     {
+        $teacherId = $request->input('teacher_id');
+        $assignment = AssignClassTeacherModel::where('teacher_id', $teacherId)->first();
 
-        // Récupérer tous les enseignants
-        $teachers = User::getTeacherClass();
-
-        // Récupérer toutes les matières
-        $subjects = SubjectModel::all();
-
-        // Vérifier que les données sont bien récupérées
-        if ($teachers->isEmpty() || $subjects->isEmpty()) {
-            return redirect()->back()->with('error', 'Aucun enseignant ou matière disponible.');
+        if (!$assignment) {
+            return response()->json(['error' => 'Enseignant non assigné à une classe'], 404);
         }
 
-        // Passer les données à la vue
-        return view('admin.assign_class_teacher.assign_subject_subject', compact('teachers', 'subjects'));
+        $subjects = ClassSubjectModel::where('class_id', $assignment->class_id)
+            ->with('subject')
+            ->get()
+            ->pluck('subject');
+
+        return response()->json($subjects);
     }
-
-
 
     // public function insert_assign_subject(Request $request)
     // {
-    //     // Validation des données envoyées depuis le formulaire
     //     $request->validate([
-    //         'teacher_id' => 'required|integer',
+    //         'teacher_id' => 'required|exists:users,id',
+    //         'class_id' => 'required|exists:class,id',
+    //         'academic_year_id' => 'required|exists:academic_years,id',
     //         'subject_ids' => 'required|array',
-    //         'subject_ids.*' => 'integer',
+    //         'subject_ids.*' => 'exists:subject,id'
     //     ]);
 
-    //     $teacher_id = $request->input('teacher_id');
-    //     $subject_ids = $request->input('subject_ids');
+    //     // Récupérer toutes les assignations existantes avec subject_id = null
+    //     $existingAssignments = AssignClassTeacherModel::where([
+    //         'teacher_id' => $request->teacher_id,
+    //         'class_id' => $request->class_id,
+    //         'academic_year_id' => $request->academic_year_id,
+    //         'is_delete' => 0
+    //     ])
+    //         ->whereNull('subject_id')
+    //         ->get();
 
-    //     // Récupérer la classe assignée à l'enseignant
-    //     $teacherAssignment = AssignClassTeacherModel::where('teacher_id', $teacher_id)->first();
-
-    //     if (!$teacherAssignment) {
-    //         return redirect()->back()->with('error', 'Aucune classe assignée à cet enseignant.');
+    //     // Vérifier qu'il y a assez d'assignations à mettre à jour
+    //     if ($existingAssignments->count() < count($request->subject_ids)) {
+    //         return back()->with('error', 'Trop de matières sélectionnées pour les assignations existantes');
     //     }
 
-    //     // Récupérer la classe et le statut automatiquement
-    //     $class_id = $teacherAssignment->class_id; // ID de la classe assignée
-    //     $status = $teacherAssignment->status;     // Statut assigné à l'enseignant
-
-    //     // On boucle sur les matières à assigner
-    //     foreach ($subject_ids as $subject_id) {
-    //         // Vérifier que le subject_id appartient bien à la class_id
-    //         $isSubjectInClass = ClassSubjectModel::where('class_id', $class_id)
-    //             ->where('subject_id', $subject_id)
-    //             ->exists();
-
-    //         if (!$isSubjectInClass) {
-    //             // Si la matière n'appartient pas à la classe, on passe à la suivante
-    //             continue;
-    //         }
-
-    //         // Vérifier si l'assignation existe déjà pour cette matière
-    //         $existingAssignment = AssignClassTeacherModel::where('teacher_id', $teacher_id)
-    //             ->where('subject_id', $subject_id)
-    //             ->first();
-
-    //         if (!$existingAssignment) {
-    //             // Créer l'assignation si elle n'existe pas
-    //             AssignClassTeacherModel::create([
-    //                 'teacher_id' => $teacher_id,
-    //                 'class_id' => $class_id,  // Classe récupérée automatiquement
+    //     // Mettre à jour les assignations existantes
+    //     foreach ($request->subject_ids as $index => $subject_id) {
+    //         if (isset($existingAssignments[$index])) {
+    //             $existingAssignments[$index]->update([
     //                 'subject_id' => $subject_id,
-    //                 'status' => $status,      // Statut récupéré automatiquement
-    //                 'is_delete' => 0,
-    //                 'created_by' => Auth::user()->id,
+    //                 'status' => 0,
+    //                 'created_by' => Auth::id()
     //             ]);
     //         }
     //     }
 
-    //     return redirect()->back();
+    //     return redirect()->route('admin.assign_class_teacher.list')
+    //         ->with('success', 'Matières mises à jour avec succès');
     // }
 
     public function insert_assign_subject(Request $request)
     {
-        // Validation des données envoyées depuis le formulaire
+        $request->validate([
+            'teacher_id' => 'required|exists:users,id',
+            'class_id' => 'required|exists:class,id',
+            'academic_year_id' => 'required|exists:academic_years,id',
+            'subject_ids' => 'required|array',
+            'subject_ids.*' => 'exists:subject,id'
+        ]);
 
-        $teacher_id = $request->input('teacher_id');
-        $subject_ids = $request->input('subject_ids');
+        // Récupérer toutes les assignations existantes (avec ou sans matière)
+        $existingAssignments = AssignClassTeacherModel::where([
+            'teacher_id' => $request->teacher_id,
+            'class_id' => $request->class_id,
+            'academic_year_id' => $request->academic_year_id,
+            'is_delete' => 0
+        ])->get();
 
-        // Récupérer la classe assignée à l'enseignant
-        $teacherAssignment = AssignClassTeacherModel::where('teacher_id', $teacher_id)->first();
-
-        if (!$teacherAssignment) {
-            return response()->json(['error' => 'Aucune classe assignée à cet enseignant.'], 400);
-        }
-
-        $class_id = $teacherAssignment->class_id; // ID de la classe assignée
-        $status = $teacherAssignment->status;     // Statut assigné à l'enseignant
-
-        foreach ($subject_ids as $subject_id) {
-            // Vérifier si la matière appartient à la classe
-            $isSubjectInClass = ClassSubjectModel::where('class_id', $class_id)
-                ->where('subject_id', $subject_id)
-                ->exists();
-
-            if (!$isSubjectInClass) {
-                // Retourner un message d'erreur si la matière n'appartient pas à la classe
-                return response()->json(['error' => 'Le cours sélectionné n\'appartient pas à la classe.'], 400);
-            }
-
-            // Vérifier si l'assignation existe déjà pour cette matière
-            $existingAssignment = AssignClassTeacherModel::where('teacher_id', $teacher_id)
-                ->where('subject_id', $subject_id)
-                ->first();
-
-            if (!$existingAssignment) {
-                // Créer l'assignation si elle n'existe pas
-                AssignClassTeacherModel::create([
-                    'teacher_id' => $teacher_id,
-                    'class_id' => $class_id,  // Classe récupérée automatiquement
-                    'subject_id' => $subject_id,
-                    'status' => $status,      // Statut récupéré automatiquement
-                    'is_delete' => 0,
-                    'created_by' => Auth::user()->id,
+        // Mettre à jour chaque assignation existante
+        foreach ($existingAssignments as $index => $assignment) {
+            if (isset($request->subject_ids[$index])) {
+                // Mettre à jour la matière si elle existe dans la sélection
+                $assignment->update([
+                    'subject_id' => $request->subject_ids[$index],
+                    'status' => 0,
+                    'created_by' => Auth::id()
                 ]);
             } else {
-                return response()->json(['error' => 'existe deja'], 400);
+                // Réinitialiser si aucune matière correspondante
+                $assignment->update([
+                    'subject_id' => null,
+                    'status' => 0
+                ]);
             }
         }
 
-        return response()->json(['success' => 'Matières assignées avec succès à l\'enseignant.']);
+        return redirect()->route('admin.assign_class_teacher.list')
+            ->with('success', 'Matières mises à jour avec succès');
     }
 
-    public function assign_subject1($teacher_id, $class_id)
+
+
+
+
+
+
+    // Nouvelle méthode pour récupérer les détails de l'enseignant
+    // public function getTeacherDetails(Request $request)
+    // {
+    //     $teacherId = $request->input('teacher_id');
+
+    //     $assignment = AssignClassTeacherModel::where('teacher_id', $teacherId)
+    //         ->with(['class.academicYear'])
+    //         ->first();
+
+    //     if (!$assignment || !$assignment->class) {
+    //         return response()->json(['error' => 'Cet enseignant n\'est assigné à aucune classe'], 404);
+    //     }
+
+    //     return response()->json([
+    //         'academic_year_name' => $assignment->class->academicYear->name ?? 'N/A',
+    //         'class_name' => $assignment->class->name ?? 'N/A',
+    //     ]);
+    // }
+
+
+
+
+
+    public function assign_subject($teacher_id)
     {
-        // Récupérer les matières associées à la classe
-        $subjects = ClassSubjectModel::where('class_id', $class_id)->get();
+        $selectedTeacher = User::findOrFail($teacher_id);
 
-        // Vérifiez si les sujets existent
-        if ($subjects->isEmpty()) {
-            return redirect()->back()->with('error', 'Aucun sujet trouvé pour cette classe.');
+        // Récupérer toutes les assignations du prof
+        $assignments = AssignClassTeacherModel::where('teacher_id', $teacher_id)
+            ->with(['class.academicYear', 'class.subjects'])
+            ->get();
+
+        // S'il n'a aucune assignation, retourne une erreur
+        if ($assignments->isEmpty()) {
+            return back()->with('error', "Aucune classe assignée à cet enseignant !");
         }
 
-        // Récupérer l'enseignant
-        $teacher = User::find($teacher_id);
-        if (!$teacher) {
-            return redirect()->back()->with('error', 'Enseignant non trouvé.');
-        }
+        // Les classes pour le select
+        $classes = $assignments->pluck('class')->unique('id');
 
-        return view('admin.assign_class_teacher.assign_subject_subject1', [
-            'subjects' => $subjects,
-            'teacher_id' => $teacher_id,
-            'class_id' => $class_id,
+        // Par défaut, on prend la première classe
+        $selectedClass = $classes->first();
+
+        // Selon la classe sélectionnée, matières et assignations existantes
+        $class_id = request('class_id', $selectedClass->id); // Permet d'arriver sur une classe choisie après postback
+        $class = $classes->where('id', $class_id)->first();
+        $subjects = $class->subjects;
+        $assignedSubjectIds = AssignClassTeacherModel::where('teacher_id', $teacher_id)
+            ->where('class_id', $class_id)
+            ->pluck('subject_id')
+            ->filter()
+            ->toArray();
+
+        return view('admin.assign_class_teacher.assign_subject_subject', [
+            'selectedTeacher'    => $selectedTeacher,
+            'classes'            => $classes,
+            'selectedClass'      => $class,
+            'academicYear'       => $class->academicYear,
+            'subjects'           => $subjects,
+            'assignedSubjectIds' => $assignedSubjectIds,
+            'teacher_id'         => $teacher_id,
         ]);
     }
 
-    public function insert_assign_subject1(Request $request)
-    {
-        // Récupérer les IDs depuis le formulaire
-        $subject_ids = $request->input('subject_ids');
-        $teacher_id = $request->input('teacher_id'); // ID de l'enseignant
-        $class_id = $request->input('class_id'); // ID de la classe
-        $status = $request->input('status');
-
-        // Vérifier si des matières ont été sélectionnées
-        if (empty($subject_ids)) {
-            return response()->json(['error' => 'Veuillez sélectionner au moins une matière.'], 400);
-        }
-
-        foreach ($subject_ids as $subject_id) {
-            // Vérifier si la matière appartient à la classe
-            $isSubjectInClass = ClassSubjectModel::where('class_id', $class_id)
-                ->where('subject_id', $subject_id)
-                ->exists();
-
-            if (!$isSubjectInClass) {
-                // Retourner un message d'erreur si la matière n'appartient pas à la classe
-                return response()->json(['error' => 'Le cours sélectionné n\'appartient pas à la classe.'], 400);
-            }
-
-            $status = AssignClassTeacherModel::where('teacher_id', $teacher_id)
-                ->where('class_id', $class_id)
-                ->value('status');
 
 
-            // Vérifier si l'assignation existe déjà pour cette matière
-            $existingAssignment = AssignClassTeacherModel::where('teacher_id', $teacher_id)
-                ->where('subject_id', $subject_id)
-                ->first();
 
-            if (!$existingAssignment) {
-                // Créer l'assignation si elle n'existe pas
-                AssignClassTeacherModel::create([
-                    'teacher_id' => $teacher_id,
-                    'class_id' => $class_id,  // Classe récupérée depuis les paramètres
-                    'subject_id' => $subject_id,
-                    'status' => $status, // Ajuste le statut selon tes besoins
-                    'is_delete' => 0,
-                    'created_by' => Auth::user()->id,
-                ]);
-            } else {
-                return response()->json(['error' => 'Cette matière est déjà assignée à l\'enseignant.'], 400);
-            }
-        }
 
-        return response()->json(['success' => 'Matières assignées avec succès à l\'enseignant.']);
-    }
+
 
     // teacher side work
 
@@ -384,5 +383,12 @@ class AssignClassTeacherController extends Controller
         $data['getRecord'] = AssignClassTeacherModel::getMyClassSubject(Auth::user()->id);
         $data['header_title'] = "My Class & Subject";
         return view('teacher.my_class_subject', $data);
+    }
+
+    public function getClassesByYear($yearId)
+    {
+        return \App\Models\ClassModel::where('academic_year_id', $yearId)
+            ->where('is_delete', 0)
+            ->get(['id', 'name', 'opt']);
     }
 }

@@ -13,6 +13,7 @@ use App\Models\AssignClassTeacherModel;
 use App\Models\User;
 use App\Models\MarksGradeModel;
 use App\Models\SettingModel;
+use App\Models\AcademicYear;
 use App\Models\SubjectModel;
 
 class ExaminationsController extends Controller
@@ -27,25 +28,80 @@ class ExaminationsController extends Controller
 
     public function exam_add()
     {
+        $data['academicYears'] = \App\Models\AcademicYear::orderBy('start_date', 'desc')->get();
         $data['header_title'] = "Add New Exam";
         return view('admin.examinations.exam.add', $data);
     }
 
+
+    // public function exam_insert(Request $request)
+    // {
+    //     $exam = new ExamModel;
+    //     $exam->name = trim($request->name);
+    //     $exam->note = trim($request->note);
+    //     $exam->created_by = Auth::user()->id;
+    //     $exam->save();
+
+    //     return redirect('admin/examinations/exam/list')->with('success', "Exam successfully created");
+    // }
+
     public function exam_insert(Request $request)
     {
-        $exam = new ExamModel;
-        $exam->name = trim($request->name);
-        $exam->note = trim($request->note);
-        $exam->created_by = Auth::user()->id;
-        $exam->save();
+        $request->validate([
+            'academic_year_id' => 'required|exists:academic_years,id',
+            'name' => 'required|array',
+            'name.*' => 'nullable|string|max:255',
+            'enabled' => 'required|array',
+            'note' => 'nullable|string'
+        ]);
+        $names = $request->name;
+        $enabled = $request->enabled ?? [];
 
-        return redirect('admin/examinations/exam/list')->with('success', "Exam successfully created");
+        foreach ($names as $k => $examName) {
+            // Vérifie si activé (case cochée)
+            if (isset($enabled[$k]) && $enabled[$k] && trim($examName) != '') {
+                $exam = new ExamModel();
+                $exam->academic_year_id = $request->academic_year_id;
+                $exam->name = trim($examName);
+                $exam->note = trim($request->note);
+                $exam->created_by = auth()->id();
+                $exam->save();
+            }
+        }
+        return redirect('admin/examinations/exam/list')->with('success', "Exams successfully created.");
     }
 
+
+
+    // public function exam_edit($id)
+    // {
+    //     $data['getRecord'] = ExamModel::getSingle($id);
+    //     if (!empty($data['getRecord'])) {
+    //         $data['header_title'] = "Edit Exam";
+    //         return view('admin.examinations.exam.edit', $data);
+    //     } else {
+    //         abort(404);
+    //     }
+    // }
+
+
+    // public function exam_update($id, Request $request)
+    // {
+    //     $exam = ExamModel::getSingle($id);;
+    //     $exam->name = trim($request->name);
+    //     $exam->note = trim($request->note);
+    //     $exam->save();
+
+    //     return redirect('admin/examinations/exam/list')->with('success', "Exam successfully updated");
+    // }
 
     public function exam_edit($id)
     {
         $data['getRecord'] = ExamModel::getSingle($id);
+
+        // Récupérer toutes les années académiques
+        $data['academicYears'] = AcademicYear::orderBy('start_date', 'desc')->get();
+
         if (!empty($data['getRecord'])) {
             $data['header_title'] = "Edit Exam";
             return view('admin.examinations.exam.edit', $data);
@@ -54,16 +110,24 @@ class ExaminationsController extends Controller
         }
     }
 
-
     public function exam_update($id, Request $request)
     {
-        $exam = ExamModel::getSingle($id);;
+        $request->validate([
+            'academic_year_id' => 'required|exists:academic_years,id',
+            'name' => 'required',
+            'note' => 'nullable'
+        ]);
+
+        $exam = ExamModel::getSingle($id);
         $exam->name = trim($request->name);
         $exam->note = trim($request->note);
+        $exam->academic_year_id = $request->academic_year_id; // Nouveau champ
         $exam->save();
 
-        return redirect('admin/examinations/exam/list')->with('success', "Exam successfully updated");
+        return redirect('admin/examinations/exam/list')
+            ->with('success', "Exam successfully updated");
     }
+
 
 
     public function exam_delete($id)
@@ -84,6 +148,28 @@ class ExaminationsController extends Controller
     {
         $data['getClass'] = ClassModel::getClass();
         $data['getExam'] = ExamModel::getExam();
+        $data['academicYears'] = AcademicYear::orderBy('start_date', 'desc')->get();
+
+        // Initialiser les variables
+        $filteredClasses = collect();
+        $filteredExams = collect();
+        $selectedAcademicYearId = $request->get('academic_year_id');
+
+        if ($selectedAcademicYearId) {
+            // Récupérer les classes de l'année sélectionnée
+            $filteredClasses = ClassModel::where('academic_year_id', $selectedAcademicYearId)->get();
+
+            // Récupérer les examens de l'année sélectionnée
+            $filteredExams = ExamModel::where('academic_year_id', $selectedAcademicYearId)->get();
+        }
+
+        $result = [];
+        // if ($request->filled('exam_id') && $request->filled('class_id')) {
+        //     // Vérifier que la classe appartient à l'année sélectionnée
+        //     $class = ClassModel::find($request->get('class_id'));
+        //     if ($class->academic_year_id != $selectedAcademicYearId) {
+        //         return redirect()->back()->with('error', 'La classe ne correspond pas à l\'année académique sélectionnée');
+        //     }
 
         $result = array();
         if (!empty($request->get('exam_id')) && !empty($request->get('class_id'))) {
@@ -123,13 +209,24 @@ class ExaminationsController extends Controller
 
         $data['getRecord'] = $result;
 
-
+        $data['filteredClasses'] = $filteredClasses;
+        $data['filteredExams'] = $filteredExams;
+        $data['selectedAcademicYearId'] = $selectedAcademicYearId;
         $data['header_title'] = "Exam Schedule";
         return view('admin.examinations.exam_schedule', $data);
     }
 
     public function exam_schedule_insert(Request $request)
     {
+
+        $request->validate([
+            'exam_id' => 'required|exists:exam,id',
+            'class_id' => 'required|exists:class,id',
+            'academic_year_id' => 'required|exists:academic_years,id'
+        ]);
+
+        $academicYearId = $request->academic_year_id;
+
         ExamScheduleModel::deleteRecord($request->exam_id, $request->class_id);
 
         if (!empty($request->schedule)) {
@@ -146,6 +243,7 @@ class ExaminationsController extends Controller
                     $exam->full_marks = $schedule['full_marks'];
                     $exam->passing_mark = $schedule['passing_mark'];
                     $exam->ponde = $schedule['ponde'];
+                    $exam->academic_year_id = $academicYearId;
                     $exam->created_by = Auth::user()->id;
                     $exam->save();
                 }
