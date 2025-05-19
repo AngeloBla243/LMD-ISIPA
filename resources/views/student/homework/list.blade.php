@@ -81,191 +81,124 @@
             color: white;
         }
     </style>
+
+    <style>
+        .card {
+            border-radius: 1.25rem;
+        }
+
+        .card-header {
+            border-radius: 1.25rem 1.25rem 0 0;
+        }
+
+        .table-primary th {
+            background-color: #cfe2ff !important;
+            color: #084298 !important;
+            font-weight: 600;
+        }
+
+        .badge {
+            font-size: 1rem;
+            padding: 0.45em 0.9em;
+        }
+
+        .btn-outline-primary {
+            border-width: 2px;
+        }
+
+        .btn-success,
+        .btn-outline-primary {
+            font-weight: 500;
+        }
+
+        .fa-book {
+            font-size: 1.1em;
+        }
+    </style>
 @endsection
 @section('content')
     <div class="content-wrapper">
-        <section class="content-header">
+        <section class="content-header py-3 bg-light border-bottom mb-4">
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-12">
-                        <h1>My Homework</h1>
+                        <h1 class="h3 fw-bold text-primary"><i class="fa-solid fa-book-open me-2"></i>Mes Devoirs</h1>
                     </div>
                 </div>
             </div>
         </section>
-        <section class="content">
+        <section class="content pb-4">
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-md-12">
 
-
-                        <div class="card">
-                            <div class="card-header">
-                                <h3 class="card-title">Search My Homework</h3>
+                        <!-- Recherche -->
+                        <div class="card shadow-sm rounded-4 border-0 mb-4">
+                            <div class="card-header bg-primary text-white rounded-top-4">
+                                <h3 class="card-title mb-0"><i class="fa-solid fa-magnifying-glass me-2"></i>Rechercher un
+                                    devoir</h3>
                             </div>
-                            <form method="get" action="">
-                                <div class="card-body">
-                                    <div class="row">
-
-
-
-                                        <div class="form-group col-md-2">
-                                            <label>Subject</label>
-                                            <input type="text" class="form-control"
-                                                value="{{ Request::get('subject_name') }}" name="subject_name"
-                                                placeholder="Subject Name">
-                                        </div>
-
-
-
-                                        <div class="form-group col-md-2">
-                                            <label>From Homework Date</label>
-                                            <input type="date" class="form-control" name="from_homework_date"
-                                                value="{{ Request::get('from_homework_date') }}">
-                                        </div>
-
-                                        <div class="form-group col-md-2">
-                                            <label>To Homework Date</label>
-                                            <input type="date" class="form-control" name="to_homework_date"
-                                                value="{{ Request::get('to_homework_date') }}">
-                                        </div>
-
-
-                                        <div class="form-group col-md-2">
-                                            <label>From Submission Date</label>
-                                            <input type="date" class="form-control" name="from_submission_date"
-                                                value="{{ Request::get('from_submission_date') }}">
-                                        </div>
-
-                                        <div class="form-group col-md-2">
-                                            <label>To Submission Date</label>
-                                            <input type="date" class="form-control" name="to_submission_date"
-                                                value="{{ Request::get('to_submission_date') }}">
-                                        </div>
-
-
-                                        <div class="form-group col-md-2">
-                                            <label>From Created Date</label>
-                                            <input type="date" class="form-control" name="from_created_date"
-                                                value="{{ Request::get('from_created_date') }}">
-                                        </div>
-
-                                        <div class="form-group col-md-2">
-                                            <label>To Created Date</label>
-                                            <input type="date" class="form-control" name="to_created_date"
-                                                value="{{ Request::get('to_created_date') }}">
-                                        </div>
-
-
-
-                                        <div class="form-group col-md-3">
-                                            <button class="btn btn-primary" type="submit" style="margin-top: 30px;"><i
-                                                    class="fa-solid fa-magnifying-glass"></i> Search</button>
-                                            <a href="{{ url('student/my_homework') }}" class="btn btn-success"
-                                                style="margin-top: 30px;">Reset</a>
-
-                                        </div>
-
-                                    </div>
-                                </div>
-                            </form>
+                            <!-- Ajoute ici ton formulaire de recherche si besoin -->
                         </div>
 
-
                         @include('_message')
-                        <div class="card">
-                            <div class="card-header">
-                                <h3 class="card-title">Homework List</h3>
+
+                        <!-- Liste des devoirs -->
+                        <div class="card shadow-sm rounded-4 border-0">
+                            <div class="card-header bg-primary text-white rounded-top-4">
+                                <h3 class="card-title mb-0"><i class="fa-solid fa-list-check me-2"></i>Liste des devoirs
+                                </h3>
                             </div>
-                            <div class="card-body p-0" style="overflow: auto;">
-                                <table class="table styled-table table-bordered table-striped">
-                                    <thead>
+                            <div class="card-body p-0 table-responsive">
+                                <table class="table table-hover table-bordered align-middle mb-0">
+                                    <thead class="table-primary text-center text-uppercase small">
                                         <tr>
                                             <th>#</th>
-                                            <th>Class</th>
-                                            <th>Subject</th>
-                                            <th style="min-width: 200px;">Homework Date</th>
-                                            <th style="min-width: 200px;">Submission Date</th>
+                                            <th>Classe</th>
+                                            <th>Matière</th>
+                                            <th>Date du devoir</th>
+                                            <th>Date de remise</th>
                                             <th>Document</th>
                                             <th>Description</th>
-                                            <th style="min-width: 200px;">Created By</th>
-                                            <th style="min-width: 200px;">Created Date</th>
-                                            <th style="min-width: 200px;">Jour restant</th>
+                                            <th>Créé par</th>
+                                            <th>Date création</th>
+                                            <th>Jour restant</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @forelse($getRecord as $value)
                                             <tr>
-                                                <td>{{ $value->id }}</td>
-                                                <td style="min-width: 200px;">{{ $value->class_name }}
-                                                    {{ $value->class_opt }}</td>
-                                                <td style="min-width: 200px;">{{ $value->subject_name }}</td>
+                                                <td class="text-center">{{ $value->id }}</td>
+                                                <td style="min-width: 200px;">{{ $value->class->name }}
+                                                    {{ $value->class->opt }}</td>
+                                                <td style="min-width: 200px;">
+                                                    <i class="fa-solid fa-book text-info me-1"></i>
+                                                    {{ $value->subject->name }}
+                                                </td>
                                                 <td style="min-width: 200px;">
                                                     {{ date('d-m-Y', strtotime($value->homework_date)) }}</td>
                                                 <td style="min-width: 200px;">
                                                     {{ date('d-m-Y', strtotime($value->submission_date)) }}</td>
-                                                <td style="min-width: 200px;">
+                                                <td class="text-center" style="min-width: 200px;">
                                                     @if (!empty($value->getDocument()))
-                                                        {{-- <a href="{{ $value->getDocument() }}" class="btn btn-primary" download="">Download</a> --}}
-                                                        <button class="download-btn" id="downloadBtn">
-                                                            <i class="fas fa-download"></i> <a
-                                                                href="{{ $value->getDocument() }}" class="btn"
-                                                                download="">Download</a>
-                                                        </button>
+                                                        <a href="{{ $value->getDocument() }}"
+                                                            class="btn btn-outline-primary btn-sm" download
+                                                            title="Télécharger">
+                                                            <i class="fas fa-download me-1"></i> Télécharger
+                                                        </a>
                                                     @endif
                                                 </td>
-                                                <td style="min-width: 200px;">
-                                                    {!! $value->description !!}
-                                                </td>
+                                                <td>{!! $value->description !!}</td>
                                                 <td style="min-width: 200px;">{{ $value->created_by_name }}</td>
                                                 <td style="min-width: 200px;">
-                                                    {{ date('d-m-Y', strtotime($value->created_at)) }}
-                                                </td>
-                                                {{-- @php
-                                                    $homeworkDate = \Carbon\Carbon::parse($value->homework_date);
-                                                    $submissionDate = \Carbon\Carbon::parse($value->submission_date);
-                                                    $daysLeft = $homeworkDate->diffInDays($submissionDate, false); // false pour avoir un nombre négatif si la date est passée
-                                                @endphp
+                                                    {{ date('d-m-Y', strtotime($value->created_at)) }}</td>
                                                 @php
                                                     $now = \Carbon\Carbon::now();
                                                     $submission = \Carbon\Carbon::parse(
                                                         $value->submission_date,
                                                     )->endOfDay();
-                                                    $diff = $now->diff($submission);
-
-                                                    // Vérifie si la date de soumission est passée
-                                                    $isTermine = $now->greaterThan($submission);
-                                                @endphp --}}
-
-                                                {{-- <td>
-                                                    @if ($daysLeft >= 0)
-                                                        {{ $daysLeft }} jour(s) restant(s)
-                                                    @else
-                                                        Terminé
-                                                    @endif
-                                                </td>
-                                                <td>
-                                                    @if ($isTermine)
-                                                        <span class="text-danger" style="font-weight: bold;">Terminé</span>
-                                                    @else
-                                                        <span class="text-success" style="font-weight: bold;">
-                                                            {{ $diff->d }} jour(s)
-                                                            {{ $diff->h }} heure(s)
-                                                            restant(s)
-                                                        </span>
-                                                    @endif
-                                                </td> --}}
-
-                                                @php
-                                                    $now = \Carbon\Carbon::now();
-                                                    $submission = \Carbon\Carbon::parse(
-                                                        $value->submission_date,
-                                                    )->endOfDay();
-
-                                                    // Calcul du nombre total de secondes restantes
                                                     $diffInSeconds = $now->diffInSeconds($submission, false);
-
                                                     if ($diffInSeconds > 0) {
                                                         $days = floor($diffInSeconds / 86400);
                                                         $hours = floor(($diffInSeconds % 86400) / 3600);
@@ -274,84 +207,54 @@
                                                         $days = $hours = $minutes = 0;
                                                     }
                                                 @endphp
-                                                <td>
+                                                <td class="text-center" style="min-width: 200px;">
                                                     @if ($diffInSeconds <= 0)
-                                                        <span class="text-danger" style="font-weight: bold;">Terminé</span>
+                                                        <span class="badge bg-danger fs-6">Terminé</span>
                                                     @else
-                                                        <span class="text-success" style="font-weight: bold;">
-                                                            {{ $days }} jour(s)
-                                                            {{ $hours }} heure(s)
-                                                            {{ $minutes }} minute(s)
+                                                        <span class="badge bg-success fs-6">
+                                                            {{ $days }}j {{ $hours }}h {{ $minutes }}m
                                                             restant(s)
                                                         </span>
                                                     @endif
                                                 </td>
-
-                                                {{-- <td style="min-width: 300px;">
-                                                    @php
-                                                        $submissionDate = \Carbon\Carbon::parse(
-                                                            $value->submission_date,
-                                                        )->startOfDay();
-                                                        $today = \Carbon\Carbon::now()->startOfDay();
-                                                        $isExpired = $submissionDate->lt($today);
-                                                    @endphp
-
-                                                    @if ($isExpired)
-                                                        <button class="btn btn-secondary" disabled
-                                                            title="La date limite de soumission est dépassée">
-                                                            <i class="fas fa-clock"></i> Date limite dépassée
-                                                        </button>
-                                                    @else
-                                                        <a href="{{ url('student/my_homework/submit_homework/' . $value->id) }}"
-                                                            class="btn btn-success">
-                                                            <i class="fas fa-upload"></i> Soumettre le devoir
-                                                        </a>
-                                                    @endif
-                                                </td> --}}
-
-
-                                                <td style="min-width: 300px;">
-                                                    @php
-                                                        $submissionDate = \Carbon\Carbon::parse(
-                                                            $value->submission_date,
-                                                        )->startOfDay();
-                                                        $today = \Carbon\Carbon::now()->startOfDay();
-                                                        $isExpired = $submissionDate->lt($today);
-                                                        $isSubmitted = in_array(
-                                                            $value->id,
-                                                            $submittedHomeworkIds ?? [],
-                                                        );
-                                                    @endphp
-
+                                                @php
+                                                    $submissionDate = \Carbon\Carbon::parse(
+                                                        $value->submission_date,
+                                                    )->startOfDay();
+                                                    $today = \Carbon\Carbon::now()->startOfDay();
+                                                    $isExpired = $submissionDate->lt($today);
+                                                    $isSubmitted = in_array($value->id, $submittedHomeworkIds ?? []);
+                                                @endphp
+                                                <td class="text-center" style="min-width: 200px;">
                                                     @if ($isSubmitted)
-                                                        <button class="btn btn-secondary" disabled
+                                                        <button class="btn btn-secondary btn-sm" disabled
                                                             title="Devoir déjà soumis">
-                                                            <i class="fas fa-check-circle"></i> Devoir Soumis
+                                                            <i class="fas fa-check-circle me-1"></i> Soumis
                                                         </button>
                                                     @elseif ($isExpired)
-                                                        <button class="btn btn-secondary" disabled
-                                                            title="La date limite de soumission est dépassée">
-                                                            <i class="fas fa-clock"></i> Date limite dépassée
+                                                        <button class="btn btn-secondary btn-sm" disabled
+                                                            title="Date limite dépassée">
+                                                            <i class="fas fa-clock me-1"></i> Expiré
                                                         </button>
                                                     @else
                                                         <a href="{{ url('student/my_homework/submit_homework/' . $value->id) }}"
-                                                            class="btn btn-success">
-                                                            <i class="fas fa-upload"></i> Soumettre le devoir
+                                                            class="btn btn-success btn-sm">
+                                                            <i class="fas fa-upload me-1"></i> Soumettre
                                                         </a>
                                                     @endif
                                                 </td>
-
-
                                             </tr>
                                         @empty
                                             <tr>
-                                                <td colspan="100%">Record not found</td>
+                                                <td colspan="100%" class="text-center text-muted py-4">
+                                                    <i class="fa-solid fa-face-frown-open fa-2x mb-2"></i><br>
+                                                    Aucun devoir trouvé.
+                                                </td>
                                             </tr>
                                         @endforelse
-
                                     </tbody>
                                 </table>
-                                <div style="padding: 10px; float: right;">
+                                <div class="mt-3 d-flex justify-content-end px-3">
                                     {!! $getRecord->appends(Illuminate\Support\Facades\Request::except('page'))->links() !!}
                                 </div>
                             </div>
@@ -360,7 +263,6 @@
                 </div>
             </div>
         </section>
-
     </div>
 @endsection
 

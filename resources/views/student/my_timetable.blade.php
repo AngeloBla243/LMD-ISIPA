@@ -43,88 +43,91 @@
 @section('content')
     <div class="content-wrapper">
         <!-- Content Header (Page header) -->
-        <section class="content-header">
+        <section class="content-header py-3 bg-light border-bottom mb-4">
             <div class="container-fluid">
-                <div class="row mb-2">
+                <div class="row align-items-center mb-3">
                     <div class="col-sm-6">
-                        <h1>My Timetable</h1>
+                        <h1 class="h3 fw-bold text-primary">Mon Emploi du Temps</h1>
                     </div>
-
-
-
-
+                    <div class="col-sm-6 text-end">
+                        @if (!$selectedAcademicYear->is_active)
+                            <div class="alert alert-warning d-inline-flex align-items-center gap-2 py-2 px-3 mb-0 rounded shadow-sm"
+                                style="font-size: 0.9rem;">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <span>Vous consultez une année archivée</span>
+                            </div>
+                        @endif
+                    </div>
                 </div>
-            </div><!-- /.container-fluid -->
+                {{-- Formulaire de sélection d'année académique (décommenter si besoin) --}}
+                {{--
+            <form method="GET" action="" class="d-flex justify-content-end mb-4">
+                <select name="academic_year_id" class="form-select w-auto border-primary shadow-sm" onchange="this.form.submit()">
+                    @foreach ($academicYears as $year)
+                        <option value="{{ $year->id }}" {{ $selectedAcademicYear->id == $year->id ? 'selected' : '' }}>
+                            {{ $year->name }} @if ($year->is_active) (Active) @endif
+                        </option>
+                    @endforeach
+                </select>
+            </form>
+            --}}
+            </div>
         </section>
-
-
-
 
         <!-- Main content -->
         <section class="content">
-
-
             <div class="container-fluid">
-                <div class="row">
 
-                    <!-- /.col -->
-                    <div class="col-md-12">
+                @include('_message')
 
-                        @include('_message')
-
-
-
-                        @foreach ($getRecord as $value)
-                            <div class="card">
-                                <div class="card-header">
-                                    <h3 class="card-title">{{ $value['name'] }}</h3>
+                <div class="row g-4">
+                    @forelse ($getRecord as $value)
+                        <div class="col-12">
+                            <div class="card shadow-sm rounded-3 border-0">
+                                <div class="card-header bg-primary text-white">
+                                    <h3 class="card-title mb-0">{{ $value['name'] }}</h3>
                                 </div>
-                                <!-- /.card-header -->
-                                <div class="card-body p-0" style="overflow: auto;">
-                                    <table class="table styled-table table-bordered table-striped">
-                                        <thead>
+                                <div class="card-body p-0 table-responsive">
+                                    <table class="table table-striped table-bordered align-middle mb-0">
+                                        <thead class="table-primary text-center text-uppercase small">
                                             <tr>
-                                                <th>Week</th>
-                                                <th>Start Time</th>
-                                                <th>End Time</th>
-                                                <th>Room Number</th>
+                                                <th>Semaine</th>
+                                                <th>Heure début</th>
+                                                <th>Heure fin</th>
+                                                <th>Numéro de salle</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             @foreach ($value['week'] as $valueW)
                                                 <tr>
-                                                    <td>{{ $valueW['week_name'] }}</td>
-                                                    <td>{{ !empty($valueW['start_time']) ? date('h:i A', strtotime($valueW['start_time'])) : '' }}
+                                                    <td class="fw-semibold text-center">{{ $valueW['week_name'] }}</td>
+                                                    <td class="text-center">
+                                                        {{ $valueW['start_time'] ? date('H:i A', strtotime($valueW['start_time'])) : '-' }}
                                                     </td>
-                                                    <td>{{ !empty($valueW['end_time']) ? date('h:i A', strtotime($valueW['end_time'])) : '' }}
+                                                    <td class="text-center">
+                                                        {{ $valueW['end_time'] ? date('H:i A', strtotime($valueW['end_time'])) : '-' }}
                                                     </td>
-                                                    <td>{{ $valueW['room_number'] }}</td>
+                                                    <td class="text-center">{{ $valueW['room_number'] ?? '-' }}</td>
                                                 </tr>
                                             @endforeach
                                         </tbody>
                                     </table>
                                 </div>
                             </div>
-                        @endforeach
-
-
-
-
-                    </div>
-
-                    <!-- /.card-body -->
+                        </div>
+                    @empty
+                        <div class="col-12">
+                            <div class="alert alert-info text-center shadow-sm rounded-3">
+                                Aucun emploi du temps disponible pour cette année académique.
+                            </div>
+                        </div>
+                    @endforelse
                 </div>
-                <!-- /.card -->
-            </div>
-            <!-- /.col -->
-    </div>
-    <!-- /.row -->
 
-    <!-- /.row -->
-    </div><!-- /.container-fluid -->
-    </section>
-    <!-- /.content -->
+            </div>
+        </section>
     </div>
+
 @endsection
 
 

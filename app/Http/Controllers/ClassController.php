@@ -5,17 +5,12 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\ClassModel;
+
 use App\Models\AcademicYear;
 
 class ClassController extends Controller
 {
-    // public function list()
-    // {
-    //     $data['getRecord'] = ClassModel::getRecord();
 
-    //     $data['header_title'] = "Class List";
-    //     return view('admin.class.list', $data);
-    // }
     public function list()
     {
         $data['getRecord'] = ClassModel::select('class.*', 'academic_years.name as academic_year_name')

@@ -22,6 +22,13 @@
             </a>
         </li>
 
+        <li class="nav-item">
+            <a href="{{ url('logout') }}" class="nav-link">
+                <i class="nav-icon fa fa-sign-out-alt"></i>
+                <p class="d-inline ml-1">Logout</p>
+            </a>
+        </li>
+
     </ul>
 </nav>
 <!-- /.navbar -->
@@ -37,6 +44,83 @@
                 style="font-weight: bold !important;font-size: 20px;">School</span>
         @endif
     </a>
+    {{-- Dans la barre de navigation --}}
+    @if (Auth::check() && Auth::user()->user_type == 3)
+        @php
+            $allAcademicYears = \App\Models\AcademicYear::orderBy('start_date', 'desc')->get();
+            $currentYear = \App\Models\AcademicYear::find(
+                session('academic_year_id', $allAcademicYears->where('is_active', 1)->first()?->id),
+            );
+        @endphp
+
+        <div class="p-2">
+            <form method="GET" action="{{ route('set_academic_year_student') }}" id="academicYearFormSidebar"
+                class="d-flex align-items-center" style="gap:8px;">
+                <label for="academic_year_id" class="mb-0" style="font-weight:600;">
+                    <i class="far fa-calendar-alt text-primary"></i>
+                </label>
+                <select name="academic_year_id" id="academic_year_id" class="form-select"
+                    style="width:190px; background: #f8faff; border: 1.2px solid #007bff; font-weight:600; color:#245aea;"
+                    onchange="this.form.submit()">
+                    @foreach ($allAcademicYears as $year)
+                        <option value="{{ $year->id }}" @if ($currentYear && $year->id == $currentYear->id) selected @endif>
+                            {{ $year->name }}{{ $year->is_active ? '' : '' }}
+                        </option>
+                    @endforeach
+                </select>
+            </form>
+            @if ($currentYear && !$currentYear->is_active)
+                <div class="alert alert-warning mt-2 py-1 px-2 mb-0 d-flex align-items-center"
+                    style="font-size:0.96em;">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <span>Vous n'êtes pas dans l'année académique active</span>
+                </div>
+            @endif
+        </div>
+    @endif
+
+    {{-- Filtre année académique pour les enseignants --}}
+    @if (Auth::check() && Auth::user()->user_type == 2)
+        @php
+            $allAcademicYears = \App\Models\AcademicYear::orderBy('start_date', 'desc')->get();
+            $currentYear = \App\Models\AcademicYear::find(
+                session('academic_year_id', $allAcademicYears->where('is_active', 1)->first()?->id),
+            );
+        @endphp
+
+        <div class="p-2">
+            <form method="GET" action="{{ route('set_academic_year_teacher') }}" id="academicYearFormSidebarTeacher"
+                class="d-flex align-items-center" style="gap:8px;">
+                <label for="academic_year_id" class="mb-0" style="font-weight:600;">
+                    <i class="far fa-calendar-alt text-primary"></i>
+                </label>
+                <select name="academic_year_id" id="academic_year_id_teacher" class="form-select"
+                    style="width:190px; background: #f8faff; border: 1.2px solid #007bff; font-weight:600; color:#245aea;"
+                    onchange="this.form.submit()">
+                    @foreach ($allAcademicYears as $year)
+                        <option value="{{ $year->id }}" @if ($currentYear && $year->id == $currentYear->id) selected @endif>
+                            {{ $year->name }}{{ $year->is_active ? '' : '' }}
+                        </option>
+                    @endforeach
+                </select>
+            </form>
+            @if ($currentYear && !$currentYear->is_active)
+                <div class="alert alert-warning mt-2 py-1 px-2 mb-0 d-flex align-items-center"
+                    style="font-size:0.96em;">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <span>Année académique non active</span>
+                </div>
+            @endif
+        </div>
+    @endif
+
+
+
+
+
+
+
+
 
     <!-- Sidebar -->
     <div class="sidebar">
@@ -799,14 +883,14 @@
 
 
 
-                <li class="nav-item">
+                {{-- <li class="nav-item">
                     <a href="{{ url('logout') }}" class="nav-link">
                         <i class="nav-icon fa fa-sign-out"></i>
                         <p>
                             Logout
                         </p>
                     </a>
-                </li>
+                </li> --}}
 
 
 
@@ -816,16 +900,3 @@
     </div>
     <!-- /.sidebar -->
 </aside>
-
-{{-- @auth
-    {{-- @if (auth()->user()->hasRole('admin'))
-        <a href="{{ route('admin.theses') }}">Gestion des thèses (Admin)</a>
-        <a href="{{ route('admin.theses.settings') }}">Paramètres des thèses (Admin)</a>
-    @endif --}}
-
-{{-- @if (auth()->user()->hasRole('student'))
-        <a href="{{ route('thesis.submit') }}">Soumettre mon mémoire</a>
-    @endif --}}
-
-<!-- ... Autres liens conditionnels ... -->
-{{-- @endauth  --}}

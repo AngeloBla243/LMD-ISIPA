@@ -9,6 +9,8 @@ use App\Models\HomeworkModel;
 use App\Models\AssignClassTeacherModel;
 use App\Models\HomeworkSubmitModel;
 use App\Models\SubjectModel;
+use App\Models\AcademicYear;
+use Illuminate\Support\Facades\DB;
 use App\Models\User;
 
 
@@ -32,85 +34,169 @@ class HomeworkController extends Controller
     }
 
 
-    public function add()
+    // public function add()
+    // {
+    //     $data['getClass'] = ClassModel::getClass();
+    //     $data['header_title'] = 'Add New Homework';
+    //     return view('admin.homework.add', $data);
+    // }
+
+    public function add(Request $request)
     {
-        $data['getClass'] = ClassModel::getClass();
-        $data['header_title'] = 'Add New Homework';
+        // 1. Récupérer toutes les années académiques
+        $data['academicYears'] = AcademicYear::orderBy('start_date', 'desc')->get();
+
+        // 2. Si une année est choisie, charger les classes de cette année
+        $data['selectedAcademicYear'] = null;
+        $data['getClass'] = [];
+        $data['getSubject'] = [];
+
+        if ($request->filled('academic_year_id')) {
+            $data['selectedAcademicYear'] = AcademicYear::find($request->academic_year_id);
+
+            // Charger les classes de cette année
+            $data['getClass'] = ClassModel::where('academic_year_id', $request->academic_year_id)
+                ->where('is_delete', 0)
+                ->where('status', 0)
+                ->get();
+
+            // Si une classe est sélectionnée, charger les matières de cette classe pour cette année
+            if ($request->filled('class_id')) {
+                $data['getSubject'] = ClassSubjectModel::where('class_id', $request->class_id)
+                    ->where('academic_year_id', $request->academic_year_id)
+                    ->with('subject')
+                    ->get();
+            }
+        }
+
+        $data['header_title'] = 'Ajouter un devoir';
         return view('admin.homework.add', $data);
     }
 
+
+
+
     public function insert(Request $request)
     {
-        $homwork = new HomeworkModel;
-        $homwork->class_id = trim($request->class_id);
-        $homwork->subject_id = trim($request->subject_id);
-        $homwork->homework_date = trim($request->homework_date);
-        $homwork->submission_date = trim($request->submission_date);
-        $homwork->description = trim($request->description);
-        $homwork->created_by = Auth::user()->id;
+        // $request->validate([
+        //     'academic_year_id' => 'required|exists:academic_years,id',
+        //     'class_id' => 'required|exists:class,id',
+        //     'subject_id' => 'required|exists:subject,id',
+        //     // ... autres règles
+        // ]);
 
-        if (!empty($request->file('document_file'))) {
+        $homework = new HomeworkModel;
+        $homework->academic_year_id = $request->academic_year_id;
+        $homework->class_id = $request->class_id;
+        $homework->subject_id = $request->subject_id;
+        $homework->homework_date = $request->homework_date;
+        $homework->submission_date = $request->submission_date;
+        $homework->description = $request->description;
+        $homework->created_by = Auth::user()->id;
+
+        if ($request->hasFile('document_file')) {
             $ext = $request->file('document_file')->getClientOriginalExtension();
             $file = $request->file('document_file');
             $randomStr = date('Ymdhis') . Str::random(20);
             $filename = strtolower($randomStr) . '.' . $ext;
             $file->move('upload/homework/', $filename);
-
-            $homwork->document_file = $filename;
+            $homework->document_file = $filename;
         }
-
-        $homwork->save();
+        $homework->save();
 
         return redirect('admin/homework/homework')->with('success', "Homework successfully created");
     }
 
-    public function ajax_get_subject(Request $request)
-    {
-        $class_id = $request->class_id;
-        $getSubject = ClassSubjectModel::MySubject($class_id);
-        $html = '';
-        $html .= '<option value="">Select Subject</option>';
-        foreach ($getSubject as $value) {
-            $html .= '<option value="' . $value->subject_id . '">' . $value->subject_name . '</option>';
-        }
 
-        $json['success'] = $html;
-        echo json_encode($json);
-    }
+
 
     public function edit($id)
     {
         $getRecord = HomeworkModel::getSingle($id);
-        $data['getRecord'] = $getRecord;
-        $data['getSubject'] = ClassSubjectModel::MySubject($getRecord->class_id);
-        $data['getClass'] = ClassModel::getClass();
-        $data['header_title'] = 'Edit Homework';
+
+        // Années disponibles
+        $academicYears = AcademicYear::orderBy('start_date', 'desc')->get();
+
+        // Année académique du devoir (pré-remplissage)
+        $selectedAcademicYearId = request('academic_year_id', $getRecord->academic_year_id);
+
+        // Classes de l'année sélectionnée
+        $getClass = ClassModel::where('academic_year_id', $selectedAcademicYearId)
+            ->where('is_delete', 0)
+            ->where('status', 0)
+            ->get();
+
+        // Classe sélectionnée (pré-remplissage)
+        $selectedClassId = request('class_id', $getRecord->class_id);
+
+        // Matières de la classe et de l'année sélectionnées
+        $getSubject = [];
+        if ($selectedClassId) {
+            $getSubject = ClassSubjectModel::where('class_id', $selectedClassId)
+                ->where('academic_year_id', $selectedAcademicYearId)
+                ->with('subject')
+                ->get();
+        }
+
+        $data = [
+            'getRecord' => $getRecord,
+            'academicYears' => $academicYears,
+            'getClass' => $getClass,
+            'getSubject' => $getSubject,
+            'header_title' => 'Edit Homework'
+        ];
         return view('admin.homework.edit', $data);
     }
 
+
+
+    // public function update(Request $request, $id)
+    // {
+    //     $homwork = HomeworkModel::getSingle($id);;
+    //     $homwork->class_id = trim($request->class_id);
+    //     $homwork->subject_id = trim($request->subject_id);
+    //     $homwork->homework_date = trim($request->homework_date);
+    //     $homwork->submission_date = trim($request->submission_date);
+    //     $homwork->description = trim($request->description);
+
+    //     if (!empty($request->file('document_file'))) {
+    //         $ext = $request->file('document_file')->getClientOriginalExtension();
+    //         $file = $request->file('document_file');
+    //         $randomStr = date('Ymdhis') . Str::random(20);
+    //         $filename = strtolower($randomStr) . '.' . $ext;
+    //         $file->move('upload/homework/', $filename);
+
+    //         $homwork->document_file = $filename;
+    //     }
+
+    //     $homwork->save();
+
+    //     return redirect('admin/homework/homework')->with('success', "Homework successfully updated");
+    // }
+
     public function update(Request $request, $id)
     {
-        $homwork = HomeworkModel::getSingle($id);;
-        $homwork->class_id = trim($request->class_id);
-        $homwork->subject_id = trim($request->subject_id);
-        $homwork->homework_date = trim($request->homework_date);
-        $homwork->submission_date = trim($request->submission_date);
-        $homwork->description = trim($request->description);
+        $homework = HomeworkModel::getSingle($id);
 
-        if (!empty($request->file('document_file'))) {
-            $ext = $request->file('document_file')->getClientOriginalExtension();
+        $homework->academic_year_id = $request->academic_year_id;
+        $homework->class_id = $request->class_id;
+        $homework->subject_id = $request->subject_id;
+        $homework->homework_date = $request->homework_date;
+        $homework->submission_date = $request->submission_date;
+        $homework->description = $request->description;
+
+        if ($request->hasFile('document_file')) {
             $file = $request->file('document_file');
-            $randomStr = date('Ymdhis') . Str::random(20);
-            $filename = strtolower($randomStr) . '.' . $ext;
+            $filename = time() . '_' . $file->getClientOriginalName();
             $file->move('upload/homework/', $filename);
-
-            $homwork->document_file = $filename;
+            $homework->document_file = $filename;
         }
 
-        $homwork->save();
+        $homework->save();
 
         return redirect('admin/homework/homework')->with('success', "Homework successfully updated");
     }
+
 
     public function delete($id)
     {
@@ -135,21 +221,6 @@ class HomeworkController extends Controller
     }
 
     // teacher side
-
-    // public function HomeworkTeacher()
-    // {
-    //     $class_ids = array();
-    //     $getClass = AssignClassTeacherModel::getMyClassSubjectGroup(Auth::user()->id);
-    //     dd($getClass);
-    //     foreach($getClass as $class)
-    //     {
-    //         $class_ids[] = $class->class_id;
-    //     }
-
-    //     $data['getRecord'] = HomeworkModel::getRecordTeacher($class_ids);
-    //     $data['header_title'] = 'Homework';
-    //     return view('teacher.homework.list', $data);
-    // }
 
     public function HomeworkTeacher()
     {
@@ -176,12 +247,6 @@ class HomeworkController extends Controller
     }
 
 
-    // public function addTeacher()
-    // {
-    //     $data['getClass'] = AssignClassTeacherModel::getMyClassSubjectGroup(Auth::user()->id);
-    //     $data['header_title'] = 'Add New Homework';
-    //     return view('teacher.homework.add', $data);
-    // }
 
     public function addTeacher()
     {
@@ -283,30 +348,46 @@ class HomeworkController extends Controller
 
     // student side work
 
-    // public function HomeworkStudent()
-    // {
-    //     $data['getRecord'] = HomeworkModel::getRecordStudent(Auth::user()->class_id, Auth::user()->id);
-    //     $data['header_title'] = 'My Homework';
-    //     return view('student.homework.list', $data);
-    // }
-
     public function HomeworkStudent()
     {
-        $studentId = Auth::user()->id;
-        $classId = Auth::user()->class_id;
+        // Récupérer l'année académique
+        $academicYearId = session('academic_year_id', AcademicYear::where('is_active', 1)->value('id'));
 
-        $getRecord = HomeworkModel::getRecordStudent($classId, $studentId);
+        // Récupérer la classe de l'étudiant pour cette année
+        $studentClass = DB::table('student_class')
+            ->where('student_id', Auth::id())
+            ->where('academic_year_id', $academicYearId)
+            ->first();
 
-        // Récupérer les IDs des devoirs déjà soumis par l'étudiant
-        $submittedHomeworkIds = HomeworkSubmitModel::where('student_id', $studentId)
+        if (!$studentClass) {
+            return redirect()->back()->with('error', 'Aucune classe assignée pour cette année académique');
+        }
+
+        // Récupérer les devoirs avec filtre académique
+        $getRecord = HomeworkModel::where('class_id', $studentClass->class_id)
+            ->where('academic_year_id', $academicYearId)
+            ->orderBy('homework_date', 'desc')
+            ->paginate(10);
+
+        // IDs des devoirs soumis
+        $submittedHomeworkIds = HomeworkSubmitModel::where('student_id', Auth::id())
             ->pluck('homework_id')
             ->toArray();
 
-        $data['getRecord'] = $getRecord;
-        $data['header_title'] = 'My Homework';
-        $data['submittedHomeworkIds'] = $submittedHomeworkIds; // Passer les IDs à la vue
+        // Données pour la vue
+        $data = [
+            'getRecord' => $getRecord,
+            'academicYears' => AcademicYear::orderBy('start_date', 'desc')->get(),
+            'selectedAcademicYear' => AcademicYear::find($academicYearId),
+            'submittedHomeworkIds' => $submittedHomeworkIds,
+            'header_title' => 'Mes Devoirs'
+        ];
+
+        // dd($data);
+
         return view('student.homework.list', $data);
     }
+
 
 
 
@@ -339,12 +420,61 @@ class HomeworkController extends Controller
         return redirect('student/my_homework')->with('success', "Homework successfully submited");
     }
 
+    // public function HomeworkSubmittedStudent(Request $request)
+    // {
+    //     $data['getRecord'] = HomeworkSubmitModel::getRecordStudent(Auth::user()->id);
+    //     $data['header_title'] = 'My Submitted Homework';
+    //     return view('student.homework.submitted_list', $data);
+    // }
+
     public function HomeworkSubmittedStudent(Request $request)
     {
-        $data['getRecord'] = HomeworkSubmitModel::getRecordStudent(Auth::user()->id);
+        // 1. Définir l'année académique active (via session ou GET)
+        $academicYearId = $request->get('academic_year_id', session(
+            'academic_year_id',
+            \App\Models\AcademicYear::where('is_active', 1)->value('id')
+        ));
+
+        // 2. Récupérer la/les classes pour CETTE année académique via la table student_class (pivot)
+        $studentClasses = DB::table('student_class')
+            ->where('student_id', Auth::id())
+            ->where('academic_year_id', $academicYearId)
+            ->pluck('class_id')->toArray();
+
+        // Si pas de classe du tout, rien à afficher
+        if (empty($studentClasses)) {
+            $data['getRecord'] = collect();
+            $data['header_title'] = 'My Submitted Homework';
+            return view('student.homework.submitted_list', $data);
+        }
+
+        // 3. Récupérer les devoirs soumis pour ces classes et cette année académique
+        $data['getRecord'] = \App\Models\HomeworkSubmitModel::with([
+            'getHomework' => function ($q) use ($academicYearId, $studentClasses) {
+                $q->where('academic_year_id', $academicYearId)
+                    ->whereIn('class_id', $studentClasses);
+            }
+        ])
+            ->where('student_id', Auth::id())
+            // on peut aussi mettre un whereHas pour n’avoir que les devoirs de la bonne année
+            ->whereHas('getHomework', function ($q) use ($academicYearId, $studentClasses) {
+                $q->where('academic_year_id', $academicYearId)
+                    ->whereIn('class_id', $studentClasses);
+            })
+            ->orderBy('id', 'desc')
+            ->paginate(20);
+
+        // 4. Pour le filtre en haut de page
+        $data['getRecord'] = HomeworkSubmitModel::getRecordStudent(Auth::user()->id)
+            ->paginate(20);
+        $data['academicYears'] = \App\Models\AcademicYear::orderBy('start_date', 'desc')->get();
+        $data['selectedAcademicYear'] = \App\Models\AcademicYear::find($academicYearId);
+
         $data['header_title'] = 'My Submitted Homework';
+
         return view('student.homework.submitted_list', $data);
     }
+
 
     // parent side work
 

@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\SettingModel;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use App\Models\ClassModel;
 use Illuminate\Support\Str;
 
 class UserController extends Controller
@@ -239,4 +240,10 @@ class UserController extends Controller
             return redirect()->back()->with('error', "Old Password is not Currect");
         }
     }
+
+    // public function studentClasses()
+    // {
+    //     return $this->belongsToMany(ClassModel::class, 'student_class')
+    //         ->withPivot('academic_year_id');
+    // }
 }

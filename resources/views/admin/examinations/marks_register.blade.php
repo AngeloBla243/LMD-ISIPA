@@ -46,97 +46,114 @@
 @endsection
 @section('content')
     <div class="content-wrapper">
-        <!-- Content Header (Page header) -->
-        <section class="content-header">
+        <!-- Content Header -->
+        <section class="content-header py-3 bg-light border-bottom mb-4">
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h1>Marks Register</h1>
+                        <h1 class="h3 fw-bold text-primary">Marks Register</h1>
                     </div>
                 </div>
-            </div><!-- /.container-fluid -->
+            </div>
         </section>
 
-
         <!-- Main content -->
-        <section class="content">
-
+        <section class="content pb-5">
             <div class="container-fluid">
                 <div class="row">
+                    <div class="col-12">
 
-                    <!-- /.col -->
-                    <div class="col-md-12">
-                        <div class="card">
-                            <div class="card-header">
-                                <h3 class="card-title">Search Marks Register</h3>
+                        <!-- Search Card -->
+                        <div class="card shadow-sm rounded-4 border-0 mb-4">
+                            <div class="card-header bg-primary text-white rounded-top-4">
+                                <h3 class="card-title mb-0">
+                                    <i class="fa-solid fa-magnifying-glass me-2"></i>Search Marks Register
+                                </h3>
                             </div>
                             <form method="get" action="">
                                 <div class="card-body">
-                                    <div class="row">
-                                        <div class="form-group col-md-3">
-                                            <label>Exam</label>
-                                            <select class="form-control getClass" name="exam_id" required>
-                                                <option value="">Select</option>
-                                                @foreach ($getExam as $exam)
-                                                    <option {{ Request::get('exam_id') == $exam->id ? 'selected' : '' }}
-                                                        value="{{ $exam->id }}">{{ $exam->name }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-
-                                        <div class="form-group col-md-3">
-                                            <label>Class</label>
-                                            <select class="form-control getClass" name="class_id" required>
-                                                <option value="">Select</option>
-                                                @foreach ($getClass as $class)
-                                                    <option {{ Request::get('class_id') == $class->id ? 'selected' : '' }}
-                                                        value="{{ $class->id }}">{{ $class->name }} {{ $class->opt }}
+                                    <div class="row g-3">
+                                        <div class="col-md-3">
+                                            <label class="form-label fw-semibold">Année Académique</label>
+                                            <select name="academic_year_id" class="form-select form-control" required
+                                                onchange="this.form.submit()">
+                                                <option value="">Sélectionner</option>
+                                                @foreach ($academicYears as $year)
+                                                    <option value="{{ $year->id }}"
+                                                        {{ Request::get('academic_year_id') == $year->id ? 'selected' : '' }}>
+                                                        {{ $year->name }}
                                                     </option>
                                                 @endforeach
                                             </select>
                                         </div>
-
-                                        <div class="form-group col-md-3">
-                                            <button class="btn btn-primary" type="submit"
-                                                style="margin-top: 30px;">Search</button>
-                                            <a href="{{ url('admin/examinations/marks_register') }}" class="btn btn-success"
-                                                style="margin-top: 30px;">reset</a>
+                                        <div class="col-md-3">
+                                            <label class="form-label fw-semibold">Examen</label>
+                                            <select name="exam_id" class="form-select form-control"
+                                                {{ empty($filteredExams) ? 'disabled' : '' }} required>
+                                                <option value="">Sélectionner</option>
+                                                @if (!empty($filteredExams))
+                                                    @foreach ($filteredExams as $exam)
+                                                        <option value="{{ $exam->id }}"
+                                                            {{ Request::get('exam_id') == $exam->id ? 'selected' : '' }}>
+                                                            {{ $exam->name }}
+                                                        </option>
+                                                    @endforeach
+                                                @endif
+                                            </select>
                                         </div>
-
+                                        <div class="col-md-3">
+                                            <label class="form-label fw-semibold">Classe</label>
+                                            <select name="class_id" class="form-select form-control"
+                                                {{ empty($filteredClasses) ? 'disabled' : '' }} required>
+                                                <option value="">Sélectionner</option>
+                                                @if (!empty($filteredClasses))
+                                                    @foreach ($filteredClasses as $class)
+                                                        <option value="{{ $class->id }}"
+                                                            {{ Request::get('class_id') == $class->id ? 'selected' : '' }}>
+                                                            {{ $class->name }} {{ $class->opt }}
+                                                        </option>
+                                                    @endforeach
+                                                @endif
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3 d-flex align-items-end gap-2">
+                                            <button type="submit" class="btn btn-primary w-100">
+                                                <i class="fa-solid fa-magnifying-glass me-1"></i> Rechercher
+                                            </button>
+                                            <a href="{{ url('admin/examinations/marks_register') }}"
+                                                class="btn btn-success w-100">
+                                                Réinitialiser
+                                            </a>
+                                        </div>
                                     </div>
                                 </div>
                             </form>
                         </div>
 
-                        <div id="customModal" class="modal">
-                            <div class="modal-content">
-                                <span class="close">&times;</span>
-                                <p id="modalMessage"></p>
-                            </div>
-                        </div>
-
                         @include('_message')
 
                         @if (!empty($getSubject) && !empty($getSubject->count()))
-                            <div class="card">
-                                <div class="card-header">
-                                    <h3 class="card-title">Exam Schedule</h3>
+                            <div class="card shadow-sm rounded-4 border-0">
+                                <div class="card-header bg-primary text-white rounded-top-4">
+                                    <h3 class="card-title mb-0">
+                                        <i class="fa-solid fa-list-ul me-2"></i>Exam Schedule
+                                    </h3>
                                 </div>
-                                <!-- /.card-header -->
-                                <div class="card-body p-0" style="overflow: auto;">
-                                    <table id="moi" class="table styled-table table-bordered table-striped">
-                                        <thead>
+                                <div class="card-body p-0 table-responsive">
+                                    <table class="table table-hover table-bordered align-middle mb-0">
+                                        <thead class="table-primary text-center text-uppercase small">
                                             <tr>
-                                                <th style="min-width: 250px;">STUDENT NAME</th>
+                                                <th style="min-width: 250px;">Student Name</th>
                                                 @foreach ($getSubject as $subject)
                                                     <th style="min-width: 200px;">
                                                         {{ $subject->subject_name }} <br />
-                                                        ({{ $subject->subject_type }}: {{ $subject->passing_mark }} /
-                                                        {{ $subject->full_marks }})
+                                                        <span class="text-muted small">
+                                                            ({{ $subject->subject_type }}: {{ $subject->passing_mark }} /
+                                                            {{ $subject->full_marks }})
+                                                        </span>
                                                     </th>
                                                 @endforeach
-                                                <th>ACTION</th>
-
+                                                <th>Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -150,31 +167,16 @@
                                                             value="{{ Request::get('exam_id') }}">
                                                         <input type="hidden" name="class_id"
                                                             value="{{ Request::get('class_id') }}">
+                                                        <input type="hidden" name="academic_year_id"
+                                                            value="{{ $class->academic_year_id ?? '' }}">
                                                         <tr>
-                                                            <td>{{ $student->name }} {{ $student->last_name }}</td>
-                                                            @php
-                                                                $i = 1;
-                                                                $totalStudentMark = 0;
-                                                                $credit = 0;
-                                                                $credits_obtenus = 0;
-
-                                                                $totalFullMarks = 0;
-                                                                $totalPassinglMarks = 0;
-                                                                $pass_fail_vali = 0;
-                                                                $fail_count = 0;
-                                                            @endphp
-
+                                                            <td class="fw-semibold">{{ $student->name }}
+                                                                {{ $student->last_name }}</td>
+                                                            @php $i = 1; @endphp
                                                             @foreach ($getSubject as $subject)
                                                                 @php
                                                                     $totalMark = 0;
                                                                     $totalMarks = 0;
-
-                                                                    // Vérifiez que $subject->ponde est valide
-                                                                    $credit += is_numeric($subject->ponde)
-                                                                        ? $subject->ponde
-                                                                        : 0;
-
-                                                                    // Appelez la méthode getMark
                                                                     $getMark = $subject->getMark(
                                                                         $student->id,
                                                                         Request::get('exam_id'),
@@ -182,7 +184,6 @@
                                                                         $subject->subject_id,
                                                                     );
 
-                                                                    // Vérifiez que $getMark et ses propriétés sont valides
                                                                     if (
                                                                         !empty($getMark) &&
                                                                         is_numeric($getMark->class_work) &&
@@ -194,14 +195,11 @@
                                                                     } else {
                                                                         $totalMark = 0; // Valeur par défaut si données non valides
                                                                     }
+
                                                                 @endphp
-
-                                                                <!-- Autres calculs ou affichages ici -->
-
-
                                                                 <td>
-                                                                    <div style="margin-bottom: 10px;">
-                                                                        class Work
+                                                                    <div class="mb-2">
+                                                                        <label class="form-label small">Class Work</label>
                                                                         <input type="hidden"
                                                                             name="mark[{{ $i }}][full_marks]"
                                                                             value="{{ $subject->full_marks }}">
@@ -211,7 +209,6 @@
                                                                         <input type="hidden"
                                                                             name="mark[{{ $i }}][ponde]"
                                                                             value="{{ $subject->ponde }}">
-
                                                                         <input type="hidden"
                                                                             name="mark[{{ $i }}][id]"
                                                                             value="{{ $subject->id }}">
@@ -221,22 +218,22 @@
                                                                         <input type="text"
                                                                             name="mark[{{ $i }}][class_work]"
                                                                             id="class_work_{{ $student->id }}{{ $subject->subject_id }}"
-                                                                            style="width: 200px" placeholder="Enter Marks"
-                                                                            value="{{ !empty($getMark->class_work) ? $getMark->class_work : '' }}"
-                                                                            class="form-control">
+                                                                            class="form-control form-control-sm"
+                                                                            style="width: 120px" placeholder="Marks"
+                                                                            value="{{ !empty($getMark->class_work) ? $getMark->class_work : '' }}">
                                                                     </div>
-
-
-
-                                                                    <div style="margin-bottom: 10px;">
-                                                                        Exam
+                                                                    <div style="margin-bottom: 10px;>
+                                                                        <label class="form-label
+                                                                        small">Exam</label>
                                                                         <input type="text"
                                                                             name="mark[{{ $i }}][exam]"
                                                                             id="exam_{{ $student->id }}{{ $subject->subject_id }}"
-                                                                            style="width: 200px" placeholder="Enter Marks"
-                                                                            value="{{ !empty($getMark->exam) ? $getMark->exam : '' }}"
-                                                                            class="form-control">
+                                                                            class="form-control form-control-sm"
+                                                                            style="width: 120px" placeholder="Marks"
+                                                                            value="{{ !empty($getMark->exam) ? $getMark->exam : '' }}">
                                                                     </div>
+
+
 
                                                                     <div style="margin-bottom: 10px;">
                                                                         <button type="button"
@@ -247,8 +244,9 @@
                                                                             data-schedule="{{ $subject->id }}"
                                                                             data-class="{{ Request::get('class_id') }}">Save</button>
 
-                                                                    </div>
 
+
+                                                                    </div>
                                                                     @if (!empty($getMark))
                                                                         <div style="margin-bottom: 10px;">
                                                                             {{-- <b>Credit obtenu : {{ $credits_obtenus }}</b> --}}
@@ -262,61 +260,41 @@
                                                                             @else
                                                                                 <b>Result :</b> <span
                                                                                     style="color: red; font-weight: bold;">NVL</span>
-                                                                                @php
-                                                                                    $pass_fail_vali = 1;
-                                                                                    $fail_count++;
-                                                                                @endphp
                                                                             @endif
 
                                                                         </div>
                                                                     @endif
 
+
                                                                 </td>
-                                                                @php
-                                                                    $i++;
-                                                                @endphp
+
+                                                                @php $i++; @endphp
                                                             @endforeach
                                                             <td style="min-width: 230px;">
                                                                 <button type="submit"
-                                                                    class="btn btn-success">Save</button>
-                                                                <a class="btn btn-primary" target="_blank"
+                                                                    class="btn btn-success btn-sm shadow-sm">
+                                                                    <i class="fas fa-save"></i> Enregistrer
+                                                                </button>
+
+                                                                <a class="btn btn-primary btn-sm shadow-sm"
+                                                                    target="_blank"
                                                                     href="{{ url('admin/my_exam_result/print?exam_id=' . Request::get('exam_id') . '&student_id=' . $student->id) }}">Print
                                                                 </a>
-
-                                                                @if (!empty($totalStudentMark))
-                                                                    <br>
-                                                                    <br>
-                                                                    <b>Total Crédits :</b> {{ $credit }}
-                                                                    <br>
-                                                                    <b>Student Mark :</b> {{ $credits_obtenus }}
-                                                                    <br>
-
-                                                                    <br>
-                                                                    @if (!empty($getGrade))
-                                                                        <b>Grade :</b> {{ $getGrade }}
-                                                                    @endif
-                                                                    <br />
-                                                                    @if ($pass_fail_vali == 0)
-                                                                        <b>Result :</b> <span
-                                                                            style="color: green; font-weight: bold;">VAL</span>
-                                                                    @else
-                                                                        <b>Result :</b> <span
-                                                                            style="color: red; font-weight: bold;">NVL</span>
-                                                                        <br />
-                                                                        <b>Nombre Echecs :</b> <span
-                                                                            style="color: red; font-weight: bold;">{{ $fail_count }}</span>
-                                                                    @endif
-                                                                @endif
-
                                                             </td>
                                                         </tr>
                                                     </form>
                                                 @endforeach
+                                            @else
+                                                <tr>
+                                                    <td colspan="{{ 2 + $getSubject->count() }}"
+                                                        class="text-center text-muted py-4">
+                                                        <i class="fa-solid fa-folder-open fa-2x mb-2"></i><br>
+                                                        Aucun étudiant trouvé.
+                                                    </td>
+                                                </tr>
                                             @endif
                                         </tbody>
                                     </table>
-
-
                                 </div>
                                 <div style="text-align: center; padding: 20px;">
                                     <a class="btn btn-primary" target="_blank"
@@ -327,18 +305,52 @@
                             </div>
                         @endif
 
-
-                        <!-- /.card -->
                     </div>
-                    <!-- /.col -->
                 </div>
-                <!-- /.row -->
-
-                <!-- /.row -->
-            </div><!-- /.container-fluid -->
+            </div>
         </section>
-        <!-- /.content -->
     </div>
+
+    <style>
+        .card {
+            border-radius: 1.25rem;
+        }
+
+        .card-header {
+            border-radius: 1.25rem 1.25rem 0 0;
+        }
+
+        .table-primary th {
+            background-color: #cfe2ff !important;
+            color: #084298 !important;
+            font-weight: 600;
+        }
+
+        .btn-primary,
+        .btn-success {
+            font-weight: 500;
+        }
+
+        .btn-sm {
+            padding: 0.25rem 0.75rem;
+            font-size: 0.9rem;
+        }
+
+        .form-control-sm {
+            font-size: 0.9rem;
+            padding: 0.25rem 0.5rem;
+        }
+
+        .form-label {
+            font-weight: 600;
+        }
+
+        .fw-bold,
+        .fw-semibold {
+            font-weight: 600 !important;
+        }
+    </style>
+
 @endsection
 
 @section('script')

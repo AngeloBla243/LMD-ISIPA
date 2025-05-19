@@ -101,11 +101,26 @@ class HomeworkSubmitModel extends Model
 
     static public function getRecordStudent($student_id)
     {
-        $return = HomeworkSubmitModel::select('homework_submit.*', 'class.name as class_name', 'subject.name as subject_name')
+        // $return = HomeworkSubmitModel::select('homework_submit.*', 'class.name as class_name', 'subject.name as subject_name')
+        //     ->join('homework', 'homework.id', '=', 'homework_submit.homework_id')
+        //     ->join('class', 'class.id', '=', 'homework.class_id')
+        //     ->join('subject', 'subject.id', '=', 'homework.subject_id')
+        //     ->join('class', 'class.id', '=', 'homework.class_id') // Jointure avec la classe
+        //     ->join('subject', 'subject.id', '=', 'homework.subject_id') // Jointure avec la matière
+        //     ->where('homework_submit.student_id', '=', $student_id);
+
+        return self::select(
+            'homework_submit.*',
+            'c.name as class_name', // Alias 'c' pour la table class
+            's.name as subject_name', // Alias 's' pour la table subject
+            'homework.homework_date',
+            'homework.submission_date'
+        )
             ->join('homework', 'homework.id', '=', 'homework_submit.homework_id')
-            ->join('class', 'class.id', '=', 'homework.class_id')
-            ->join('subject', 'subject.id', '=', 'homework.subject_id')
-            ->where('homework_submit.student_id', '=', $student_id);
+            ->join('class as c', 'c.id', '=', 'homework.class_id') // Alias 'c'
+            ->join('subject as s', 's.id', '=', 'homework.subject_id') // Alias 's'
+            ->where('homework_submit.student_id', '=', $student_id)
+            ->orderBy('homework_submit.id', 'desc');
 
         if (!empty(Request::get('class_name'))) {
             $return = $return->where('class.name', 'like', '%' . Request::get('class_name') . '%');
@@ -143,8 +158,7 @@ class HomeworkSubmitModel extends Model
         }
 
 
-        $return = $return->orderBy('homework_submit.id', 'asc')
-            ->paginate(20);
+        $return = $return->orderBy('homework_submit.id', 'asc');
 
         return $return;
     }

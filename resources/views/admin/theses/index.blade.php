@@ -2,125 +2,151 @@
 
 @section('content')
     <div class="content-wrapper">
-
-        <section class="content-header">
+        <!-- Content Header -->
+        <section class="content-header py-3 bg-light border-bottom mb-4">
             <div class="container-fluid">
-                <div class="row mb-2">
+                <div class="row align-items-center">
                     <div class="col-sm-6">
-                        <h1>Soumissions de mémoires</h1>
-                        {{-- @if ($activeYear)
-                            <h2>Année active : {{ $activeYear->name }}</h2>
-                        @else
-                            <h2>Aucune année active sélectionnée</h2>
-                        @endif --}}
-
-                    </div>
-
-                </div>
-            </div><!-- /.container-fluid -->
-
-            <form method="GET" action="" class="mb-3">
-                <div class="row">
-                    <div class="col-md-4">
-                        <input type="text" name="search" class="form-control"
-                            placeholder="Recherche étudiant, classe ou mémoire" value="{{ request('search') }}">
-                    </div>
-                    <div class="col-md-2">
-                        <button type="submit" class="btn btn-primary">Rechercher</button>
+                        <h1 class="h3 fw-bold text-primary">Soumissions de mémoires</h1>
                     </div>
                 </div>
-            </form>
 
-            {{-- <div class="form-group">
-                <label for="academic_year_id">Année Académique</label>
-                <select name="academic_year_id" id="academic_year_id" class="form-control">
-                    <option value="">Sélectionner une année</option>
-                    @foreach ($academicYears as $year)
-                        <option value="{{ $year->id }}"
-                            {{ isset($thesis) && $thesis->academic_year_id == $year->id ? 'selected' : '' }}>
-                            {{ $year->name }}</option>
-                    @endforeach
-                </select>
-            </div> --}}
-
-
+                <!-- Recherche -->
+                <form method="GET" action="" class="mb-4">
+                    <div class="row g-2">
+                        <div class="col-md-6 col-lg-4">
+                            <input type="text" name="search" class="form-control"
+                                placeholder="Recherche étudiant, classe ou mémoire" value="{{ request('search') }}">
+                        </div>
+                        <div class="col-md-2 col-lg-2">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fa-solid fa-magnifying-glass me-1"></i> Rechercher
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
         </section>
 
+        <!-- Main content -->
+        <section class="content pb-5">
+            <div class="container-fluid">
+                <div class="card shadow-sm rounded-4 border-0">
+                    <div class="card-body p-0 table-responsive">
+                        <table class="table table-striped table-bordered align-middle mb-0">
+                            <thead class="table-primary text-center text-uppercase small">
+                                <tr>
+                                    <th>#</th>
+                                    <th>Étudiant</th>
+                                    <th>Classe</th>
+                                    <th>Sujet</th>
+                                    <th>Taux de plagiat</th>
+                                    <th>Statut</th>
+                                    <th>Date de soumission</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @php
+                                    $start = ($submissions->currentPage() - 1) * $submissions->perPage() + 1;
+                                @endphp
+                                @forelse($submissions as $i => $submission)
+                                    <tr>
+                                        <td class="text-center">{{ $start + $i }}</td>
+                                        <td style="min-width: 200px;">{{ $submission->student->name ?? 'N/A' }}
+                                            {{ $submission->student->last_name ?? '' }}</td>
+                                        <td style="min-width: 200px;">{{ $submission->student->class->name ?? 'N/A' }}</td>
+                                        <td style="min-width: 200px;">{{ $submission->subject }}</td>
+                                        <td class="text-center">{{ $submission->plagiarism_rate }}%</td>
+                                        <td class="text-center">
+                                            @php
+                                                $statusClasses = [
+                                                    'accepted' => 'badge bg-success',
+                                                    'rejected' => 'badge bg-danger',
+                                                    'pending' => 'badge bg-warning text-dark',
+                                                ];
+                                                $status = $submission->status ?? 'pending';
+                                            @endphp
+                                            <span class="{{ $statusClasses[$status] ?? 'badge bg-secondary' }}">
+                                                {{ ucfirst($status) }}
+                                            </span>
+                                        </td>
+                                        <td class="text-center" style="min-width: 200px;">
+                                            {{ $submission->created_at->format('d/m/Y H:i') }}</td>
+                                        <td class="text-center" style="min-width: 200px;">
+                                            <a href="{{ route('admin.theses.show', $submission->id) }}"
+                                                class="btn btn-sm btn-info me-1" title="Voir">
+                                                <i class="fas fa-eye"></i> Voir
+                                            </a>
+                                            <button type="button" class="btn btn-sm btn-danger delete-btn"
+                                                data-id="{{ $submission->id }}"
+                                                data-nom="{{ $submission->student->name ?? '' }} {{ $submission->student->last_name ?? '' }}"
+                                                title="Supprimer">
+                                                <i class="fas fa-trash-alt"></i> Supprimer
+                                            </button>
+                                            <form id="delete-form-{{ $submission->id }}"
+                                                action="{{ route('admin.theses.destroy', $submission->id) }}"
+                                                method="POST" style="display: none;">
+                                                @csrf
+                                                @method('DELETE')
+                                            </form>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="8" class="text-center text-muted py-4">
+                                            <i class="fa-solid fa-folder-open fa-2x mb-2"></i><br>
+                                            Aucune soumission trouvée.
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
 
-        <section class="content">
-            <div class="card-body p-0" style="overflow: auto;">
-                <table class="table table-bordered table-striped">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Étudiant</th>
-                            <th>Classe</th>
-                            <th>Sujet</th>
-                            <th>Taux plagiat</th>
-                            <th>Statut</th>
-                            <th>Date de soumission</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @php
-                            $start = ($submissions->currentPage() - 1) * $submissions->perPage() + 1;
-                        @endphp
-                        @forelse($submissions as $i => $submission)
-                            <tr>
-                                <td>{{ $start + $i }}</td>
-                                <td>{{ $submission->student->name ?? 'N/A' }} {{ $submission->student->last_name ?? '' }}
-                                </td>
-                                <td>{{ $submission->student->class->name ?? 'N/A' }}</td>
-                                <td>{{ $submission->subject }}</td>
-                                <td>{{ $submission->plagiarism_rate }}%</td>
-                                {{-- <td>{{ ucfirst($submission->status ?? 'pending') }}</td> --}}
-                                <td>
-                                    <span
-                                        class="badge
-                                        {{ $submission->status === 'accepted' ? 'badge-success' : '' }}
-                                        {{ $submission->status === 'rejected' ? 'badge-danger' : '' }}
-                                        {{ $submission->status === 'pending' ? 'badge-warning' : '' }}">
-                                        {{ ucfirst($submission->status ?? 'pending') }}
-                                    </span>
-                                </td>
-
-                                <td>{{ $submission->created_at->format('d/m/Y H:i') }}</td>
-                                <td>
-                                    <a href="{{ route('admin.theses.show', $submission->id) }}"
-                                        class="btn btn-sm btn-info">Voir</a>
-                                    {{-- <form action="{{ route('admin.theses.destroy', $submission->id) }}" method="POST"
-                                    style="display:inline" onsubmit="return confirm('Confirmer la suppression ?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button class="btn btn-sm btn-danger" type="submit">Supprimer</button>
-                                </form> --}}
-
-                                    <button type="button" class="btn btn-sm btn-danger delete-btn"
-                                        data-id="{{ $submission->id }}"
-                                        data-nom="{{ $submission->student->name ?? '' }} {{ $submission->student->last_name ?? '' }}">
-                                        Supprimer
-                                    </button>
-                                    <form id="delete-form-{{ $submission->id }}"
-                                        action="{{ route('admin.theses.destroy', $submission->id) }}" method="POST"
-                                        style="display: none;">
-                                        @csrf
-                                        @method('DELETE')
-                                    </form>
-
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="8" class="text-center">Aucune soumission trouvée.</td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
+                    <div class="card-footer d-flex justify-content-end bg-white border-0">
+                        {{ $submissions->links() }}
+                    </div>
+                </div>
             </div>
-            {{ $submissions->links() }}
         </section>
     </div>
+
+    <style>
+        .card {
+            border-radius: 1.25rem;
+        }
+
+        .table-primary th {
+            background-color: #cfe2ff !important;
+            color: #084298 !important;
+            font-weight: 600;
+        }
+
+        .btn-sm {
+            font-weight: 500;
+        }
+
+        .badge {
+            font-size: 0.9rem;
+            padding: 0.4em 0.75em;
+        }
+    </style>
+
+    {{-- <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const deleteButtons = document.querySelectorAll('.delete-btn');
+            deleteButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const id = this.dataset.id;
+                    const nom = this.dataset.nom;
+                    if (confirm(`Confirmer la suppression de la soumission de ${nom} ?`)) {
+                        document.getElementById(`delete-form-${id}`).submit();
+                    }
+                });
+            });
+        });
+    </script> --}}
 @endsection
 
 @section('script')

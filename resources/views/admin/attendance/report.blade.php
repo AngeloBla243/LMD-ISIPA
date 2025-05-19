@@ -1,245 +1,291 @@
 @extends('layouts.app')
 @section('style')
+    <style type="text/css">
+        .styled-table {
+            border-collapse: collapse;
+            margin: 25px 0;
+            min-width: 400px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+            border-radius: 8px;
+            overflow: hidden;
+        }
 
-<style type="text/css">
-.styled-table {
-    border-collapse: collapse;
-    margin: 25px 0;
-    min-width: 400px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
-    border-radius: 8px;
-    overflow: hidden;
-}
-.styled-table thead tr {
-    background-color: #009879;
-    color: #ffffff;
-    text-align: left;
-}
-.styled-table th,
-.styled-table td {
-    padding: 12px 15px;
-}
-.styled-table tbody tr {
-    border-bottom: 1px solid #dddddd;
-}
+        .styled-table thead tr {
+            background-color: #009879;
+            color: #ffffff;
+            text-align: left;
+        }
 
-.styled-table tbody tr:nth-of-type(even) {
-    background-color: #f3f3f3;
-}
+        .styled-table th,
+        .styled-table td {
+            padding: 12px 15px;
+        }
 
-.styled-table tbody tr:last-of-type {
-    border-bottom: 2px solid #009879;
-}
+        .styled-table tbody tr {
+            border-bottom: 1px solid #dddddd;
+        }
 
-/* Effet survol (hover) */
-.styled-table tbody tr:hover {
-    background-color: #f1f1f1;
-    cursor: pointer;
-}
+        .styled-table tbody tr:nth-of-type(even) {
+            background-color: #f3f3f3;
+        }
 
-.present {
-    color: white;
-    background-color: #28a745;
-    padding: 5px 10px;
-    border-radius: 5px;
-}
+        .styled-table tbody tr:last-of-type {
+            border-bottom: 2px solid #009879;
+        }
 
-.absent {
-    color: white;
-    background-color: #dc3545;
-    padding: 5px 10px;
-    border-radius: 5px;
-}
+        /* Effet survol (hover) */
+        .styled-table tbody tr:hover {
+            background-color: #f1f1f1;
+            cursor: pointer;
+        }
 
-.half {
-    color: white;
-    background-color: #282aa7;
-    padding: 5px 10px;
-    border-radius: 5px;
+        .present {
+            color: white;
+            background-color: #28a745;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
 
-}
+        .absent {
+            color: white;
+            background-color: #dc3545;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
 
-.late {
-    color: white;
-    background-color: #dc9435;
-    padding: 5px 10px;
-    border-radius: 5px;
-}
+        .half {
+            color: white;
+            background-color: #282aa7;
+            padding: 5px 10px;
+            border-radius: 5px;
 
-</style>
+        }
 
+        .late {
+            color: white;
+            background-color: #dc9435;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+    </style>
 @endsection
 @section('content')
-<div class="content-wrapper">
-    <!-- Content Header (Page header) -->
-    <section class="content-header">
-      <div class="container-fluid">
-        <div class="row mb-2">
-          <div class="col-sm-6">
-            <h1>Attendance Report <span style="color:blue">(Total : {{ $getRecord->total() }})</span> </h1>
-          </div>
-        </div>
-      </div><!-- /.container-fluid -->
-    </section>
-    <!-- Main content -->
-    <section class="content">
-      <div class="container-fluid">
-        <div class="row">
-
-          <!-- /.col -->
-          <div class="col-md-12">
-            <div class="card">
-              <div class="card-header">
-                <h3 class="card-title">Search Attendance Report</h3>
-              </div>
-              <form method="get" action="">
-                <div class="card-body">
-                  <div class="row">
-
-                  <div class="form-group col-md-2">
-                    <label>Student ID</label>
-                    <input type="text" class="form-control" placeholder="Student ID" value="{{ Request::get('student_id') }}" name="student_id">
-                  </div>
-
-
-                   <div class="form-group col-md-2">
-                    <label>Student Name</label>
-                    <input type="text" class="form-control" placeholder="Student Name" value="{{ Request::get('student_name') }}" name="student_name">
-                  </div>
-
-                  <div class="form-group col-md-2">
-                    <label>Student Last Name</label>
-                    <input type="text" class="form-control" placeholder="Student Last Name" value="{{ Request::get('student_last_name') }}" name="student_last_name">
-                  </div>
-
-
-
-                  <div class="form-group col-md-2">
-                    <label>Class</label>
-                    <select class="form-control" name="class_id" >
-                        <option value="">Select</option>
-                        @foreach($getClass as $class)
-                          <option {{ (Request::get('class_id') == $class->id) ? 'selected' : '' }} value="{{ $class->id }}">{{ $class->name }} {{ $class->opt }}</option>
-                        @endforeach
-                    </select>
-                  </div>
-
-                   <div class="form-group col-md-2">
-                    <label>Start Attendance Date</label>
-                    <input type="date" class="form-control"  value="{{ Request::get('start_attendance_date') }}" name="start_attendance_date">
-                  </div>
-
-                   <div class="form-group col-md-2">
-                    <label>End Attendance Date</label>
-                    <input type="date" class="form-control"  value="{{ Request::get('end_attendance_date') }}" name="end_attendance_date">
-                  </div>
-
-
-                  <div class="form-group col-md-2">
-                    <label>Attendance Type</label>
-                    <select class="form-control" name="attendance_type">
-                        <option value="">Select</option>
-                        <option {{ (Request::get('attendance_type') == 1) ? 'selected' : '' }} value="1">Present</option>
-                        <option {{ (Request::get('attendance_type') == 2) ? 'selected' : '' }} value="2">Late</option>
-                        <option {{ (Request::get('attendance_type') == 3) ? 'selected' : '' }} value="3">Absent</option>
-                        <option {{ (Request::get('attendance_type') == 4) ? 'selected' : '' }} value="4">Half Day</option>
-                    </select>
-                  </div>
-
-
-                  <div class="form-group col-md-3">
-                    <button class="btn btn-primary" type="submit" style="margin-top: 30px;"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
-                    <a href="{{ url('admin/attendance/report') }}" class="btn btn-success" style="margin-top: 30px;">Reset</a>
-
-                  </div>
-
-                  </div>
+    <div class="content-wrapper">
+        <!-- Content Header -->
+        <section class="content-header py-3 bg-light border-bottom mb-4">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1 class="h3 fw-bold text-primary">
+                            Attendance Report <span class="fw-normal" style="color: #0d6efd;">(Total :
+                                {{ $getRecord->total() }})</span>
+                        </h1>
+                    </div>
                 </div>
-              </form>
             </div>
+        </section>
 
+        <!-- Main content -->
+        <section class="content pb-5">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-12">
 
-                 <div class="card">
-                    <div class="card-header">
-                      <h3 class="card-title">Attendance List</h3>
-                      <form style="float: right;" action="{{ url('admin/attendance/report_export_excel') }}" method="post">
-                          {{ csrf_field() }}
-                          <input type="hidden" name="student_id" value="{{ Request::get('student_id') }}">
-                          <input type="hidden" name="student_name" value="{{ Request::get('student_name') }}">
-                          <input type="hidden" name="student_last_name" value="{{ Request::get('student_last_name') }}">
-                          <input type="hidden" name="class_id" value="{{ Request::get('class_id') }}">
-                          <input type="hidden" name="start_attendance_date" value="{{ Request::get('start_attendance_date') }}">
-                          <input type="hidden" name="end_attendance_date" value="{{ Request::get('end_attendance_date') }}">
-                          <input type="hidden" name="attendance_type" value="{{ Request::get('attendance_type') }}">
+                        <!-- Search Card -->
+                        <div class="card shadow-sm rounded-4 border-0 mb-4">
+                            <div class="card-header bg-primary text-white rounded-top-4">
+                                <h3 class="card-title mb-0">
+                                    <i class="fa-solid fa-magnifying-glass me-2"></i>Search Attendance Report
+                                </h3>
+                            </div>
+                            <form method="get" action="">
+                                <div class="card-body">
+                                    <div class="row g-3">
+                                        <div class="col-md-2">
+                                            <label class="form-label fw-semibold">Student ID</label>
+                                            <input type="text" class="form-control" placeholder="Student ID"
+                                                value="{{ Request::get('student_id') }}" name="student_id">
+                                        </div>
+                                        <div class="col-md-2">
+                                            <label class="form-label fw-semibold">Student Name</label>
+                                            <input type="text" class="form-control" placeholder="Student Name"
+                                                value="{{ Request::get('student_name') }}" name="student_name">
+                                        </div>
+                                        <div class="col-md-2">
+                                            <label class="form-label fw-semibold">Student Last Name</label>
+                                            <input type="text" class="form-control" placeholder="Student Last Name"
+                                                value="{{ Request::get('student_last_name') }}" name="student_last_name">
+                                        </div>
+                                        <div class="col-md-2">
+                                            <label class="form-label fw-semibold">Class</label>
+                                            <select class="form-select form-control" name="class_id">
+                                                <option value="">Select</option>
+                                                @foreach ($getClass as $class)
+                                                    <option {{ Request::get('class_id') == $class->id ? 'selected' : '' }}
+                                                        value="{{ $class->id }}">{{ $class->name }} {{ $class->opt }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        {{-- <div class="col-md-2">
+                                            <label class="form-label fw-semibold">Start Attendance Date</label>
+                                            <input type="date" class="form-control"
+                                                value="{{ Request::get('start_attendance_date') }}"
+                                                name="start_attendance_date">
+                                        </div>
+                                        <div class="col-md-2">
+                                            <label class="form-label fw-semibold">End Attendance Date</label>
+                                            <input type="date" class="form-control"
+                                                value="{{ Request::get('end_attendance_date') }}"
+                                                name="end_attendance_date">
+                                        </div> --}}
+                                        <div class="col-md-2">
+                                            <label class="form-label fw-semibold">Attendance Type</label>
+                                            <select class="form-select form-control" name="attendance_type">
+                                                <option value="">Select</option>
+                                                <option {{ Request::get('attendance_type') == 1 ? 'selected' : '' }}
+                                                    value="1">Present</option>
+                                                {{-- <option {{ Request::get('attendance_type') == 2 ? 'selected' : '' }}
+                                                    value="2">Late</option> --}}
+                                                <option {{ Request::get('attendance_type') == 3 ? 'selected' : '' }}
+                                                    value="3">Absent</option>
+                                                {{-- <option {{ Request::get('attendance_type') == 4 ? 'selected' : '' }}
+                                                    value="4">Half Day</option> --}}
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3 d-flex align-items-end gap-2">
+                                            <button class="btn btn-primary w-100" type="submit">
+                                                <i class="fa-solid fa-magnifying-glass me-1"></i> Search
+                                            </button>
+                                            <a href="{{ url('admin/attendance/report') }}" class="btn btn-success w-100">
+                                                Reset
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
 
-                          <button class="btn btn-primary">Export Excel</button>
-                      </form>
+                        <!-- Attendance List Card -->
+                        <div class="card shadow-sm rounded-4 border-0">
+                            <div
+                                class="card-header bg-primary text-white rounded-top-4 d-flex justify-content-between align-items-center">
+                                <h3 class="card-title mb-0">
+                                    <i class="fa-solid fa-list-ul me-2"></i>Attendance List
+                                </h3>
+                                <form action="{{ url('admin/attendance/report_export_excel') }}" method="post"
+                                    class="d-inline ms-auto">
+                                    @csrf
+                                    <input type="hidden" name="student_id" value="{{ Request::get('student_id') }}">
+                                    <input type="hidden" name="student_name" value="{{ Request::get('student_name') }}">
+                                    <input type="hidden" name="student_last_name"
+                                        value="{{ Request::get('student_last_name') }}">
+                                    <input type="hidden" name="class_id" value="{{ Request::get('class_id') }}">
+                                    <input type="hidden" name="start_attendance_date"
+                                        value="{{ Request::get('start_attendance_date') }}">
+                                    <input type="hidden" name="end_attendance_date"
+                                        value="{{ Request::get('end_attendance_date') }}">
+                                    <input type="hidden" name="attendance_type"
+                                        value="{{ Request::get('attendance_type') }}">
+                                    <button class="btn btn-primary btn-sm"><i class="fa-solid fa-file-export me-1"></i>
+                                        Export Excel</button>
+                                </form>
+                            </div>
+                            <div class="card-body p-0 table-responsive">
+                                <table class="table table-hover table-bordered align-middle mb-0">
+                                    <thead class="table-primary text-center text-uppercase small">
+                                        <tr>
+                                            <th>Student ID</th>
+                                            <th>Student Name</th>
+                                            <th>Class Name</th>
+                                            <th>Attendance Type</th>
+                                            <th>Attendance Date</th>
+                                            <th>Created By</th>
+                                            <th>Created Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @forelse($getRecord as $value)
+                                            <tr>
+                                                <td class="text-center">{{ $value->student_id }}</td>
+                                                <td>{{ $value->student_name }} {{ $value->student_last_name }}</td>
+                                                <td>{{ $value->class_name }} {{ $value->class_opt }}</td>
+                                                <td class="text-center">
+                                                    @if ($value->attendance_type == 1)
+                                                        <span class="badge bg-success">P</span>
+                                                    @elseif($value->attendance_type == 2)
+                                                        <span class="badge bg-warning text-dark">L</span>
+                                                    @elseif($value->attendance_type == 3)
+                                                        <span class="badge bg-danger">A</span>
+                                                    @elseif($value->attendance_type == 4)
+                                                        <span class="badge bg-info text-dark">H</span>
+                                                    @endif
+                                                </td>
+                                                <td> {{ date('d-m-Y', strtotime($value->attendance_date)) }} </td>
+                                                <td> {{ $value->created_name }} </td>
+                                                <td> {{ date('d-m-Y H:i A', strtotime($value->created_at)) }} </td>
+                                            </tr>
+                                        @empty
+                                            <tr>
+                                                <td colspan="7" class="text-center text-muted py-4">
+                                                    <i class="fa-solid fa-folder-open fa-2x mb-2"></i><br>
+                                                    Record not found
+                                                </td>
+                                            </tr>
+                                        @endforelse
+                                    </tbody>
+                                </table>
+                                <div class="mt-3 d-flex justify-content-end px-3">
+                                    {!! $getRecord->appends(Illuminate\Support\Facades\Request::except('page'))->links() !!}
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
+                </div>
+            </div>
+        </section>
+    </div>
 
-                    <div class="card-body p-0" style="overflow: auto;">
-                        <table class="table styled-table table-bordered table-striped">
-                        <thead>
-                          <tr>
-                            <th>Student ID</th>
-                            <th>Student Name</th>
-                            <th>Class Name</th>
-                            <th>Attendance Type</th>
-                            <th>Attendance Date</th>
-                            <th>Created By</th>
-                            <th>Created Date</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          @forelse($getRecord as $value)
-                            <tr>
-                              <td>{{ $value->student_id }}</td>
-                              <td>{{ $value->student_name }} {{ $value->student_last_name }}</td>
-                              <td>{{ $value->class_name }} {{ $value->class_opt }}</td>
-                              <td>
-                                @if($value->attendance_type == 1)
-                                    <b class="present">P</b>
-                                @elseif($value->attendance_type == 2)
-                                    <b class="late">L</b>
-                                @elseif($value->attendance_type == 3)
-                                    <b class="absent">A</b>
-                                @elseif($value->attendance_type == 4)
-                                    <b class="half">H</b>
-                                @endif
-                              </td>
-                              <td> {{ date('d-m-Y', strtotime($value->attendance_date)) }} </td>
-                              <td> {{ $value->created_name }} </td>
-                              <td> {{ date('d-m-Y H:i A', strtotime($value->created_at)) }} </td>
-                            </tr>
-                          @empty
-                            <tr>
-                              <td colspan="100%">Record not found</td>
-                            </tr>
-                          @endforelse
-                        </tbody>
-                      </table>
+    <style>
+        .card {
+            border-radius: 1.25rem;
+        }
 
-                       <div style="padding: 10px; float: right;">
-                          {!! $getRecord->appends(Illuminate\Support\Facades\Request::except('page'))->links() !!}
-                      </div>
+        .card-header {
+            border-radius: 1.25rem 1.25rem 0 0;
+        }
 
+        .table-primary th {
+            background-color: #cfe2ff !important;
+            color: #084298 !important;
+            font-weight: 600;
+        }
 
-                    </div>
-                  </div>
+        .btn-info,
+        .btn-danger,
+        .btn-success,
+        .btn-primary {
+            font-weight: 500;
+        }
 
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+        }
 
+        .form-label {
+            font-weight: 600;
+        }
 
-          </div>
-
-        </div>
-
-      </div>
-    </section>
-  </div>
-
+        .badge {
+            font-size: 1rem;
+            padding: 0.5em 0.9em;
+            letter-spacing: 0.05em;
+        }
+    </style>
 @endsection
 
-@section('script').
-
-
-
+@section('script')
+    .
 @endsection

@@ -50,11 +50,12 @@ class ExamScheduleModel extends Model
     }
 
 
-    static public function getExam($class_id)
+    static public function getExam($class_id, $academic_year_id)
     {
         return ExamScheduleModel::select('exam_schedule.*', 'exam.name as exam_name')
             ->join('exam', 'exam.id', '=', 'exam_schedule.exam_id')
             ->where('exam_schedule.class_id', '=', $class_id)
+            ->where('exam_schedule.academic_year_id', $academic_year_id) // Préciser la table // Filtre ajoutés
             ->groupBy('exam_schedule.exam_id')
             ->orderBy('exam_schedule.id', 'desc')
             ->get();
@@ -80,19 +81,55 @@ class ExamScheduleModel extends Model
             ->where('exam_schedule.class_id', '=', $class_id)
             ->get();
     }
-
-    static public function getExamTimetable1($exam_id, $class_id, $teacher_id)
+    // student pour affichage du calendrier des examens
+    static public function getExamTimetableS($exam_id, $class_id, $academic_year_id)
     {
-        return ExamScheduleModel::select('exam_schedule.*', 'subject.name as subject_name', 'subject.type as subject_type')
+        return self::select(
+            'exam_schedule.*',
+            'subject.name as subject_name',
+            'subject.type as subject_type'
+        )
+            ->join('subject', 'subject.id', '=', 'exam_schedule.subject_id')
+            ->where('exam_schedule.exam_id', $exam_id)
+            ->where('exam_schedule.class_id', $class_id)
+            ->where('exam_schedule.academic_year_id', $academic_year_id)
+            ->get();
+    }
+
+
+    // static public function getExamTimetable1($exam_id, $class_id, $teacher_id)
+    // {
+    //     return ExamScheduleModel::select('exam_schedule.*', 'subject.name as subject_name', 'subject.type as subject_type')
+    //         ->join('subject', 'subject.id', '=', 'exam_schedule.subject_id')
+    //         ->join('assign_class_teacher', function ($join) use ($teacher_id) {
+    //             $join->on('assign_class_teacher.subject_id', '=', 'exam_schedule.subject_id')
+    //                 ->where('assign_class_teacher.teacher_id', '=', $teacher_id);
+    //         })
+    //         ->where('exam_schedule.exam_id', '=', $exam_id)
+    //         ->where('exam_schedule.class_id', '=', $class_id)
+    //         ->get();
+    // }
+
+    static public function getExamTimetable1($exam_id, $class_id, $teacher_id, $academic_year_id)
+    {
+        return ExamScheduleModel::select(
+            'exam_schedule.*',
+            'subject.name as subject_name',
+            'subject.type as subject_type'
+        )
             ->join('subject', 'subject.id', '=', 'exam_schedule.subject_id')
             ->join('assign_class_teacher', function ($join) use ($teacher_id) {
                 $join->on('assign_class_teacher.subject_id', '=', 'exam_schedule.subject_id')
                     ->where('assign_class_teacher.teacher_id', '=', $teacher_id);
             })
-            ->where('exam_schedule.exam_id', '=', $exam_id)
-            ->where('exam_schedule.class_id', '=', $class_id)
+            ->join('class', 'class.id', '=', 'exam_schedule.class_id') // Jointure ajoutée
+            ->where('exam_schedule.exam_id', $exam_id)
+            ->where('exam_schedule.class_id', $class_id)
+            ->where('class.academic_year_id', $academic_year_id) // Filtre académique
             ->get();
     }
+
+
     static public function getSubject($exam_id, $class_id)
     {
         return ExamScheduleModel::select('exam_schedule.*', 'subject.name as subject_name', 'subject.type as subject_type', 'subject.code as subject_code')
@@ -142,5 +179,9 @@ class ExamScheduleModel extends Model
             ->where('class_id', $class_id)
             ->pluck('exam_id') // Récupère uniquement l'ID de l'examen
             ->first();
+    }
+    public function subject()
+    {
+        return $this->belongsTo(SubjectModel::class, 'subject_id');
     }
 }

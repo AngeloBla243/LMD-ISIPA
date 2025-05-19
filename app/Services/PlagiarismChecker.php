@@ -71,8 +71,8 @@ class PlagiarismChecker
                 }
             }
 
-            // On ne garde que les phrases vraiment similaires (> seuil, ex 0.5)
-            if ($bestScore > 0.7) {
+            // On ne garde que les phrases vraiment similaires (> seuil, ex 0.5) chnager le taux de plagiat acceptale
+            if ($bestScore > 0.8) {
                 $results[] = [
                     'phrase' => $phrase,
                     'similarity' => round($bestScore * 100, 2),

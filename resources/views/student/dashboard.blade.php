@@ -118,6 +118,24 @@
             }
         }
 
+        /* Dans votre fichier CSS */
+        .input-group {
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-select {
+            border: 2px solid #007bff;
+            border-radius: 25px;
+            padding: 8px 15px;
+        }
+
+        .fa-exclamation-triangle {
+            text-shadow: 0 2px 4px rgba(255, 193, 7, 0.3);
+        }
+
         /* Style pour le bouton bleu */
         .btn-blue {
             --blue: #1e88e5;
@@ -168,70 +186,78 @@
 
 @section('content')
     <div class="content-wrapper">
-        <div class="content-header">
-            <div class="container-fluid">
-                <div class="row mb-2">
-                    <div class="col-sm-12">
-                        <h1 class="m-0">Dashboard</h1>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <section class="content">
-            <div class="container-fluid">
-                <div class="row">
+        <section class="content py-4">
+            <div class="container">
+                <div class="row justify-content-center g-4">
 
                     <!-- Carte Profil Utilisateur -->
-                    <div class="card card-body box-profile">
-                        <div class="text-center">
-                            <img class="profile-user-img img-fluid img-circle" src="{{ Auth::user()->getProfileDirect() }}"
-                                alt="User profile picture">
+                    <div class="col-md-4">
+                        <div class="card shadow-sm rounded-4 border-0 text-center p-4">
+                            <img class="profile-user-img img-fluid rounded-circle mx-auto mb-3"
+                                src="{{ Auth::user()->getProfileDirect() }}" alt="Photo de profil"
+                                style="width: 140px; height: 140px; object-fit: cover;">
+
+                            <h3 class="profile-username fw-bold mb-1">{{ Auth::user()->name }} {{ Auth::user()->last_name }}
+                            </h3>
+                            <p class="text-muted mb-3">{{ Auth::user()->departement }}</p>
+
+                            <ul class="list-group list-group-flush text-start mb-3">
+                                <li class="list-group-item d-flex align-items-center gap-2">
+                                    <i class="fa-solid fa-envelope text-primary"></i>
+                                    <span class="text-truncate">{{ Auth::user()->email }}</span>
+                                </li>
+                                <li class="list-group-item d-flex align-items-center gap-2">
+                                    <i class="fa-solid fa-phone text-success"></i>
+                                    <span>{{ Auth::user()->mobile_number }}</span>
+                                </li>
+                                <li class="list-group-item text-center">
+                                    <span class="badge bg-info fs-6 px-3 py-2 rounded-pill">
+                                        ID : {{ Auth::user()->admission_number }}
+                                    </span>
+                                </li>
+                                <li class="list-group-item text-center">
+                                    <span class="fw-semibold fs-5">{{ $TotalSubject }}</span><br>
+                                    <small class="text-muted">Cours suivis cette année</small>
+                                </li>
+                            </ul>
                         </div>
-
-                        <h3 class="profile-username text-center card-title mt-2">{{ Auth::user()->name }}
-                            {{ Auth::user()->last_name }}</h3>
-
-                        <p class="text-muted text-center">{{ Auth::user()->departement }}</p>
-
-                        <ul class="list-group list-group-unbordered mb-3">
-                            <b style="text-align: center"><i class="fa-solid fa-envelope"></i> {{ Auth::user()->email }}</b>
-                            <b style="text-align: center"><i class="fa-solid fa-phone"></i>
-                                {{ Auth::user()->mobile_number }}</b>
-
-                            <a href="javascript:void(0)"
-                                class="mt-2 waves-effect waves-dark btn btn-blue btn-md btn-rounded">
-                                ID : {{ Auth::user()->admission_number }}
-                            </a>
-
-                            <b style="text-align: center">{{ $TotalSubject }}</b>
-
-                            <p style="text-align: center">Cours suivis pour cette année</p>
-                        </ul>
                     </div>
 
                     <!-- Carte Cours -->
-                    <div class="card card-body post clearfix">
-                        <h5><i class="fa fa-list-alt"></i> Mes Cours</h5>
-                        <p>Voici la liste de tous vos cours dans votre promotion pour cette année académique :
-                            {{ $TotalSubject }}
-                        </p>
+                    <div class="col-md-8">
+                        <div class="card shadow-sm rounded-4 border-0 p-4">
+                            <h5 class="fw-bold mb-3 text-primary">
+                                <i class="fa-solid fa-book-open-reader me-2"></i> Mes Cours
+                            </h5>
+                            <p class="mb-4 text-secondary">
+                                Voici la liste de tous vos cours dans votre promotion pour cette année académique :
+                                <strong>{{ $TotalSubject }}</strong>
+                            </p>
 
-                        <!-- Liste des cours -->
-                        <ul class="list-group1">
-                            @foreach ($getRecord as $course)
-                                <li class="list-group-item1 d-flex align-items-center">
-                                    <div class="course-icon">
-                                        <i class="fas fa-book"></i>
-                                    </div>
-                                    <span>{{ $course->subject_name }}</span>
-                                </li>
-                            @endforeach
-                        </ul>
+                            <!-- Liste des cours -->
+                            <ul class="list-group">
+                                @foreach ($getRecord as $course)
+                                    <li class="list-group-item d-flex align-items-center gap-3">
+                                        <div class="course-icon bg-primary text-white rounded-circle d-flex justify-content-center align-items-center"
+                                            style="width: 36px; height: 36px;">
+                                            <i class="fa-solid fa-book-open-reader"></i>
+                                        </div>
+                                        <span class="flex-grow-1">{{ $course->subject_name }}</span>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        </div>
                     </div>
 
                 </div>
             </div>
         </section>
     </div>
+@endsection
+@section('script')
+    <script>
+        document.getElementById('academicYearSelect').addEventListener('change', function() {
+            this.form.submit();
+        });
+    </script>
 @endsection

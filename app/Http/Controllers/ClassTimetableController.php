@@ -10,55 +10,13 @@ use App\Models\WeekModel;
 use App\Models\ClassSubjectTimetableModel;
 use App\Models\User;
 use App\Models\AcademicYear;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
 
 
 class ClassTimetableController extends Controller
 {
-    // public function list(Request $request)
-    // {
-    //     $data['getClass'] = ClassModel::getClass();
-
-    //     if (!empty($request->class_id)) {
-    //         $data['getSubject'] = ClassSubjectModel::MySubject($request->class_id);
-    //     }
-
-
-
-    //     $getWeek = WeekModel::getRecord();
-    //     $week = array();
-    //     foreach ($getWeek as $value) {
-    //         $dataW = array();
-    //         $dataW['week_id'] = $value->id;
-    //         $dataW['week_name'] = $value->name;
-
-    //         if (!empty($request->class_id) && !empty($request->subject_id)) {
-    //             $ClassSubject = ClassSubjectTimetableModel::getRecordClassSubject($request->class_id, $request->subject_id, $value->id);
-    //             if (!empty($ClassSubject)) {
-    //                 $dataW['start_time'] = $ClassSubject->start_time;
-    //                 $dataW['end_time'] = $ClassSubject->end_time;
-    //                 $dataW['room_number'] = $ClassSubject->room_number;
-    //             } else {
-    //                 $dataW['start_time'] = '';
-    //                 $dataW['end_time'] = '';
-    //                 $dataW['room_number'] = '';
-    //             }
-    //         } else {
-    //             $dataW['start_time'] = '';
-    //             $dataW['end_time'] = '';
-    //             $dataW['room_number'] = '';
-    //         }
-
-    //         $week[] = $dataW;
-    //     }
-
-    //     $data['week'] = $week;
-
-    //     $data['header_title'] = "Class Timetable";
-    //     return view('admin.class_timetable.list', $data);
-    // }
-
     public function list(Request $request)
     {
         // Charger toutes les années académiques pour le filtre
@@ -73,7 +31,7 @@ class ClassTimetableController extends Controller
 
         // Charger les matières si une classe est sélectionnée
         if ($request->filled('class_id')) {
-            $data['getSubject'] = ClassSubjectModel::MySubject($request->class_id);
+            $data['getSubject'] = ClassSubjectModel::MySubjectAdmin($request->class_id);
 
             // Vérifier la cohérence entre classe et année sélectionnée
             $selectedClass = ClassModel::find($request->class_id);
@@ -143,7 +101,7 @@ class ClassTimetableController extends Controller
 
     public function get_subject(Request $request)
     {
-        $getSubject = ClassSubjectModel::MySubject($request->class_id);
+        $getSubject = ClassSubjectModel::MySubjectAdmin($request->class_id);
 
         $html = "<option value=''>Select</option>";
 
@@ -178,44 +136,68 @@ class ClassTimetableController extends Controller
 
     // student side
 
+
+
     public function MyTimetable()
     {
         $result = array();
-        $getRecord = ClassSubjectModel::MySubject(Auth::user()->class_id);
+
+        // 1. Récupérer l'année académique
+        $academicYearId = session('academic_year_id', AcademicYear::where('is_active', 1)->value('id'));
+
+        // 2. Trouver la classe de l'étudiant pour cette année
+        $studentClass = DB::table('student_class')
+            ->where('student_id', Auth::id())
+            ->where('academic_year_id', $academicYearId)
+            ->first();
+
+        if (!$studentClass) {
+            return redirect()->back()->with('error', 'Aucune classe assignée pour cette année académique');
+        }
+
+        $classId = $studentClass->class_id;
+
+        // 3. Récupérer les matières avec filtre académique
+        $getRecord = ClassSubjectModel::MySubject($classId, $academicYearId);
+
         foreach ($getRecord as $value) {
             $dataS['name'] = $value->subject_name;
 
             $getWeek = WeekModel::getRecord();
             $week = array();
+
             foreach ($getWeek as $valueW) {
                 $dataW = array();
                 $dataW['week_name'] = $valueW->name;
 
-                $ClassSubject = ClassSubjectTimetableModel::getRecordClassSubject($value->class_id, $value->subject_id, $valueW->id);
+                // 4. Récupération des horaires avec vérification académique
+                $ClassSubject = ClassSubjectTimetableModel::getRecordClassSubject(
+                    $classId,
+                    $value->subject_id,
+                    $valueW->id
+                );
 
-                if (!empty($ClassSubject)) {
-                    $dataW['start_time'] = $ClassSubject->start_time;
-                    $dataW['end_time'] = $ClassSubject->end_time;
-                    $dataW['room_number'] = $ClassSubject->room_number;
-                } else {
-                    $dataW['start_time'] = '';
-                    $dataW['end_time'] = '';
-                    $dataW['room_number'] = '';
-                }
+                $dataW['start_time'] = $ClassSubject->start_time ?? 'N/A';
+                $dataW['end_time'] = $ClassSubject->end_time ?? 'N/A';
+                $dataW['room_number'] = $ClassSubject->room_number ?? 'N/A';
 
                 $week[] = $dataW;
             }
 
             $dataS['week'] = $week;
             $result[] = $dataS;
+            // dd($result);
         }
 
-
+        // 5. Données pour le filtre
+        $data['academicYears'] = AcademicYear::orderBy('start_date', 'desc')->get();
+        $data['selectedAcademicYear'] = AcademicYear::find($academicYearId);
         $data['getRecord'] = $result;
+        $data['header_title'] = "Mon Emploi du Temps";
 
-        $data['header_title'] = "My Timetable";
         return view('student.my_timetable', $data);
     }
+
 
 
     // teacher side

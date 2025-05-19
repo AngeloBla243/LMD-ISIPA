@@ -42,134 +42,147 @@
 @endsection
 @section('content')
     <div class="content-wrapper">
-        <!-- Content Header (Page header) -->
-        <section class="content-header">
+        <!-- Content Header -->
+        <section class="content-header py-3 bg-light border-bottom mb-4">
             <div class="container-fluid">
-                <div class="row mb-2">
+                <div class="row align-items-center">
                     <div class="col-sm-6">
-                        <h1>Exam List (Total : {{ $getRecord->total() }})</h1>
+                        <h1 class="h3 fw-bold text-primary">
+                            Exam List (Total : {{ $getRecord->total() }})
+                        </h1>
                     </div>
-                    <div class="col-sm-6" style="text-align: right;">
-                        <a href="{{ url('admin/examinations/exam/add') }}" class="btn btn-info"><i
-                                class="fa-solid fa-file-circle-plus"></i> Add New Exam</a>
+                    <div class="col-sm-6 text-end">
+                        <a href="{{ url('admin/examinations/exam/add') }}" class="btn btn-info shadow-sm rounded-3">
+                            <i class="fa-solid fa-file-circle-plus me-2"></i> Add New Exam
+                        </a>
                     </div>
-
-
-
                 </div>
-            </div><!-- /.container-fluid -->
+            </div>
         </section>
 
-
-
-
         <!-- Main content -->
-        <section class="content">
-
-
+        <section class="content pb-5">
             <div class="container-fluid">
                 <div class="row">
+                    <div class="col-12">
 
-                    <!-- /.col -->
-                    <div class="col-md-12">
-
-
-
-                        <div class="card">
-                            <div class="card-header">
-                                <h3 class="card-title">Search Exam</h3>
+                        <!-- Search Card -->
+                        <div class="card shadow-sm rounded-4 border-0 mb-4">
+                            <div class="card-header bg-primary text-white rounded-top-4">
+                                <h3 class="card-title mb-0">
+                                    <i class="fa-solid fa-magnifying-glass me-2"></i>Search Exam
+                                </h3>
                             </div>
                             <form method="get" action="">
                                 <div class="card-body">
-                                    <div class="row">
-
-
-                                        <div class="form-group col-md-3">
-                                            <label>Exam Name</label>
-                                            <input type="text" class="form-control" value="{{ Request::get('name') }}"
-                                                name="name" placeholder="Exam Name">
+                                    <div class="row g-3">
+                                        <div class="col-md-3">
+                                            <label for="name" class="form-label fw-semibold">Exam Name</label>
+                                            <input type="text" id="name" name="name" class="form-control"
+                                                value="{{ Request::get('name') }}" placeholder="Exam Name">
                                         </div>
-
-                                        <div class="form-group col-md-3">
-                                            <label>Date</label>
-                                            <input type="date" class="form-control" name="date"
-                                                value="{{ Request::get('date') }}" placeholder="Date">
+                                        <div class="col-md-3">
+                                            <label for="date" class="form-label fw-semibold">Date</label>
+                                            <input type="date" id="date" name="date" class="form-control"
+                                                value="{{ Request::get('date') }}">
                                         </div>
-
-                                        <div class="form-group col-md-3">
-                                            <button class="btn btn-primary" type="submit" style="margin-top: 30px;"><i
-                                                    class="fa-solid fa-magnifying-glass"></i>Search</button>
-                                            <a href="{{ url('admin/examinations/exam/list') }}" class="btn btn-success"
-                                                style="margin-top: 30px;">Reset</a>
-
+                                        <div class="col-md-3 d-flex align-items-end gap-2">
+                                            <button type="submit" class="btn btn-primary w-100">
+                                                <i class="fa-solid fa-magnifying-glass me-1"></i> Search
+                                            </button>
+                                            <a href="{{ url('admin/examinations/exam/list') }}"
+                                                class="btn btn-success w-100">
+                                                Reset
+                                            </a>
                                         </div>
-
                                     </div>
                                 </div>
                             </form>
                         </div>
 
-
-
                         @include('_message')
 
-                        <!-- /.card -->
-
-                        <div class="card">
-                            <div class="card-header">
-                                <h3 class="card-title">Exam List</h3>
+                        <!-- Exam List Card -->
+                        <div class="card shadow-sm rounded-4 border-0">
+                            <div class="card-header bg-primary text-white rounded-top-4">
+                                <h3 class="card-title mb-0">
+                                    <i class="fa-solid fa-list-ul me-2"></i>Exam List
+                                </h3>
                             </div>
-                            <!-- /.card-header -->
-                            <div class="card-body p-0" style="overflow: auto;">
-                                <table class="table styled-table table-bordered table-striped">
-                                    <thead>
+                            <div class="card-body p-0 table-responsive">
+                                <table class="table table-hover table-bordered align-middle mb-0">
+                                    <thead class="table-primary text-center text-uppercase small">
                                         <tr>
-                                            <th>#</th>
-                                            <th>Annee Academique</th>
-                                            <th>Exam Name</th>
-                                            <th>Note</th>
-                                            <th>Created By</th>
-                                            <th>Created Date</th>
-                                            <th>Action</th>
+                                            <th style="min-width: 50px;">#</th>
+                                            <th style="min-width: 200px;">Année Académique</th>
+                                            <th style="min-width: 200px;">Exam Name</th>
+                                            <th style="min-width: 150px;">Note</th>
+                                            <th style="min-width: 200px;">Created By</th>
+                                            <th style="min-width: 180px;">Created Date</th>
+                                            <th style="min-width: 220px;">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @foreach ($getRecord as $value)
                                             <tr>
-                                                <td style="min-width: 50px;">{{ $value->id }}</td>
-                                                <td style="min-width: 300px;">{{ $value->academic_year_name ?? 'N/A' }}</td>
-                                                <td style="min-width: 300px;">{{ $value->name }}</td>
-                                                <td style="min-width: 300px;">{{ $value->note }}</td>
-                                                <td style="min-width: 250px;">{{ $value->created_name }}</td>
-                                                <td style="min-width: 250px;">
-                                                    {{ date('d-m-Y H:i A', strtotime($value->created_at)) }}</td>
-                                                <td style="min-width: 300px;">
+                                                <td class="text-center">{{ $value->id }}</td>
+                                                <td>{{ $value->academic_year_name ?? 'N/A' }}</td>
+                                                <td>{{ $value->name }}</td>
+                                                <td>{{ $value->note }}</td>
+                                                <td>{{ $value->created_name }}</td>
+                                                <td>{{ date('d-m-Y H:i A', strtotime($value->created_at)) }}</td>
+                                                <td class="text-center">
                                                     <a href="{{ url('admin/examinations/exam/edit/' . $value->id) }}"
-                                                        class="btn btn-info"><i class="fas fa-pencil-alt"></i> Edit</a>
+                                                        class="btn btn-info btn-sm me-1" title="Edit">
+                                                        <i class="fas fa-pencil-alt"></i> Edit
+                                                    </a>
                                                     <a href="{{ url('admin/examinations/exam/delete/' . $value->id) }}"
-                                                        class="btn btn-danger"><i class="fas fa-trash"></i> Delete</a>
+                                                        class="btn btn-danger btn-sm" title="Delete"
+                                                        onclick="return confirm('Are you sure you want to delete this exam?');">
+                                                        <i class="fas fa-trash"></i> Delete
+                                                    </a>
                                                 </td>
                                             </tr>
                                         @endforeach
                                     </tbody>
                                 </table>
-                                <div style="padding: 10px; float: right;">
+                                <div class="mt-3 d-flex justify-content-end px-3">
                                     {!! $getRecord->appends(Illuminate\Support\Facades\Request::except('page'))->links() !!}
                                 </div>
-
                             </div>
-
-                            <!-- /.card-body -->
                         </div>
-                        <!-- /.card -->
-                    </div>
-                    <!-- /.col -->
-                </div>
-                <!-- /.row -->
 
-                <!-- /.row -->
-            </div><!-- /.container-fluid -->
+                    </div>
+                </div>
+            </div>
         </section>
-        <!-- /.content -->
     </div>
+
+    <style>
+        .card {
+            border-radius: 1.25rem;
+        }
+
+        .card-header {
+            border-radius: 1.25rem 1.25rem 0 0;
+        }
+
+        .table-primary th {
+            background-color: #cfe2ff !important;
+            color: #084298 !important;
+            font-weight: 600;
+        }
+
+        .btn-info,
+        .btn-danger,
+        .btn-success,
+        .btn-primary {
+            font-weight: 500;
+        }
+
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+        }
+    </style>
 @endsection

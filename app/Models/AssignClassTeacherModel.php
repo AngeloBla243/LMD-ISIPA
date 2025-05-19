@@ -75,72 +75,65 @@ class AssignClassTeacherModel extends Model
         return $return;
     }
 
-    static public function getMyClassSubjectCount($teacher_id)
+
+
+    static public function getMyClassSubjectGroupCount($teacher_id, $academic_year_id = null)
     {
-        return AssignClassTeacherModel::select('assign_class_teacher.id')
+        return self::select('class.id')
+            ->join('class', 'class.id', '=', 'assign_class_teacher.class_id')
+            ->where('assign_class_teacher.teacher_id', $teacher_id)
+            ->when($academic_year_id, function ($q) use ($academic_year_id) {
+                $q->where('class.academic_year_id', $academic_year_id);
+            })
+            ->groupBy('class.id')
+            ->count();
+    }
+
+    static public function getMyClassSubjectCount($teacher_id, $academic_year_id = null)
+    {
+        return self::select('class_subject.id')
             ->join('class', 'class.id', '=', 'assign_class_teacher.class_id')
             ->join('class_subject', 'class_subject.class_id', '=', 'class.id')
-            ->join('subject', 'subject.id', '=', 'class_subject.subject_id')
-            ->where('assign_class_teacher.is_delete', '=', 0)
-            ->where('assign_class_teacher.status', '=', 0)
-            ->where('subject.status', '=', 0)
-            ->where('subject.is_delete', '=', 0)
-            ->where('class_subject.status', '=', 0)
-            ->where('class_subject.is_delete', '=', 0)
-            ->where('assign_class_teacher.teacher_id', '=', $teacher_id)
+            ->where('assign_class_teacher.teacher_id', $teacher_id)
+            ->when($academic_year_id, function ($q) use ($academic_year_id) {
+                $q->where('class.academic_year_id', $academic_year_id);
+            })
             ->count();
     }
 
 
-    static public function getMyClassSubjectGroupCount($teacher_id)
+    // public static function getMyClassSubject($teacher_id)
+    // {
+    //     return self::select('assign_class_teacher.*', 'class.name as class_name', 'class.opt as class_opt', 'subject.name as subject_name', 'subject.code as subject_code')
+    //         ->join('class', 'assign_class_teacher.class_id', '=', 'class.id')
+    //         ->join('subject', 'assign_class_teacher.subject_id', '=', 'subject.id')
+    //         ->where('assign_class_teacher.teacher_id', $teacher_id)
+    //         ->where('assign_class_teacher.is_delete', 0)
+    //         ->where('assign_class_teacher.status', 0)
+    //         ->get();
+    // }
+
+    static public function getMyClassSubject($teacher_id, $academic_year_id = null)
     {
-        return AssignClassTeacherModel::select('assign_class_teacher.id')
-            ->join('class', 'class.id', '=', 'assign_class_teacher.class_id')
-            ->where('assign_class_teacher.is_delete', '=', 0)
-            ->where('assign_class_teacher.status', '=', 0)
-            ->where('assign_class_teacher.teacher_id', '=', $teacher_id)
-            ->count();
-    }
-
-
-    //  static public function getMyClassSubject($teacher_id)
-    //  {
-    //        return AssignClassTeacherModel::select('assign_class_teacher.*', 'class.name as class_name', 'subject.name as subject_name', 'subject.type as subject_type', 'class.id as class_id', 'subject.id as subject_id')
-    //                 ->join('class', 'class.id', '=', 'assign_class_teacher.class_id')
-    //                 ->join('class_subject', 'class_subject.class_id', '=', 'class.id')
-    //                 ->join('subject', 'subject.id', '=', 'class_subject.subject_id')
-    //                 ->where('assign_class_teacher.is_delete', '=', 0)
-    //                 ->where('assign_class_teacher.status', '=', 0)
-    //                 ->where('subject.status', '=', 0)
-    //                 ->where('subject.is_delete', '=', 0)
-    //                 ->where('class_subject.status', '=', 0)
-    //                 ->where('class_subject.is_delete', '=', 0)
-    //                 ->where('assign_class_teacher.teacher_id', '=', $teacher_id)
-    //                 ->get();
-    //  }
-
-    public static function getMyClassSubject($teacher_id)
-    {
-        return self::select('assign_class_teacher.*', 'class.name as class_name', 'class.opt as class_opt', 'subject.name as subject_name', 'subject.code as subject_code')
+        return self::select(
+            'assign_class_teacher.*',
+            'class.name as class_name',
+            'class.opt as class_opt',
+            'subject.name as subject_name',
+            'subject.code as subject_code'
+        )
             ->join('class', 'assign_class_teacher.class_id', '=', 'class.id')
             ->join('subject', 'assign_class_teacher.subject_id', '=', 'subject.id')
             ->where('assign_class_teacher.teacher_id', $teacher_id)
+            ->when($academic_year_id, function ($q) use ($academic_year_id) {
+                $q->where('class.academic_year_id', $academic_year_id);
+            })
             ->where('assign_class_teacher.is_delete', 0)
             ->where('assign_class_teacher.status', 0)
             ->get();
     }
 
 
-    // static public function getMyClassSubjectGroup($teacher_id)
-    // {
-    //     return AssignClassTeacherModel::select('assign_class_teacher.*', 'class.name as class_name',  'class.id as class_id')
-    //         ->join('class', 'class.id', '=', 'assign_class_teacher.class_id')
-    //         ->where('assign_class_teacher.is_delete', '=', 0)
-    //         ->where('assign_class_teacher.status', '=', 0)
-    //         ->where('assign_class_teacher.teacher_id', '=', $teacher_id)
-    //         ->groupBy('assign_class_teacher.class_id')
-    //         ->get();
-    // }
 
     static public function getMyClassSubjectGroup($teacher_id)
     {

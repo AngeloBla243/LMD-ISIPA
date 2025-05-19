@@ -1,6 +1,6 @@
 @extends('layouts.app')
 @section('style')
-    <style type="text/css">
+    {{-- <style type="text/css">
         .styled-table {
             border-collapse: collapse;
             margin: 25px 0;
@@ -38,275 +38,280 @@
             background-color: #f1f1f1;
             cursor: pointer;
         }
-    </style>
+    </style> --}}
 @endsection
 @section('content')
     <div class="content-wrapper">
-        <!-- Content Header (Page header) -->
-        <section class="content-header">
+        <!-- Content Header -->
+        <section class="content-header py-3 bg-light border-bottom mb-4">
             <div class="container-fluid">
-                <div class="row mb-2">
+                <div class="row align-items-center">
                     <div class="col-sm-6">
-                        <h1>Teacher List (Total : {{ $getRecord->total() }})</h1>
+                        <h1 class="h3 fw-bold text-primary">
+                            Liste des Enseignants <small class="text-muted">(Total : {{ $getRecord->total() }})</small>
+                        </h1>
                     </div>
-                    <div class="col-sm-6" style="text-align: right;">
-                        <a href="{{ url('admin/teacher/add') }}" class="btn btn-info"><i
-                                class="fa-solid fa-file-circle-plus"></i> Add New Teacher</a>
+                    <div class="col-sm-6 text-end">
+                        <a href="{{ url('admin/teacher/add') }}" class="btn btn-info shadow-sm rounded-3">
+                            <i class="fa-solid fa-file-circle-plus me-2"></i> Ajouter un enseignant
+                        </a>
                     </div>
-
-
-
                 </div>
-            </div><!-- /.container-fluid -->
+            </div>
         </section>
-
-
-
 
         <!-- Main content -->
-        <section class="content">
-
-
+        <section class="content pb-5">
             <div class="container-fluid">
-                <div class="row">
 
-                    <!-- /.col -->
-                    <div class="col-md-12">
-
-
-
-                        <div class="card">
-                            <div class="card-header">
-                                <h3 class="card-title">Search Teacher</h3>
-                            </div>
-                            <form method="get" action="">
-                                <div class="card-body">
-                                    <div class="row">
-
-
-                                        <div class="form-group col-md-2">
-                                            <label>Name</label>
-                                            <input type="text" class="form-control" value="{{ Request::get('name') }}"
-                                                name="name" placeholder="Name">
-                                        </div>
-
-                                        <div class="form-group col-md-2">
-                                            <label>Last Name</label>
-                                            <input type="text" class="form-control"
-                                                value="{{ Request::get('last_name') }}" name="last_name"
-                                                placeholder="Last Name">
-                                        </div>
-
-                                        <div class="form-group col-md-2">
-                                            <label>Email</label>
-                                            <input type="text" class="form-control" name="email"
-                                                value="{{ Request::get('email') }}" placeholder="Email">
-                                        </div>
-
-                                        <div class="form-group col-md-2">
-                                            <label>Gender</label>
-                                            <select class="form-control" name="gender">
-                                                <option value="">Select Gender</option>
-                                                <option {{ Request::get('gender') == 'Male' ? 'selected' : '' }}
-                                                    value="Male">Male</option>
-                                                <option {{ Request::get('gender') == 'Female' ? 'selected' : '' }}
-                                                    value="Female">Female</option>
-                                                <option {{ Request::get('gender') == 'Other' ? 'selected' : '' }}
-                                                    value="Other">Other</option>
-                                            </select>
-                                        </div>
-
-                                        <div class="form-group col-md-2">
-                                            <label>Mobile Number</label>
-                                            <input type="text" class="form-control" name="mobile_number"
-                                                value="{{ Request::get('mobile_number') }}" placeholder="Mobile Number">
-                                        </div>
-
-
-                                        <div class="form-group col-md-2">
-                                            <label> Marital Status </label>
-                                            <input type="text" class="form-control" name="marital_status"
-                                                value="{{ Request::get('marital_status') }}" placeholder="Marital Status">
-                                        </div>
-
-                                        <div class="form-group col-md-2">
-                                            <label> Current Address </label>
-                                            <input type="text" class="form-control" name="address"
-                                                value="{{ Request::get('address') }}" placeholder="Current Address">
-                                        </div>
-
-                                        <div class="form-group col-md-2">
-                                            <label>Status</label>
-                                            <select class="form-control" name="status">
-                                                <option value="">Select Status</option>
-                                                <option {{ Request::get('status') == 100 ? 'selected' : '' }}
-                                                    value="100">Active</option>
-                                                <option {{ Request::get('status') == 1 ? 'selected' : '' }}
-                                                    value="1">Inactive</option>
-
-                                            </select>
-                                        </div>
-
-                                        <div class="form-group col-md-2">
-                                            <label>Date Of Joining</label>
-                                            <input type="date" class="form-control" name="admission_date"
-                                                value="{{ Request::get('admission_date') }}">
-                                        </div>
-
-
-                                        <div class="form-group col-md-2">
-                                            <label>Created Date</label>
-                                            <input type="date" class="form-control" name="date"
-                                                value="{{ Request::get('date') }}" placeholder="">
-                                        </div>
-
-                                        <div class="form-group col-md-3">
-                                            <button class="btn btn-primary" type="submit"
-                                                style="margin-top: 30px;"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
-                                            <a href="{{ url('admin/teacher/list') }}" class="btn btn-success"
-                                                style="margin-top: 30px;">Reset</a>
-
-                                        </div>
-
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-
-
-
-                        @include('_message')
-
-                        <!-- /.card -->
-
-                        <div class="card">
-                            <div class="card-header">
-                                <h3 class="card-title">Teacher List</h3>
-
-                                <form action="{{ url('admin/teacher/export_excel') }}" method="post"
-                                    style="float: right;">
-                                    {{ csrf_field() }}
-                                    <input type="hidden" name="name" value="{{ Request::get('name') }}">
-                                    <input type="hidden" name="last_name" value="{{ Request::get('last_name') }}">
-                                    <input type="hidden" name="email" value="{{ Request::get('email') }}">
-                                    <input type="hidden" name="gender" value="{{ Request::get('gender') }}">
-                                    <input type="hidden" name="mobile_number"
-                                        value="{{ Request::get('mobile_number') }}">
-                                    <input type="hidden" name="marital_status"
-                                        value="{{ Request::get('marital_status') }}">
-                                    <input type="hidden" name="address" value="{{ Request::get('address') }}">
-                                    <input type="hidden" name="status" value="{{ Request::get('status') }}">
-                                    <input type="hidden" name="admission_date"
-                                        value="{{ Request::get('admission_date') }}">
-                                    <input type="hidden" name="date" value="{{ Request::get('date') }}">
-                                    <button class="btn btn-primary">Export Excel</button>
-                                </form>
-                            </div>
-                            <!-- /.card-header -->
-                            <div class="card-body p-0" style="overflow: auto;">
-                                <table class="table styled-table table-bordered table-striped">
-                                    <thead>
-                                        <tr>
-                                            <th>#</th>
-                                            <th style="min-width: 150px;">Profile Pic</th>
-                                            <th style="min-width: 150px;">Teacher Name</th>
-                                            <th>Email</th>
-                                            <th>Gender</th>
-                                            <th style="min-width: 150px;">Date of Birth </th>
-                                            <th style="min-width: 150px;">Date Of Joining</th>
-                                            <th style="min-width: 150px;">Mobile Number</th>
-                                            <th style="min-width: 150px;">Marital Status </th>
-                                            <th style="min-width: 150px;">Current Address </th>
-                                            <th style="min-width: 200px;">Permanent Address </th>
-                                            <th style="min-width: 150px;">Qualification</th>
-                                            <th style="min-width: 150px;">Work Experience</th>
-                                            <th>Note</th>
-                                            <th>Status</th>
-                                            <th style="min-width: 150px;">Created Date</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach ($getRecord as $value)
-                                            <tr>
-                                                <td style="min-width: 100px;">
-                                                    {{ ($getRecord->currentPage() - 1) * $getRecord->perPage() + $loop->iteration }}
-                                                </td>
-                                                <td>
-                                                    @if (!empty($value->getProfileDirect()))
-                                                        <img src="{{ $value->getProfileDirect() }}"
-                                                            style="height: 50px; width:50px; border-radius: 50px;">
-                                                    @endif
-                                                </td>
-
-                                                <td style="min-width: 100px;">{{ $value->name }} {{ $value->last_name }}
-                                                </td>
-                                                <td style="min-width: 100px;">{{ $value->email }}</td>
-                                                <td style="min-width: 100px;">{{ $value->gender }}</td>
-                                                <td style="min-width: 100px;">
-                                                    @if (!empty($value->date_of_birth))
-                                                        {{ date('d-m-Y', strtotime($value->date_of_birth)) }}
-                                                    @endif
-                                                </td style="min-width: 100px;">
-                                                <td style="min-width: 100px;">
-                                                    @if (!empty($value->admission_date))
-                                                        {{ date('d-m-Y', strtotime($value->admission_date)) }}
-                                                    @endif
-                                                </td>
-                                                <td style="min-width: 100px;">{{ $value->mobile_number }}</td>
-                                                <td style="min-width: 100px;">{{ $value->marital_status }}</td>
-                                                <td style="min-width: 100px;">{{ $value->address }}</td>
-
-
-                                                <td style="min-width: 100px;">{{ $value->permanent_address }}</td>
-                                                <td style="min-width: 100px;">{{ $value->qualification }}</td>
-                                                <td style="min-width: 100px;">{{ $value->work_experience }}</td>
-                                                <td style="min-width: 100px;">{{ $value->note }}</td>
-                                                <td style="min-width: 100px;">
-                                                    {{ $value->status == 0 ? 'Active' : 'Inactive' }}</td>
-
-
-                                                <td style="min-width: 100px;">
-                                                    {{ date('d-m-Y H:i A', strtotime($value->created_at)) }}</td>
-                                                <td style="min-width: 400px;">
-                                                    <a href="{{ url('admin/teacher/edit/' . $value->id) }}"
-                                                        class="btn btn-info">
-                                                        <i class="fas fa-pencil-alt"></i>
-                                                        Edit
-                                                    </a>
-                                                    <a href="{{ url('admin/teacher/delete/' . $value->id) }}"
-                                                        class="btn btn-danger">
-                                                        <i class="fas fa-trash">
-                                                        </i>
-                                                        Delete
-                                                    </a>
-                                                    <a href="{{ url('chat?receiver_id=' . base64_encode($value->id)) }}"
-                                                        class="btn btn-success">
-                                                        <i class="fas fa-comments"></i>
-                                                        Send Message
-                                                    </a>
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                                <div style="padding: 10px; float: right;">
-                                    {!! $getRecord->appends(Illuminate\Support\Facades\Request::except('page'))->links() !!}
-                                </div>
-
-                            </div>
-
-                            <!-- /.card-body -->
-                        </div>
-                        <!-- /.card -->
+                <!-- Recherche -->
+                <div class="card shadow-sm rounded-4 border-0 mb-4">
+                    <div class="card-header bg-primary text-white rounded-top-4">
+                        <h3 class="card-title mb-0">
+                            <i class="fa-solid fa-magnifying-glass me-2"></i>Recherche Enseignant
+                        </h3>
                     </div>
-                    <!-- /.col -->
+                    <form method="get" action="">
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-md-2">
+                                    <label class="form-label fw-semibold">Nom</label>
+                                    <input type="text" class="form-control" value="{{ Request::get('name') }}"
+                                        name="name" placeholder="Nom">
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label fw-semibold">Prénom</label>
+                                    <input type="text" class="form-control" value="{{ Request::get('last_name') }}"
+                                        name="last_name" placeholder="Prénom">
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label fw-semibold">Email</label>
+                                    <input type="text" class="form-control" name="email"
+                                        value="{{ Request::get('email') }}" placeholder="Email">
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label fw-semibold">Genre</label>
+                                    <select class="form-control" name="gender">
+                                        <option value="">Genre</option>
+                                        <option {{ Request::get('gender') == 'Male' ? 'selected' : '' }} value="Male">
+                                            Homme</option>
+                                        <option {{ Request::get('gender') == 'Female' ? 'selected' : '' }} value="Female">
+                                            Femme</option>
+                                        <option {{ Request::get('gender') == 'Other' ? 'selected' : '' }} value="Other">
+                                            Autre</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label fw-semibold">Téléphone</label>
+                                    <input type="text" class="form-control" name="mobile_number"
+                                        value="{{ Request::get('mobile_number') }}" placeholder="Téléphone">
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label fw-semibold">Statut marital</label>
+                                    <input type="text" class="form-control" name="marital_status"
+                                        value="{{ Request::get('marital_status') }}" placeholder="Statut marital">
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label fw-semibold">Adresse actuelle</label>
+                                    <input type="text" class="form-control" name="address"
+                                        value="{{ Request::get('address') }}" placeholder="Adresse actuelle">
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label fw-semibold">Statut</label>
+                                    <select class="form-control" name="status">
+                                        <option value="">Statut</option>
+                                        <option {{ Request::get('status') == 100 ? 'selected' : '' }} value="100">Actif
+                                        </option>
+                                        <option {{ Request::get('status') == 1 ? 'selected' : '' }} value="1">Inactif
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label fw-semibold">Date d'entrée</label>
+                                    <input type="date" class="form-control" name="admission_date"
+                                        value="{{ Request::get('admission_date') }}">
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label fw-semibold">Date création</label>
+                                    <input type="date" class="form-control" name="date"
+                                        value="{{ Request::get('date') }}">
+                                </div>
+                                <div class="col-md-3 d-flex align-items-end gap-2">
+                                    <button class="btn btn-primary w-100" type="submit">
+                                        <i class="fa-solid fa-magnifying-glass me-1"></i> Rechercher
+                                    </button>
+                                    <a href="{{ url('admin/teacher/list') }}"
+                                        class="btn btn-secondary w-100">Réinitialiser</a>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
                 </div>
-                <!-- /.row -->
 
-                <!-- /.row -->
-            </div><!-- /.container-fluid -->
+                @include('_message')
+
+                <!-- Liste des enseignants -->
+                <div class="card shadow-sm rounded-4 border-0">
+                    <div
+                        class="card-header bg-primary text-white rounded-top-4 d-flex justify-content-between align-items-center">
+                        <h3 class="card-title mb-0">
+                            <i class="fa-solid fa-chalkboard-user me-2"></i>Liste des Enseignants
+                        </h3>
+                        <form action="{{ url('admin/teacher/export_excel') }}" method="post"
+                            class="d-inline-block ms-auto">
+                            {{ csrf_field() }}
+                            <input type="hidden" name="name" value="{{ Request::get('name') }}">
+                            <input type="hidden" name="last_name" value="{{ Request::get('last_name') }}">
+                            <input type="hidden" name="email" value="{{ Request::get('email') }}">
+                            <input type="hidden" name="gender" value="{{ Request::get('gender') }}">
+                            <input type="hidden" name="mobile_number" value="{{ Request::get('mobile_number') }}">
+                            <input type="hidden" name="marital_status" value="{{ Request::get('marital_status') }}">
+                            <input type="hidden" name="address" value="{{ Request::get('address') }}">
+                            <input type="hidden" name="status" value="{{ Request::get('status') }}">
+                            <input type="hidden" name="admission_date" value="{{ Request::get('admission_date') }}">
+                            <input type="hidden" name="date" value="{{ Request::get('date') }}">
+                            <button class="btn btn-success">
+                                <i class="fa-solid fa-file-excel me-1"></i> Export Excel
+                            </button>
+                        </form>
+                    </div>
+                    <div class="card-body p-0 table-responsive">
+                        <table class="table table-hover table-bordered align-middle mb-0">
+                            <thead class="table-primary text-center text-uppercase small">
+                                <tr>
+                                    <th>#</th>
+                                    <th>Photo</th>
+                                    <th>Nom Enseignant</th>
+                                    <th>Email</th>
+                                    <th>Genre</th>
+                                    <th>Date de naissance</th>
+                                    <th>Date d'entrée</th>
+                                    <th>Téléphone</th>
+                                    <th>Statut marital</th>
+                                    <th>Adresse actuelle</th>
+                                    <th>Adresse permanente</th>
+                                    <th>Qualification</th>
+                                    <th>Expérience</th>
+                                    <th>Note</th>
+                                    <th>Statut</th>
+                                    <th>Date création</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse ($getRecord as $value)
+                                    <tr>
+                                        <td class="text-center">
+                                            {{ ($getRecord->currentPage() - 1) * $getRecord->perPage() + $loop->iteration }}
+                                        </td>
+                                        <td class="text-center" style="min-width: 200px;">
+                                            @if (!empty($value->getProfileDirect()))
+                                                <img src="{{ $value->getProfileDirect() }}" alt="Photo"
+                                                    class="rounded-circle"
+                                                    style="width: 50px; height: 50px; object-fit: cover;">
+                                            @else
+                                                <span class="text-muted">N/A</span>
+                                            @endif
+                                        </td>
+                                        <td style="min-width: 200px;">{{ $value->name }} {{ $value->last_name }}</td>
+                                        <td style="min-width: 200px;">{{ $value->email }}</td>
+                                        <td style="min-width: 200px;">{{ $value->gender }}</td>
+                                        <td style="min-width: 200px;">
+                                            @if (!empty($value->date_of_birth))
+                                                {{ date('d-m-Y', strtotime($value->date_of_birth)) }}
+                                            @endif
+                                        </td>
+                                        <td style="min-width: 200px;">
+                                            @if (!empty($value->admission_date))
+                                                {{ date('d-m-Y', strtotime($value->admission_date)) }}
+                                            @endif
+                                        </td>
+                                        <td style="min-width: 200px;">{{ $value->mobile_number }}</td>
+                                        <td style="min-width: 200px;">{{ $value->marital_status }}</td>
+                                        <td style="min-width: 200px;">{{ $value->address }}</td>
+                                        <td style="min-width: 200px;">{{ $value->permanent_address }}</td>
+                                        <td style="min-width: 200px;">{{ $value->qualification }}</td>
+                                        <td style="min-width: 200px;">{{ $value->work_experience }}</td>
+                                        <td style="min-width: 200px;">{{ $value->note }}</td>
+                                        <td style="min-width: 200px;">
+                                            <span class="badge {{ $value->status == 0 ? 'bg-success' : 'bg-secondary' }}">
+                                                {{ $value->status == 0 ? 'Actif' : 'Inactif' }}
+                                            </span>
+                                        </td>
+                                        <td style="min-width: 200px;">
+                                            {{ date('d-m-Y H:i A', strtotime($value->created_at)) }}</td>
+                                        <td style="min-width: 200px;">
+                                            <a href="{{ url('admin/teacher/edit/' . $value->id) }}"
+                                                class="btn btn-info btn-sm me-1 mb-1" title="Modifier">
+                                                <i class="fas fa-pencil-alt"></i>
+                                            </a>
+                                            <a href="{{ url('admin/teacher/delete/' . $value->id) }}"
+                                                class="btn btn-danger btn-sm me-1 mb-1" title="Supprimer"
+                                                onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet enseignant ?');">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                            <a href="{{ url('chat?receiver_id=' . base64_encode($value->id)) }}"
+                                                class="btn btn-success btn-sm mb-1" title="Envoyer un message">
+                                                <i class="fas fa-comments"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="17" class="text-center text-muted py-4">
+                                            <i class="fa-solid fa-face-frown-open fa-2x mb-2"></i><br>
+                                            Aucun enseignant trouvé.
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                        @if ($getRecord instanceof \Illuminate\Pagination\AbstractPaginator && $getRecord->hasPages())
+                            <div class="mt-3 d-flex justify-content-end px-3">
+                                {!! $getRecord->appends(Illuminate\Support\Facades\Request::except('page'))->links() !!}
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
         </section>
-        <!-- /.content -->
     </div>
+
+    <style>
+        .card {
+            border-radius: 1.25rem;
+        }
+
+        .card-header {
+            border-radius: 1.25rem 1.25rem 0 0;
+        }
+
+        .table-primary th {
+            background-color: #cfe2ff !important;
+            color: #084298 !important;
+            font-weight: 600;
+        }
+
+        .btn-info,
+        .btn-danger,
+        .btn-success,
+        .btn-primary,
+        .btn-secondary {
+            font-weight: 500;
+        }
+
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .badge {
+            font-size: 1em;
+            padding: 0.45em 0.9em;
+        }
+
+        .fa-face-frown-open {
+            color: #adb5bd;
+        }
+    </style>
 @endsection

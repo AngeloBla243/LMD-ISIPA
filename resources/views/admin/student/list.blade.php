@@ -42,334 +42,352 @@
 @endsection
 @section('content')
     <div class="content-wrapper">
-        <!-- Content Header (Page header) -->
-        <section class="content-header">
+        <!-- Content Header -->
+        <section class="content-header py-3 bg-light border-bottom mb-4">
             <div class="container-fluid">
-                <div class="row mb-2">
+                <div class="row align-items-center">
                     <div class="col-sm-6">
-                        <h1>Student List (Total : {{ $getRecord->total() }})</h1>
+                        <h1 class="h3 fw-bold text-primary">
+                            Liste des étudiants <small class="text-muted">(Total : {{ $getRecord->total() }})</small>
+                        </h1>
                     </div>
-                    <div class="col-sm-6" style="text-align: right;">
-                        <a href="{{ url('admin/student/add') }}" class="btn btn-info"><i class="fa-solid fa-file-circle-plus"></i> Add New Student</a>
+                    <div class="col-sm-6 text-end">
+                        <a href="{{ url('admin/student/add') }}" class="btn btn-info shadow-sm rounded-3">
+                            <i class="fa-solid fa-file-circle-plus me-2"></i> Ajouter un étudiant
+                        </a>
                     </div>
-
-
-
                 </div>
-            </div><!-- /.container-fluid -->
+            </div>
         </section>
 
-
-
-
         <!-- Main content -->
-        <section class="content">
-
-
+        <section class="content pb-5">
             <div class="container-fluid">
                 <div class="row">
-
-                    <!-- /.col -->
                     <div class="col-md-12">
 
-
-                        <div class="card">
-                            <div class="card-header">
-                                <h3 class="card-title">Search Student </h3>
+                        <!-- Recherche -->
+                        <div class="card shadow-sm rounded-4 border-0 mb-4">
+                            <div class="card-header bg-primary text-white rounded-top-4">
+                                <h3 class="card-title mb-0">
+                                    <i class="fa-solid fa-magnifying-glass me-2"></i>Recherche Étudiant
+                                </h3>
                             </div>
                             <form method="get" action="">
                                 <div class="card-body">
-                                    <div class="row">
-
-
-                                        <div class="form-group col-md-2">
-                                            <label>Name</label>
+                                    <div class="row g-3">
+                                        <div class="col-md-2">
+                                            <label class="form-label fw-semibold">Nom</label>
                                             <input type="text" class="form-control" value="{{ Request::get('name') }}"
-                                                name="name" placeholder="Name">
+                                                name="name" placeholder="Nom">
                                         </div>
-
-                                        <div class="form-group col-md-2">
-                                            <label>Last Name</label>
+                                        <div class="col-md-2">
+                                            <label class="form-label fw-semibold">Prénom</label>
                                             <input type="text" class="form-control"
                                                 value="{{ Request::get('last_name') }}" name="last_name"
-                                                placeholder="Last Name">
+                                                placeholder="Prénom">
                                         </div>
-
-                                        <div class="form-group col-md-2">
-                                            <label>Email</label>
+                                        <div class="col-md-2">
+                                            <label class="form-label fw-semibold">Email</label>
                                             <input type="text" class="form-control" name="email"
                                                 value="{{ Request::get('email') }}" placeholder="Email">
                                         </div>
-
-                                        <div class="form-group col-md-2">
-                                            <label>Admission Number</label>
+                                        <div class="col-md-2">
+                                            <label class="form-label fw-semibold">N° Admission</label>
                                             <input type="text" class="form-control" name="admission_number"
-                                                value="{{ Request::get('admission_number') }}"
-                                                placeholder="Admission Number">
+                                                value="{{ Request::get('admission_number') }}" placeholder="N° Admission">
                                         </div>
-
-                                        <div class="form-group col-md-2">
-                                            <label>Roll Number</label>
+                                        <div class="col-md-2">
+                                            <label class="form-label fw-semibold">N° Appel</label>
                                             <input type="text" class="form-control" name="roll_number"
-                                                value="{{ Request::get('roll_number') }}" placeholder="Roll Number">
+                                                value="{{ Request::get('roll_number') }}" placeholder="N° Appel">
                                         </div>
-
-
-
-                                        <div class="form-group col-md-2">
-                                            <label>Class</label>
+                                        <div class="col-md-2">
+                                            <label class="form-label fw-semibold">Classe</label>
                                             <input type="text" class="form-control" name="class"
-                                                value="{{ Request::get('class') }}" placeholder="Class">
+                                                value="{{ Request::get('class') }}" placeholder="Classe">
                                         </div>
-
-
-                                        <div class="form-group col-md-2">
-                                            <label>Gender</label>
+                                        <div class="col-md-2">
+                                            <label class="form-label fw-semibold">Genre</label>
                                             <select class="form-control" name="gender">
-                                                <option value="">Select Gender</option>
+                                                <option value="">Genre</option>
                                                 <option {{ Request::get('gender') == 'Male' ? 'selected' : '' }}
-                                                    value="Male">Male</option>
+                                                    value="Male">Homme</option>
                                                 <option {{ Request::get('gender') == 'Female' ? 'selected' : '' }}
-                                                    value="Female">Female</option>
+                                                    value="Female">Femme</option>
                                                 <option {{ Request::get('gender') == 'Other' ? 'selected' : '' }}
-                                                    value="Other">Other</option>
+                                                    value="Other">Autre</option>
                                             </select>
                                         </div>
-
-
-                                        <div class="form-group col-md-2">
-                                            <label>Département</label>
+                                        <div class="col-md-2">
+                                            <label class="form-label fw-semibold">Département</label>
                                             <select class="form-control" name="departement">
-                                                <option value="">Select Département</option>
-                                                <option {{ Request::get('departement') == 'Informatique de gestion' ? 'selected' : '' }}
-                                                    value="Male">Informatique de gestion
-                                                </option>
-                                                <option {{ Request::get('departement') == 'Techniques de Maintenance' ? 'selected' : '' }}
-                                                    value="Techniques de Maintenance">Techniques de Maintenance
-                                                </option>
-                                                <option {{ Request::get('departement') == 'Communication numérique' ? 'selected' : '' }}
-                                                    value="Other">Communication numérique
-                                                </option>
-                                                    <option {{ Request::get('departement') == 'Gestion financière' ? 'selected' : '' }}
-                                                    value="Gestion financière">Gestion financière
-                                                </option>
-                                                    <option {{ Request::get('departement') == 'Gestion Douanière et Accises' ? 'selected' : '' }}
+                                                <option value="">Département</option>
+                                                <option
+                                                    {{ Request::get('departement') == 'Informatique de gestion' ? 'selected' : '' }}
+                                                    value="Informatique de gestion">Informatique de gestion</option>
+                                                <option
+                                                    {{ Request::get('departement') == 'Techniques de Maintenance' ? 'selected' : '' }}
+                                                    value="Techniques de Maintenance">Techniques de Maintenance</option>
+                                                <option
+                                                    {{ Request::get('departement') == 'Communication numérique' ? 'selected' : '' }}
+                                                    value="Communication numérique">Communication numérique</option>
+                                                <option
+                                                    {{ Request::get('departement') == 'Gestion financière' ? 'selected' : '' }}
+                                                    value="Gestion financière">Gestion financière</option>
+                                                <option
+                                                    {{ Request::get('departement') == 'Gestion Douanière et Accises' ? 'selected' : '' }}
                                                     value="Gestion Douanière et Accises">Gestion Douanière et Accises
                                                 </option>
                                             </select>
                                         </div>
-
-                                        <div class="form-group col-md-2">
-                                            <label>Religion</label>
+                                        <div class="col-md-2">
+                                            <label class="form-label fw-semibold">Religion</label>
                                             <input type="text" class="form-control" name="religion"
                                                 value="{{ Request::get('religion') }}" placeholder="Religion">
                                         </div>
-
-                                        <div class="form-group col-md-2">
-                                            <label>Mobile Number</label>
+                                        <div class="col-md-2">
+                                            <label class="form-label fw-semibold">Téléphone</label>
                                             <input type="text" class="form-control" name="mobile_number"
-                                                value="{{ Request::get('mobile_number') }}" placeholder="Mobile Number">
+                                                value="{{ Request::get('mobile_number') }}" placeholder="Téléphone">
                                         </div>
-
-
-                                        <div class="form-group col-md-2">
-                                            <label>Blood Group</label>
+                                        <div class="col-md-2">
+                                            <label class="form-label fw-semibold">Groupe Sanguin</label>
                                             <input type="text" class="form-control" name="blood_group"
-                                                value="{{ Request::get('blood_group') }}" placeholder="Blood Group">
+                                                value="{{ Request::get('blood_group') }}" placeholder="Groupe sanguin">
                                         </div>
-
-
-                                        <div class="form-group col-md-2">
-                                            <label>Status</label>
+                                        <div class="col-md-2">
+                                            <label class="form-label fw-semibold">Statut</label>
                                             <select class="form-control" name="status">
-                                                <option value="">Select Status</option>
+                                                <option value="">Statut</option>
                                                 <option {{ Request::get('status') == 100 ? 'selected' : '' }}
-                                                    value="100">Active</option>
+                                                    value="100">Actif</option>
                                                 <option {{ Request::get('status') == 1 ? 'selected' : '' }}
-                                                    value="1">Inactive</option>
-
+                                                    value="1">Inactif</option>
                                             </select>
                                         </div>
-
-
-
-
-
-                                        <div class="form-group col-md-2">
-                                            <label>Admission Date</label>
+                                        <div class="col-md-2">
+                                            <label class="form-label fw-semibold">Date d'admission</label>
                                             <input type="date" class="form-control" name="admission_date"
                                                 value="{{ Request::get('admission_date') }}">
                                         </div>
-
-
-
-
-
-
-                                        <div class="form-group col-md-2">
-                                            <label>Created Date</label>
+                                        <div class="col-md-2">
+                                            <label class="form-label fw-semibold">Date création</label>
                                             <input type="date" class="form-control" name="date"
-                                                value="{{ Request::get('date') }}" placeholder="">
+                                                value="{{ Request::get('date') }}">
                                         </div>
-
-                                        <div class="form-group col-md-3">
-                                            <button class="btn btn-primary" type="submit"
-                                                style="margin-top: 30px;"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
-                                            <a href="{{ url('admin/student/list') }}" class="btn btn-success"
-                                                style="margin-top: 30px;">Reset</a>
-
+                                        <div class="col-md-3 d-flex align-items-end gap-2">
+                                            <button class="btn btn-primary w-100" type="submit">
+                                                <i class="fa-solid fa-magnifying-glass me-1"></i> Rechercher
+                                            </button>
+                                            <a href="{{ url('admin/student/list') }}"
+                                                class="btn btn-secondary w-100">Réinitialiser</a>
                                         </div>
-
                                     </div>
                                 </div>
                             </form>
                         </div>
 
-
-
-
-
                         @include('_message')
 
-                        <!-- /.card -->
-
-                        <div class="card">
-                            <div class="card-header">
-                                <h3 class="card-title">Student List</h3>
+                        <!-- Liste des étudiants -->
+                        <div class="card shadow-sm rounded-4 border-0">
+                            <div
+                                class="card-header bg-primary text-white rounded-top-4 d-flex justify-content-between align-items-center">
+                                <h3 class="card-title mb-0">
+                                    <i class="fa-solid fa-users me-2"></i>Liste des étudiants
+                                </h3>
                                 <form action="{{ url('admin/student/export_excel') }}" method="post"
-                                    style="float: right;">
+                                    class="d-inline-block ms-auto">
                                     {{ csrf_field() }}
-                                    <input type="hidden" name="name" value="{{ Request::get('name') }}">
-                                    <input type="hidden" name="last_name" value="{{ Request::get('last_name') }}">
-                                    <input type="hidden" name="email" value="{{ Request::get('email') }}">
-                                    <input type="hidden" name="departement" value="{{ Request::get('departement') }}">
-                                    <input type="hidden" name="admission_number"
-                                        value="{{ Request::get('admission_number') }}">
-                                    <input type="hidden" name="roll_number" value="{{ Request::get('roll_number') }}">
-                                    <input type="hidden" name="gender" value="{{ Request::get('gender') }}">
-                                    <input type="hidden" name="class" value="{{ Request::get('class') }}">
-                                    <input type="hidden" name="caste" value="{{ Request::get('caste') }}">
-                                    <input type="hidden" name="religion" value="{{ Request::get('religion') }}">
-                                    <input type="hidden" name="mobile_number"
-                                        value="{{ Request::get('mobile_number') }}">
-                                    <input type="hidden" name="blood_group" value="{{ Request::get('blood_group') }}">
-                                    <input type="hidden" name="status" value="{{ Request::get('status') }}">
-                                    <input type="hidden" name="admission_date"
-                                        value="{{ Request::get('admission_date') }}">
-                                    <input type="hidden" name="date" value="{{ Request::get('date') }}">
-                                    <button class="btn btn-primary">Export Excel</button>
+                                    @foreach (['name', 'last_name', 'email', 'departement', 'admission_number', 'roll_number', 'gender', 'class', 'caste', 'religion', 'mobile_number', 'blood_group', 'status', 'admission_date', 'date'] as $field)
+                                        <input type="hidden" name="{{ $field }}"
+                                            value="{{ Request::get($field) }}">
+                                    @endforeach
+                                    <button class="btn btn-success">
+                                        <i class="fa-solid fa-file-excel me-1"></i> Export Excel
+                                    </button>
                                 </form>
                             </div>
-                            <!-- /.card-header -->
-                            <div class="card-body p-0" style="overflow: auto;">
-                                <table class="table styled-table table-bordered table-striped">
-                                    <thead>
+                            <div class="card-body p-0 table-responsive">
+                                <table class="table table-hover table-bordered align-middle mb-0">
+                                    <thead class="table-primary text-center text-uppercase small">
                                         <tr>
                                             <th>#</th>
-                                            <th>Profile Pic</th>
-                                            <th style="min-width: 150px;">Student Name</th>
-                                            <th style="min-width: 150px;">Département</th>
-                                            <th style="min-width: 150px;">Parent Name</th>
+                                            <th>Photo</th>
+                                            <th>Nom</th>
+                                            <th>Département</th>
+                                            <th>Parent</th>
                                             <th>Email</th>
-                                            <th style="min-width: 200px;">Admission Number</th>
-                                            <th style="min-width: 150px;">Roll Number</th>
-                                            <th>Class</th>
-                                            <th>Gender</th>
-                                            <th style="min-width: 150px;">Date of Birth </th>
-                                            <th>Caste </th>
+                                            <th>N° Admission</th>
+                                            <th>N° Appel</th>
+                                            <th>Classe</th>
+                                            <th>Genre</th>
+                                            <th>Date de naissance</th>
+                                            <th>Caste</th>
                                             <th>Religion</th>
-                                            <th style="min-width: 150px;">Mobile Number</th>
-                                            <th style="min-width: 150px;">Admission Date</th>
-                                            <th style="min-width: 150px;">Blood Group</th>
-                                            <th>Height</th>
-                                            <th>Weight</th>
-                                            <th>Status</th>
-                                            <th style="min-width: 150px;">Created Date</th>
+                                            <th>Téléphone</th>
+                                            <th>Date Admission</th>
+                                            <th>Groupe Sanguin</th>
+                                            <th>Taille</th>
+                                            <th>Poids</th>
+                                            <th>Statut</th>
+                                            <th>Date création</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach ($getRecord as $value)
+                                        @forelse ($getRecord as $value)
                                             <tr>
-                                                <td style="min-width: 10px;">
+                                                <td class="text-center">
                                                     {{ ($getRecord->currentPage() - 1) * $getRecord->perPage() + $loop->iteration }}
                                                 </td>
-                                                <td style="min-width: 100px;">
+                                                <td class="text-center" style="min-width: 200px;">
                                                     @if (!empty($value->getProfileDirect()))
-                                                        <img src="{{ $value->getProfileDirect() }}"
-                                                            style="height: 50px; width:50px; border-radius: 50px;">
+                                                        <img src="{{ $value->getProfileDirect() }}" alt="Photo"
+                                                            class="rounded-circle"
+                                                            style="width: 50px; height: 50px; object-fit: cover;">
+                                                    @else
+                                                        <span class="text-muted">N/A</span>
                                                     @endif
                                                 </td>
-
-                                                <td style="min-width: 100px;">{{ $value->name }} {{ $value->last_name }}</td>
-                                                <td style="min-width: 100px;">{{ $value->departement }}</td>
-                                                <td style="min-width: 100px;">{{ $value->parent_name }}
-                                                    {{ $value->parent_last_name }}</td>
-                                                <td style="min-width: 100px;">{{ $value->email }}</td>
-                                                <td style="min-width: 100px;">{{ $value->admission_number }}</td>
-                                                <td style="min-width: 100px;">{{ $value->roll_number }}</td>
-                                                <td style="min-width: 300px;">{{ $value->class_name }} {{ $value->class_opt }}</td>
-                                                <td style="min-width: 100px;">{{ $value->gender }}</td>
-                                                <td style="min-width: 100px;">
+                                                <td style="min-width: 200px;">{{ $value->name }} {{ $value->last_name }}
+                                                </td>
+                                                <td style="min-width: 200px;">{{ $value->departement }}</td>
+                                                <td style="min-width: 200px;">{{ $value->parent_name }}</td>
+                                                <td style="min-width: 200px;">{{ $value->email }}</td>
+                                                <td style="min-width: 200px;">{{ $value->admission_number }}</td>
+                                                <td style="min-width: 200px;">{{ $value->roll_number }}</td>
+                                                {{-- <td>{{ $value->class_name }}</td> --}}
+                                                </td>
+                                                <td style="min-width: 400px;">
+                                                    @if ($value->studentClasses->count() == 0)
+                                                        <span class="text-muted">Aucune classe assignée</span>
+                                                    @else
+                                                        @foreach ($value->studentClasses as $class)
+                                                            {{ $class->name }}
+                                                            @if ($class->opt)
+                                                                - {{ $class->opt }}
+                                                            @endif
+                                                            @if ($class->academicYear)
+                                                                ({{ $class->academicYear->name }})
+                                                            @endif
+                                                            @if (!$loop->last)
+                                                                ,
+                                                            @endif
+                                                        @endforeach
+                                                    @endif
+                                                </td>
+                                                <td style="min-width: 200px;">{{ $value->gender }}</td>
+                                                <td style="min-width: 200px;">
                                                     @if (!empty($value->date_of_birth))
                                                         {{ date('d-m-Y', strtotime($value->date_of_birth)) }}
                                                     @endif
                                                 </td>
-                                                <td style="min-width: 100px;">{{ $value->caste }}</td>
-                                                <td style="min-width: 100px;">{{ $value->religion }}</td>
-                                                <td style="min-width: 100px;">{{ $value->mobile_number }}</td>
-                                                <td style="min-width: 100px;">
+                                                <td style="min-width: 200px;">{{ $value->caste }}</td>
+                                                <td style="min-width: 200px;">{{ $value->religion }}</td>
+                                                <td style="min-width: 200px;">{{ $value->mobile_number }}</td>
+                                                <td style="min-width: 200px;">
                                                     @if (!empty($value->admission_date))
                                                         {{ date('d-m-Y', strtotime($value->admission_date)) }}
                                                     @endif
                                                 </td>
-                                                <td style="min-width: 100px;">{{ $value->blood_group }}</td>
-                                                <td style="min-width: 100px;">{{ $value->height }}</td>
-                                                <td style="min-width: 100px;">{{ $value->weight }}</td>
-                                                <td style="min-width: 100px;">
-                                                    {{ $value->status == 0 ? 'Active' : 'Inactive' }}</td>
-
-
-                                                <td style="min-width: 100px;">
+                                                <td style="min-width: 200px;">{{ $value->blood_group }}</td>
+                                                <td>{{ $value->height }}</td>
+                                                <td>{{ $value->weight }}</td>
+                                                <td style="min-width: 200px;">
+                                                    <span
+                                                        class="badge {{ $value->status == 0 ? 'bg-success' : 'bg-secondary' }}">
+                                                        {{ $value->status == 0 ? 'Actif' : 'Inactif' }}
+                                                    </span>
+                                                </td>
+                                                <td style="min-width: 200px;">
                                                     {{ date('d-m-Y H:i A', strtotime($value->created_at)) }}</td>
-                                                <td style="min-width: 400px;">
+                                                <td style="min-width: 200px;">
                                                     <a href="{{ url('admin/student/edit/' . $value->id) }}"
-                                                        class="btn btn-info  ">
+                                                        class="btn btn-info btn-sm me-1 mb-1" title="Modifier">
                                                         <i class="fas fa-pencil-alt"></i>
-                                                        Edit
                                                     </a>
                                                     <a href="{{ url('admin/student/delete/' . $value->id) }}"
-                                                        class="btn btn-danger ">
+                                                        class="btn btn-danger btn-sm me-1 mb-1" title="Supprimer"
+                                                        onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet étudiant ?');">
                                                         <i class="fas fa-trash"></i>
-                                                        Delete
                                                     </a>
                                                     <a href="{{ url('chat?receiver_id=' . base64_encode($value->id)) }}"
-                                                        class="btn btn-success">
+                                                        class="btn btn-success btn-sm mb-1" title="Envoyer un message">
                                                         <i class="fas fa-comments"></i>
-                                                        Send Message
                                                     </a>
                                                 </td>
                                             </tr>
-                                        @endforeach
+                                        @empty
+                                            <tr>
+                                                <td colspan="21" class="text-center text-muted py-4">
+                                                    <i class="fa-solid fa-face-frown-open fa-2x mb-2"></i><br>
+                                                    Aucun étudiant trouvé.
+                                                </td>
+                                            </tr>
+                                        @endforelse
                                     </tbody>
                                 </table>
-                                <div style="padding: 10px; float: right;">
-                                    {!! $getRecord->appends(Illuminate\Support\Facades\Request::except('page'))->links() !!}
-                                </div>
-
+                                @if ($getRecord instanceof \Illuminate\Pagination\AbstractPaginator && $getRecord->hasPages())
+                                    <div class="mt-3 d-flex justify-content-end px-3">
+                                        {!! $getRecord->appends(Illuminate\Support\Facades\Request::except('page'))->links() !!}
+                                    </div>
+                                @endif
                             </div>
-
-                            <!-- /.card-body -->
                         </div>
-                        <!-- /.card -->
-                    </div>
-                    <!-- /.col -->
-                </div>
-                <!-- /.row -->
 
-                <!-- /.row -->
-            </div><!-- /.container-fluid -->
+                    </div>
+                </div>
+            </div>
         </section>
-        <!-- /.content -->
     </div>
+
+    <style>
+        .card {
+            border-radius: 1.25rem;
+        }
+
+        .card-header {
+            border-radius: 1.25rem 1.25rem 0 0;
+        }
+
+        .table-primary th {
+            background-color: #cfe2ff !important;
+            color: #084298 !important;
+            font-weight: 600;
+        }
+
+        .btn-info,
+        .btn-danger,
+        .btn-success,
+        .btn-primary,
+        .btn-secondary {
+            font-weight: 500;
+        }
+
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .badge {
+            font-size: 1em;
+            padding: 0.45em 0.9em;
+        }
+
+        .fa-face-frown-open {
+            color: #adb5bd;
+        }
+
+        .form-label {
+            font-weight: 600;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, .15);
+        }
+    </style>
 @endsection

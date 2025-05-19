@@ -69,6 +69,34 @@ Route::get('lang/{locale}', function ($locale) {
     return redirect()->back();
 });
 
+// Route::get('/set-academic-year/{id}', function ($id) {
+//     $year = App\Models\AcademicYear::findOrFail($id);
+//     session(['academic_year_id' => $year->id]);
+//     return redirect()->back();
+// })->name('set_academic_year')->middleware('auth');
+
+// Route::get('/set-academic-year', function (\Illuminate\Http\Request $request) {
+//     $year = App\Models\AcademicYear::findOrFail($request->academic_year_id);
+//     session(['academic_year_id' => $year->id]);
+//     return redirect()->back();
+// })->name('set_academic_year')->middleware('auth');
+
+// filtre academique
+Route::get('/set-academic-year-student', function (\Illuminate\Http\Request $request) {
+    $year = App\Models\AcademicYear::findOrFail($request->academic_year_id);
+    session(['academic_year_id' => $year->id]);
+    return redirect()->back();
+})->name('set_academic_year_student')->middleware('auth');
+
+// Route pour les enseignants
+Route::get('/set-academic-year-teacher', function (\Illuminate\Http\Request $request) {
+    $year = App\Models\AcademicYear::findOrFail($request->academic_year_id);
+    session(['academic_year_id' => $year->id]);
+    return redirect()->back();
+})->name('set_academic_year_teacher')->middleware('auth');
+
+
+
 
 
 
@@ -322,7 +350,6 @@ Route::group(['middleware' => 'admin'], function () {
 
     Route::get('admin/homework/homework', [HomeworkController::class, 'homework']);
     Route::get('admin/homework/homework/add', [HomeworkController::class, 'add']);
-    Route::post('admin/ajax_get_subject', [HomeworkController::class, 'ajax_get_subject']);
     Route::post('admin/homework/homework/add', [HomeworkController::class, 'insert']);
 
     Route::get('admin/homework/homework/edit/{id}', [HomeworkController::class, 'edit']);
@@ -346,6 +373,13 @@ Route::group(['middleware' => 'admin'], function () {
     Route::post('admin/fees_collection/collect_fees/add_fees/{student_id}', [FeesCollectionController::class, 'collect_fees_insert']);
 
     Route::get('admin/recours/list', [RecoursController::class, 'list']);
+    Route::post('admin/recours/toggle-status/{id}', [RecoursController::class, 'toggleStatus'])
+        ->name('admin.recours.toggle_status');
+
+    Route::get('admin/recours/mark_register_modal', [ExaminationsController::class, 'markRegisterModal'])
+        ->name('admin.recours.mark_register_modal');
+    Route::post('admin/recours/update_mark', [ExaminationsController::class, 'updateSingleMark'])
+        ->name('admin.recours.update_mark');
 });
 
 
@@ -403,19 +437,28 @@ Route::group(['middleware' => 'teacher'], function () {
     Route::get('teacher/homework/homework/delete/{id}', [HomeworkController::class, 'delete']);
 
     Route::get('teacher/homework/homework/submitted/{id}', [HomeworkController::class, 'submittedTeacher']);
+
+    // Teacher Recours Routes
+    Route::post('teacher/recours/toggle-status/{id}', [RecoursController::class, 'toggleStatusTeacher'])
+        ->name('teacher.recours.toggle_status');
+
+    Route::get('teacher/recours/mark_register_modal', [ExaminationsController::class, 'markRegisterModalTeacher'])
+        ->name('teacher.recours.mark_register_modal');
+    Route::post('teacher/recours/update_mark', [ExaminationsController::class, 'updateSingleMark'])
+        ->name('teacher.recours.update_mark');
 });
 
 
 Route::group(['middleware' => 'student'], function () {
 
-    Route::get('student/dashboard', [DashboardController::class, 'dashboard']);
+    Route::get('student/dashboard', [DashboardController::class, 'dash']);
 
     Route::get('student/account', [UserController::class, 'MyAccount']);
     Route::post('student/account', [UserController::class, 'UpdateMyAccountStudent']);
 
 
     Route::get('student/my_subject', [SubjectController::class, 'MySubject']);
-    Route::post('student/my_subject/', [SubjectController::class, 'MySubjectRecours']);
+    Route::post('student/my_subject', [SubjectController::class, 'MySubjectRecours']);
 
 
     Route::get('student/my_timetable', [ClassTimetableController::class, 'MyTimetable']);
@@ -427,7 +470,11 @@ Route::group(['middleware' => 'student'], function () {
     Route::post('student/change_password', [UserController::class, 'update_change_password']);
 
 
+
     Route::get('student/my_calendar', [CalendarController::class, 'MyCalendar']);
+    // Route::get('student/my_calendar', [CalendarController::class, 'MyCalendar'])
+    //     ->name('student.my_calendar');
+
 
     Route::get('student/my_exam_result', [ExaminationsController::class, 'myExamResult']);
     Route::get('student/my_exam_result/print', [ExaminationsController::class, 'myExamResultPrint']);

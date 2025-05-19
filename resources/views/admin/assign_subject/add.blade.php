@@ -33,72 +33,176 @@
 @endsection
 @section('content')
     <div class="content-wrapper">
-        <div class="card shadow">
-            <div class="card-header bg-primary text-white">
-                <h3 class="mb-0">Assigner des matières à une classe</h3>
+        <div class="card shadow-sm rounded-4 border-0 mx-auto" style="max-width: 900px;">
+            <div class="card-header bg-primary text-white rounded-top-4">
+                <h3 class="mb-0 fw-bold">Assigner des matières à une classe</h3>
             </div>
             <div class="card-body">
-                <form action="" method="POST" id="assignmentForm">
+                <form action="" method="POST" id="assignmentForm" novalidate>
                     @csrf
-
-                    <div class="row">
-                        <!-- Sélection de l'année académique -->
+                    <div class="row g-3">
+                        <!-- Année Académique -->
                         <div class="col-md-4">
-                            <div class="form-group">
-                                <label>Année Académique</label>
-                                <select name="academic_year_id" id="academicYear" class="form-control" required>
-                                    <option value="">Sélectionner une année</option>
-                                    @foreach ($academicYears as $year)
-                                        <option value="{{ $year->id }}">{{ $year->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
+                            <label for="academicYear" class="form-label fw-semibold">Année Académique <span
+                                    class="text-danger">*</span></label>
+                            <select name="academic_year_id" id="academicYear"
+                                class="form-select @error('academic_year_id') is-invalid @enderror" required>
+                                <option value="">Sélectionner une année</option>
+                                @foreach ($academicYears as $year)
+                                    <option value="{{ $year->id }}">{{ $year->name }}</option>
+                                @endforeach
+                            </select>
+                            @error('academic_year_id')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
 
-                        <!-- Sélection dynamique des classes -->
+                        <!-- Classe -->
                         <div class="col-md-4">
-                            <div class="form-group">
-                                <label>Classe</label>
-                                <select name="class_id" id="classSelect" class="form-control" required disabled>
-                                    <option value="">Choisissez d'abord une année</option>
-                                </select>
-                            </div>
+                            <label for="classSelect" class="form-label fw-semibold">Classe <span
+                                    class="text-danger">*</span></label>
+                            <select name="class_id" id="classSelect"
+                                class="form-select @error('class_id') is-invalid @enderror" required disabled>
+                                <option value="">Choisissez d'abord une année</option>
+                            </select>
+                            @error('class_id')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
 
-                        <!-- Sélection dynamique des matières -->
+                        <!-- Matières -->
                         <div class="col-md-4">
-                            <div class="form-group">
-                                <label>Matières</label>
-                                <select name="subject_id[]" id="subjectSelect" class="form-control select2" multiple
-                                    required disabled>
-                                    <option value="">Choisissez d'abord une année</option>
-                                </select>
-                            </div>
+                            <label for="subjectSelect" class="form-label fw-semibold">Matières <span
+                                    class="text-danger">*</span></label>
+                            <select name="subject_id[]" id="subjectSelect"
+                                class="form-select select2 @error('subject_id') is-invalid @enderror" multiple required
+                                disabled>
+                                <option value="">Choisissez d'abord une année</option>
+                            </select>
+                            @error('subject_id')
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                            @enderror
                         </div>
 
+                        <!-- Statut -->
                         <div class="col-md-4">
-                            <div class="form-group">
-                                <label>Status</label>
-                                <select class="form-control" name="status">
-                                    <option value="0">Active</option>
-                                    <option value="1">Inactive</option>
-                                </select>
-
-                            </div>
+                            <label for="status" class="form-label fw-semibold">Statut</label>
+                            <select id="status" name="status" class="form-select">
+                                <option value="0">Active</option>
+                                <option value="1">Inactive</option>
+                            </select>
                         </div>
-
                     </div>
 
-
-                    <div class="form-group mt-4">
-                        <button type="submit" class="btn btn-success">
-                            <i class="fas fa-save"></i> Enregistrer
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-success px-4 py-2 fw-semibold shadow-sm">
+                            <i class="fas fa-save me-2"></i> Enregistrer
                         </button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
+
+    <style>
+        .card {
+            border-radius: 1.5rem;
+        }
+
+        .form-label {
+            font-weight: 600;
+        }
+
+        .form-select:focus {
+            border-color: #198754;
+            box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.25);
+        }
+
+        .btn-success {
+            background: linear-gradient(90deg, #198754 60%, #20c997 100%);
+            border: none;
+            transition: background 0.3s ease;
+        }
+
+        .btn-success:hover {
+            background: linear-gradient(90deg, #20c997 0%, #198754 100%);
+        }
+
+        .select2-container--bootstrap5 .select2-selection {
+            border-radius: 0.375rem;
+            border: 1px solid #ced4da;
+            height: calc(2.5rem + 2px);
+            padding: 0.375rem 0.75rem;
+        }
+
+        .select2-container--bootstrap5 .select2-selection--multiple {
+            min-height: calc(2.5rem + 2px);
+        }
+    </style>
+
+    <!-- N'oublie pas d'inclure jQuery et Select2 JS/CSS dans ta page pour que le select2 fonctionne -->
+    <script>
+        $(document).ready(function() {
+            // Initialiser Select2
+            $('#subjectSelect').select2({
+                theme: 'bootstrap-5',
+                placeholder: 'Sélectionnez les matières',
+                allowClear: true
+            });
+
+            // Exemple de gestion dynamique des classes et matières selon l'année sélectionnée
+            $('#academicYear').on('change', function() {
+                let yearId = $(this).val();
+
+                if (!yearId) {
+                    $('#classSelect').prop('disabled', true).html(
+                        '<option>Choisissez d\'abord une année</option>');
+                    $('#subjectSelect').prop('disabled', true).val(null).trigger('change');
+                    return;
+                }
+
+                // Activer et charger les classes via AJAX (exemple)
+                $.ajax({
+                    url: `/api/classes?year_id=${yearId}`,
+                    type: 'GET',
+                    success: function(data) {
+                        let options = '<option value="">Sélectionner une classe</option>';
+                        data.forEach(cls => {
+                            options +=
+                                `<option value="${cls.id}">${cls.name} ${cls.opt}</option>`;
+                        });
+                        $('#classSelect').html(options).prop('disabled', false);
+                        $('#subjectSelect').prop('disabled', true).val(null).trigger('change');
+                    }
+                });
+            });
+
+            // Charger les matières selon la classe sélectionnée
+            $('#classSelect').on('change', function() {
+                let classId = $(this).val();
+
+                if (!classId) {
+                    $('#subjectSelect').prop('disabled', true).val(null).trigger('change');
+                    return;
+                }
+
+                // Activer et charger les matières via AJAX (exemple)
+                $.ajax({
+                    url: `/api/subjects?class_id=${classId}`,
+                    type: 'GET',
+                    success: function(data) {
+                        let options = '';
+                        data.forEach(subject => {
+                            options +=
+                                `<option value="${subject.id}">${subject.name} / ${subject.code}</option>`;
+                        });
+                        $('#subjectSelect').html(options).prop('disabled', false).trigger(
+                            'change');
+                    }
+                });
+            });
+        });
+    </script>
 @endsection
 
 

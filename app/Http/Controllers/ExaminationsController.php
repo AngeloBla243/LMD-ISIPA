@@ -14,6 +14,7 @@ use App\Models\User;
 use App\Models\MarksGradeModel;
 use App\Models\SettingModel;
 use App\Models\AcademicYear;
+use Illuminate\Support\Facades\DB;
 use App\Models\SubjectModel;
 
 class ExaminationsController extends Controller
@@ -33,17 +34,6 @@ class ExaminationsController extends Controller
         return view('admin.examinations.exam.add', $data);
     }
 
-
-    // public function exam_insert(Request $request)
-    // {
-    //     $exam = new ExamModel;
-    //     $exam->name = trim($request->name);
-    //     $exam->note = trim($request->note);
-    //     $exam->created_by = Auth::user()->id;
-    //     $exam->save();
-
-    //     return redirect('admin/examinations/exam/list')->with('success', "Exam successfully created");
-    // }
 
     public function exam_insert(Request $request)
     {
@@ -71,29 +61,6 @@ class ExaminationsController extends Controller
         return redirect('admin/examinations/exam/list')->with('success', "Exams successfully created.");
     }
 
-
-
-    // public function exam_edit($id)
-    // {
-    //     $data['getRecord'] = ExamModel::getSingle($id);
-    //     if (!empty($data['getRecord'])) {
-    //         $data['header_title'] = "Edit Exam";
-    //         return view('admin.examinations.exam.edit', $data);
-    //     } else {
-    //         abort(404);
-    //     }
-    // }
-
-
-    // public function exam_update($id, Request $request)
-    // {
-    //     $exam = ExamModel::getSingle($id);;
-    //     $exam->name = trim($request->name);
-    //     $exam->note = trim($request->note);
-    //     $exam->save();
-
-    //     return redirect('admin/examinations/exam/list')->with('success', "Exam successfully updated");
-    // }
 
     public function exam_edit($id)
     {
@@ -173,7 +140,7 @@ class ExaminationsController extends Controller
 
         $result = array();
         if (!empty($request->get('exam_id')) && !empty($request->get('class_id'))) {
-            $getSubject = ClassSubjectModel::MySubject($request->get('class_id'));
+            $getSubject = ClassSubjectModel::MySubjectAdmin($request->get('class_id'));
             foreach ($getSubject as $value) {
                 $dataS = array();
                 $dataS['subject_id'] = $value->subject_id;
@@ -253,21 +220,50 @@ class ExaminationsController extends Controller
         return redirect()->back()->with('success', "Exam Schedule Successfully Saved");
     }
 
-
     public function marks_register(Request $request)
     {
-        $data['getClass'] = ClassModel::getClass();
-        $data['getExam'] = ExamModel::getExam();
+        // Récupérer toutes les années académiques
+        $data['academicYears'] = AcademicYear::orderBy('start_date', 'desc')->get();
+        $academicYearId = $request->get('academic_year_id');
 
-        if (!empty($request->get('exam_id')) && !empty($request->get('class_id'))) {
-            $data['getSubject'] = ExamScheduleModel::getSubject($request->get('exam_id'), $request->get('class_id'));
+        // Récupérer les étudiants avec ou sans filtre académique
 
-            $data['getStudent'] = User::getStudentClass($request->get('class_id'));
+
+
+        // Initialiser les variables filtrées
+        $filteredClasses = collect();
+        $filteredExams = collect();
+
+        // Si une année est sélectionnée
+        if ($request->filled('academic_year_id')) {
+            $academicYearId = $request->get('academic_year_id');
+
+            // Récupérer les classes de cette année
+            $filteredClasses = ClassModel::where('academic_year_id', $academicYearId)->get();
+
+            // Récupérer les examens de cette année
+            $filteredExams = ExamModel::where('academic_year_id', $academicYearId)->get();
         }
 
-        $data['header_title'] = "Marks Register";
+        // Passer les données à la vue
+        $data['filteredClasses'] = $filteredClasses;
+        $data['filteredExams'] = $filteredExams;
+
+        // Logique existante pour les matières et étudiants
+        if ($request->filled('exam_id') && $request->filled('class_id')) {
+            $data['getSubject'] = ExamScheduleModel::getSubject($request->get('exam_id'), $request->get('class_id'));
+            // $data['getStudent'] = User::getStudentClass($request->get('class_id'));
+            $data['getStudent'] = User::getStudentClass(
+                $request->get('class_id'),
+                $academicYearId // Transmettre l'année académique (peut être null)
+            );
+            // dd($data);
+        }
+
+        $data['header_title'] = "Registre des Notes";
         return view('admin.examinations.marks_register', $data);
     }
+
 
 
 
@@ -292,12 +288,15 @@ class ExaminationsController extends Controller
 
     public function submit_marks_register(Request $request)
     {
+
         $valiation = 0;
         if (!empty($request->mark)) {
             foreach ($request->mark as $mark) {
                 $getExamSchedule = ExamScheduleModel::getSingle($mark['id']);
                 $full_marks = $getExamSchedule->full_marks;
                 $ponde = $getExamSchedule->ponde;
+                $class = ClassModel::find($request->class_id);
+                $academicYearId = $class->academic_year_id;
 
                 $class_work = !empty($mark['class_work']) ? $mark['class_work'] : 0;
                 $exam = !empty($mark['exam']) ? $mark['exam'] : 0;
@@ -326,6 +325,7 @@ class ExaminationsController extends Controller
                     $save->full_marks       = $full_marks;
                     $save->passing_mark    = $passing_mark;
                     $save->ponde            = $ponde;
+                    $save->academic_year_id = $academicYearId; // Ajouté
                     $save->save();
                 } else {
                     $valiation = 1;
@@ -343,6 +343,76 @@ class ExaminationsController extends Controller
     }
 
 
+
+    public function markRegisterModal(Request $request)
+    {
+        $request->validate([
+            'class_id' => 'required|exists:class,id',
+            'exam_id' => 'required|exists:exam,id',
+            'student_id' => 'required|exists:users,id',
+            'subject_id' => 'required|exists:subject,id',
+            'academic_year_id' => 'required|exists:academic_years,id'
+        ]);
+
+        // Récupère l'étudiant
+        $student = User::findOrFail($request->student_id);
+
+        // Récupère la note (si existante) depuis mark_register
+        $mark = MarksRegisterModel::where('student_id', $request->student_id)
+            ->where('class_id', $request->class_id)
+            ->where('exam_id', $request->exam_id)
+            ->where('subject_id', $request->subject_id)
+            ->where('academic_year_id', $request->academic_year_id) // Ajouté
+            ->first();
+
+
+        // Récupère les infos du sujet depuis la table subject (via la relation)
+        $subject = SubjectModel::findOrFail($request->subject_id);
+
+        $subject = ExamScheduleModel::with('subject')
+            ->where('class_id', $request->class_id)
+            ->where('exam_id', $request->exam_id)
+            ->where('subject_id', $request->subject_id)
+            ->first();
+
+        return view('admin.recours.mark_register_modal', compact('student', 'subject', 'mark'));
+    }
+
+
+
+    public function updateSingleMark(Request $request)
+    {
+        $request->validate([
+            'student_id' => 'required|exists:users,id',
+            'class_id' => 'required|exists:class,id',
+            'exam_id' => 'required|exists:exam,id',
+            'subject_id' => 'required|exists:subject,id',
+            'class_work' => 'required|numeric|min:0|max:20',
+            'academic_year_id' => 'required|exists:academic_years,id',
+            'exam' => 'required|numeric|min:0|max:20'
+        ]);
+
+        $markModel = MarksRegisterModel::firstOrNew([
+            'student_id' => $request->student_id,
+            'class_id' => $request->class_id,
+            'exam_id' => $request->exam_id,
+            'subject_id' => $request->subject_id,
+            'academic_year_id' => $request->academic_year_id
+        ]);
+
+        $markModel->class_work = $request->class_work;
+        $markModel->exam = $request->exam;
+        $markModel->created_by = auth()->id();
+        $markModel->save();
+
+        return response()->json(['message' => 'Note enregistrée avec succès']);
+    }
+
+
+
+
+
+
     public function single_submit_marks_register(Request $request)
     {
         $id = $request->id;
@@ -350,6 +420,8 @@ class ExaminationsController extends Controller
 
         $full_marks = $getExamSchedule->full_marks;
         $ponde = $getExamSchedule->ponde;
+        $class = ClassModel::find($request->class_id);
+        $academicYearId = $class->academic_year_id;
 
         $class_work = !empty($request->class_work) ? $request->class_work : 0;
 
@@ -378,6 +450,7 @@ class ExaminationsController extends Controller
             $save->full_marks       = $getExamSchedule->full_marks;
             $save->passing_mark    = $getExamSchedule->passing_mark;
             $save->ponde           = $getExamSchedule->ponde;
+            $save->academic_year_id = $academicYearId; // Ajouté
             $save->save();
 
             $json['message'] = "Mark Register successfully saved";
@@ -444,20 +517,37 @@ class ExaminationsController extends Controller
 
     public function MyExamTimetable(Request $request)
     {
-        $class_id = Auth::user()->class_id;
-        $getExam = ExamScheduleModel::getExam($class_id);
+        // Récupérer l'année académique
+        $academicYearId = session('academic_year_id', AcademicYear::where('is_active', 1)->value('id'));
+
+        // Récupérer la classe de l'étudiant via student_class
+        $studentClass = DB::table('student_class')
+            ->where('student_id', Auth::id())
+            ->where('academic_year_id', $academicYearId)
+            ->first();
+
+        if (!$studentClass) {
+            return redirect()->back()->with('error', 'Aucune classe assignée pour cette année académique');
+        }
+
+        $classId = $studentClass->class_id;
+
+        // Récupérer les examens pour cette classe et année
+        $getExam = ExamScheduleModel::getExam($classId, $academicYearId);
+
         $result = array();
         foreach ($getExam as $value) {
             $dataE = array();
             $dataE['name'] = $value->exam_name;
-            $getExamTimetable = ExamScheduleModel::getExamTimetable($value->exam_id, $class_id);
+            $getExamTimetable = ExamScheduleModel::getExamTimetableS($value->exam_id, $classId, $academicYearId);
+
             $resultS = array();
             foreach ($getExamTimetable as $valueS) {
                 $dataS = array();
                 $dataS['subject_name'] = $valueS->subject_name;
                 $dataS['exam_date'] = $valueS->exam_date;
-                $dataS['start_time'] = $valueS->start_time;
-                $dataS['end_time'] = $valueS->end_time;
+                $dataS['start_time'] = date('H:i', strtotime($valueS->start_time));
+                $dataS['end_time'] = date('H:i', strtotime($valueS->end_time));
                 $dataS['room_number'] = $valueS->room_number;
                 $dataS['full_marks'] = $valueS->full_marks;
                 $dataS['passing_mark'] = $valueS->passing_mark;
@@ -468,23 +558,34 @@ class ExaminationsController extends Controller
             $result[] = $dataE;
         }
 
+        // Données pour le filtre
+        $data['academicYears'] = AcademicYear::orderBy('start_date', 'desc')->get();
+        $data['selectedAcademicYear'] = AcademicYear::find($academicYearId);
         $data['getRecord'] = $result;
+        $data['header_title'] = "Mon emploi du temps d'examens";
 
-        $data['header_title'] = "My Exam Timetable";
         return view('student.my_exam_timetable', $data);
     }
 
-
-
-    public function myExamResult()
+    public function myExamResult(Request $request)
     {
+        // Récupérer l'année académique depuis la session ou la requête
+        $academicYearId = session(
+            'academic_year_id',
+            $request->get(
+                'academic_year_id',
+                AcademicYear::where('is_active', 1)->value('id')
+            )
+        );
+
         $result = array();
-        $getExam = MarksRegisterModel::getExam(Auth::user()->id);
+        $getExam = MarksRegisterModel::getExams(Auth::user()->id, $academicYearId); // Ajout du paramètre
+
         foreach ($getExam as $value) {
             $dataE = array();
             $dataE['exam_name'] = $value->exam_name;
             $dataE['exam_id'] = $value->exam_id;
-            $getExamSubject = MarksRegisterModel::getExamSubject($value->exam_id, Auth::user()->id);
+            $getExamSubject = MarksRegisterModel::getExamSubjects($value->exam_id, Auth::user()->id, $academicYearId); // Ajout du paramètre
 
             $dataSubject = array();
             foreach ($getExamSubject as $exam) {
@@ -505,10 +606,15 @@ class ExaminationsController extends Controller
             $result[] = $dataE;
         }
 
+        // Données supplémentaires pour le filtre
+        $data['academicYears'] = AcademicYear::orderBy('start_date', 'desc')->get();
+        $data['selectedAcademicYear'] = AcademicYear::find($academicYearId);
         $data['getRecord'] = $result;
         $data['header_title'] = "My Exam Result";
+
         return view('student.my_exam_result', $data);
     }
+
 
 
     public function myExamResultPrint(Request $request)
@@ -520,6 +626,18 @@ class ExaminationsController extends Controller
         $data['getStudent'] = User::getSingle($student_id);
 
         $data['getClass'] = MarksRegisterModel::getClass($exam_id, $student_id);
+
+        // Récupérer l'année académique
+        // $academicYear = AcademicYear::find($data['getClass']->academic_year_id);
+        // $data['academicYear'] = $academicYear ? $academicYear->name : 'N/A';
+
+        if ($data['getClass']) {
+            $class = ClassModel::find($data['getClass']->class_id);
+            $data['academicYear'] = $class->academicYear->name ?? 'N/A';
+        } else {
+            $data['academicYear'] = 'N/A';
+        }
+        // dd($data);
 
         $data['getSetting'] = SettingModel::getSingle();
 
@@ -611,179 +729,116 @@ class ExaminationsController extends Controller
         return view('result_print', $data);
     }
 
-    // public function printClassResults(Request $request)
-    // {
-    //     $exam_id = $request->input('exam_id');
-    //     $class_id = $request->input('class_id');
-    //     // Vérifiez que les paramètres existent
-    //     if (!$exam_id || !$class_id) {
-    //         return redirect()->back()->with('error', 'Paramètres manquants.');
-    //     }
-
-    //     // Récupérez les données nécessaires
-    //     $class = ClassModel::find($class_id);
-
-    //     // Vérifier si la classe existe
-    //     if (!$class) {
-    //         return redirect()->back()->with('error', 'Classe non trouvée.');
-    //     }
-
-    //     // Récupérer les matières associées à la classe (Utiliser les Models pour ne pas devoir refaire le code)
-    //     $subjects = ExamScheduleModel::getSubject($exam_id, $class_id); // Utilisation du model
-
-    //     // Récupérer les étudiants de la classe
-    //     $students = User::getStudentClass($class_id);
-
-    //     $getSetting = SettingModel::getSingle();
-
-    //     // Récupérer les résultats pour tous les étudiants de la classe
-    //     $results = MarksRegisterModel::select(
-    //         'marks_register.class_work',
-    //         'marks_register.exam',
-    //         'marks_register.ponde',
-    //         'marks_register.subject_id',
-    //         'marks_register.student_id',
-    //         'marks_register.class_id',
-    //         'marks_register.exam_id',
-    //         'subject.code as subject_code'
-
-    //     )
-
-    //         ->where('marks_register.exam_id', $exam_id)
-    //         ->where('marks_register.class_id', $class_id)
-    //         ->get();
-
-    //     // Relier les résultats aux étudiants
-    //     foreach ($students as $student) {
-    //         $student->results = $results->where('student_id', $student->id);
-    //     }
-
-    //     // Préparer les données pour la vue
-    //     $data = [
-    //         'class' => $class,
-    //         'getSetting' => $getSetting,
-    //         'students' => $students,
-    //         'subjects' => $subjects, // Utilisez les données récupérées de la table "examschedule"
-    //         'results' => $results,
-    //         'exam_id' => $exam_id
-    //     ];
-
-    //     // Transmettez les données à la vue d'impression
-    //     return view('result_print', $data);
-    // }
-
-
-
-
-    // public function printClassResults(Request $request)
-    // {
-    //     $exam_id = $request->input('exam_id');
-    //     $class_id = $request->input('class_id');
-
-    //     // Vérifiez que les paramètres existent
-    //     if (!$exam_id || !$class_id) {
-    //         return redirect()->back()->with('error', 'Paramètres manquants.');
-    //     }
-
-    //     // Récupérez les données nécessaires
-    //     $class = ClassModel::find($class_id);
-
-    //     // Vérifier si la classe existe
-    //     if (!$class) {
-    //         return redirect()->back()->with('error', 'Classe non trouvée.');
-    //     }
-
-    //     // Récupérer les matières associées à la classe
-    //     $subjects = ClassSubjectModel::MySubject($class_id);
-
-    //     // Récupérer les étudiants de la classe
-    //     $students = User::getStudentClass($class_id);
-
-    //     $getSetting = SettingModel::getSingle();
-
-    //     // Récupérer les résultats pour tous les étudiants de la classe et ajouter le nom, le code et le ponde
-    //     $results = MarksRegisterModel::select(
-    //         'marks_register.class_work',
-    //         'marks_register.exam',
-    //         'marks_register.ponde',
-    //         'marks_register.subject_id',
-    //         'marks_register.student_id',
-    //         'marks_register.class_id',
-    //         'marks_register.exam_id',
-    //         'subject.name as subject_name',
-    //         'subject.code as subject_code'
-    //     )
-    //         ->join('subject', 'subject.id', '=', 'marks_register.subject_id')
-    //         ->where('marks_register.exam_id', $exam_id)
-    //         ->where('marks_register.class_id', $class_id)
-    //         ->get();
-
-    //     // Relier les résultats aux étudiants
-    //     foreach ($students as $student) {
-    //         $student->results = $results->where('student_id', $student->id);
-    //     }
-
-    //     // Préparer les données pour la vue
-    //     $data = [
-    //         'class' => $class,
-    //         'getSetting' => $getSetting,
-    //         'students' => $students,
-    //         'subjects' => $subjects,
-    //         'results' => $results,
-    //         'exam_id' => $exam_id,
-    //     ];
-
-    //     // Transmettez les données à la vue d'impression
-    //     return view('result_print', $data);
-    // }
-
-    // teacher side work
-
-
 
     public function MyExamTimetableTeacher()
     {
+        // 1. Récupérer l'année académique sélectionnée
+        $academicYearId = session('academic_year_id', AcademicYear::where('is_active', 1)->value('id'));
+
         $result = [];
-        $getClass = AssignClassTeacherModel::getMyClassSubjectGroup(Auth::user()->id);
+
+        // 2. Récupérer les classes du professeur pour CETTE année
+        $getClass = AssignClassTeacherModel::select('assign_class_teacher.*', 'class.*')
+            ->join('class', 'class.id', '=', 'assign_class_teacher.class_id')
+            ->where('assign_class_teacher.teacher_id', Auth::id())
+            ->where('class.academic_year_id', $academicYearId)
+            ->groupBy('class.id')
+            ->get();
 
         foreach ($getClass as $class) {
-            $dataC = [];
-            $dataC['class_name'] = $class->class_name;
-            $dataC['class_opt'] = $class->class_opt;
-            $classId = $class->class_id; // On récupère l'ID de la classe
+            $dataC = [
+                'class_name' => $class->name,
+                'class_opt' => $class->opt,
+                'academic_year' => AcademicYear::find($academicYearId)->name
+            ];
 
-            // Vérifie si la classe a déjà été ajoutée au résultat
-            if (isset($result[$classId])) {
-                continue; // Passer si la classe existe déjà
-            }
-
-            // Récupérer les examens pour cette classe
-            $getExam = ExamScheduleModel::getExam($classId);
+            // 3. Récupérer les examens de la classe pour l'année
+            $getExam = ExamScheduleModel::getExam($class->id, $academicYearId);
             $examData = [];
 
             foreach ($getExam as $exam) {
-                $getExamTimetable = ExamScheduleModel::getExamTimetable1($exam->exam_id, $classId, Auth::user()->id);
+                $getExamTimetable = ExamScheduleModel::getExamTimetable1(
+                    $exam->exam_id,
+                    $class->id,
+                    Auth::id(),
+                    $academicYearId // Nouveau paramètre
+                );
 
-                // Si l'examen a des sujets, on les ajoute à l'examen
-                if ($getExamTimetable->count() > 0) {
+                if ($getExamTimetable->isNotEmpty()) {
                     $examData[] = [
-                        'exam_name' => $exam->exam_name,
+                        'exam_name' => $exam->name,
                         'subjects' => $getExamTimetable,
                     ];
                 }
             }
 
-            // Si l'examen a été trouvé pour la classe, on ajoute à $result
             if (!empty($examData)) {
                 $dataC['exam'] = $examData;
-                $result[$classId] = $dataC; // Utilise l'ID de la classe comme clé
+                $result[] = $dataC;
             }
         }
 
-        $data['getRecord'] = array_values($result); // Réinitialise les clés
-        $data['header_title'] = "My Exam Timetable";
+        // 4. Données pour le filtre
+        $data = [
+            'getRecord' => $result,
+            'academicYears' => AcademicYear::orderBy('start_date', 'desc')->get(),
+            'selectedAcademicYear' => AcademicYear::find($academicYearId),
+            'header_title' => "Mon emploi du temps d'examens"
+        ];
+
         return view('teacher.my_exam_timetable', $data);
     }
+
+    public function markRegisterModalTeacher(Request $request)
+    {
+
+        $request->validate([
+            'class_id' => 'required|exists:class,id',
+            'exam_id' => 'required|exists:exam,id',
+            'student_id' => 'required|exists:users,id',
+            'subject_id' => 'required|exists:subject,id',
+            'academic_year_id' => 'required|exists:academic_years,id'
+        ]);
+
+
+        // Vérifier les permissions du professeur
+        $isAllowed = AssignClassTeacherModel::where('teacher_id', Auth::id())
+            ->where('class_id', $request->class_id)
+            ->where('subject_id', $request->subject_id)
+            ->exists();
+
+        if (!$isAllowed) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Accès non autorisé à cette matière'
+            ], 403);
+        }
+
+        // Récupère l'étudiant
+        $student = User::findOrFail($request->student_id);
+
+        // Récupère la note (si existante) depuis mark_register
+        $mark = MarksRegisterModel::where('student_id', $request->student_id)
+            ->where('class_id', $request->class_id)
+            ->where('exam_id', $request->exam_id)
+            ->where('subject_id', $request->subject_id)
+            ->where('academic_year_id', $request->academic_year_id) // Ajouté
+            ->first();
+
+
+        // Récupère les infos du sujet depuis la table subject (via la relation)
+        $subject = SubjectModel::findOrFail($request->subject_id);
+
+        $subject = ExamScheduleModel::with('subject')
+            ->where('class_id', $request->class_id)
+            ->where('exam_id', $request->exam_id)
+            ->where('subject_id', $request->subject_id)
+            ->first();
+
+        return view('teacher.recours.mark_register_modal', compact('student', 'subject', 'mark'));
+    }
+
+
 
 
 

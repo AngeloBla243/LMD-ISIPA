@@ -43,7 +43,8 @@
                                             <option value="">Select Class</option>
                                             @foreach ($getClass as $class)
                                                 <option {{ $getRecord->class_id == $class->id ? 'selected' : '' }}
-                                                    value="{{ $class->id }}">{{ $class->name }}</option>
+                                                    value="{{ $class->id }}">{{ $class->name }} {{ $class->opt }}
+                                                </option>
                                             @endforeach
                                         </select>
 
