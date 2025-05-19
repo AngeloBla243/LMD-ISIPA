@@ -12,6 +12,15 @@ class ClassSubjectModel extends Model
 
     protected $table = 'class_subject';
 
+    protected $fillable = [
+        'class_id',
+        'subject_id',
+        'academic_year_id', // Ajouté
+        'created_by',
+        'status',
+        'is_delete'
+    ];
+
     static public function getSingle($id)
     {
         return self::find($id);
@@ -52,7 +61,7 @@ class ClassSubjectModel extends Model
         return $return;
     }
 
-    static public function MySubject($class_id)
+    static public function MySubjectAdmin($class_id)
     {
         return  self::select('class_subject.*', 'subject.name as subject_name', 'subject.type as subject_type')
             ->join('subject', 'subject.id', '=', 'class_subject.subject_id')
@@ -65,19 +74,64 @@ class ClassSubjectModel extends Model
             ->get();
     }
 
+    // // Dans chaque modèle concerné (ClassSubjectModel, etc.)
 
-    static public function MySubjectTotal($class_id)
+
+
+    // static public function MySubjectTotal($class_id)
+    // {
+    //     return  self::select('class_subject.id')
+    //         ->join('subject', 'subject.id', '=', 'class_subject.subject_id')
+    //         ->join('class', 'class.id', '=', 'class_subject.class_id')
+    //         ->join('users', 'users.id', '=', 'class_subject.created_by')
+    //         ->where('class_subject.class_id', '=', $class_id)
+    //         ->where('class_subject.is_delete', '=', 0)
+    //         ->where('class_subject.status', '=', 0)
+    //         ->orderBy('class_subject.id', 'asc')
+    //         ->count();
+    // }
+    // Récupère les matières d'une classe pour une année académique spécifique
+    static public function MySubject($class_id, $academic_year_id)
     {
-        return  self::select('class_subject.id')
+        return self::select(
+            'class_subject.*',
+            'subject.name as subject_name',
+            'subject.type as subject_type',
+            'academic_years.name as academic_year_name' // Ajout du nom de l'année
+        )
             ->join('subject', 'subject.id', '=', 'class_subject.subject_id')
             ->join('class', 'class.id', '=', 'class_subject.class_id')
+            ->join('academic_years', 'academic_years.id', '=', 'class_subject.academic_year_id') // Jointure explicite
             ->join('users', 'users.id', '=', 'class_subject.created_by')
             ->where('class_subject.class_id', '=', $class_id)
+            ->where('class_subject.academic_year_id', '=', $academic_year_id) // Filtre académique
             ->where('class_subject.is_delete', '=', 0)
             ->where('class_subject.status', '=', 0)
             ->orderBy('class_subject.id', 'asc')
+            ->get();
+    }
+
+    static public function MySubjectTotal($class_id, $academic_year_id)
+    {
+        return self::select('class_subject.id')
+            ->join('subject', 'subject.id', '=', 'class_subject.subject_id')
+            ->join('class', 'class.id', '=', 'class_subject.class_id')
+            ->join('academic_years', 'academic_years.id', '=', 'class_subject.academic_year_id')
+            ->join('users', 'users.id', '=', 'class_subject.created_by')
+            ->where('class_subject.class_id', '=', $class_id)
+            ->where('class_subject.academic_year_id', '=', $academic_year_id)
+            ->where('class_subject.is_delete', '=', 0)
+            ->where('class_subject.status', '=', 0)
             ->count();
     }
+
+
+    // Dans chaque modèle concerné (ClassSubjectModel, etc.)
+    public function academicYear()
+    {
+        return $this->belongsTo(AcademicYear::class);
+    }
+
 
 
 

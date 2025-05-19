@@ -2,45 +2,41 @@
 
 @section('content')
     <div class="content-wrapper">
-        <!-- Content Header (Page header) -->
-        <section class="content-header">
+        <!-- Content Header -->
+        <section class="content-header py-3 bg-light border-bottom mb-4">
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h1>Add New Subject</h1>
+                        <h1 class="h3 fw-bold text-primary">Assigner des matières à un enseignant</h1>
                     </div>
-
                 </div>
-            </div><!-- /.container-fluid -->
+            </div>
         </section>
 
         <!-- Main content -->
-        <section class="content">
-            <div class="container-fluid">
-                <div class="row">
-                    <!-- left column -->
-                    <div class="col-md-12">
+        <section class="content pb-5">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-md-8">
 
-
-                        <div class="card card-primary">
-
+                        <div class="card shadow-sm rounded-4 border-0">
                             @include('_message')
                             <div class="card-body">
                                 <form method="post"
-                                    action="{{ route('admin.assign_class_teacher.assign_subject.submit') }}">
+                                    action="{{ route('admin.assign_class_teacher.assign_subject.submit') }}" novalidate>
                                     @csrf
 
-                                    <div class="form-group">
-                                        <label>Enseignant</label>
+                                    <div class="mb-4">
+                                        <label class="form-label fw-semibold">Enseignant</label>
                                         <input type="text" class="form-control"
                                             value="{{ $selectedTeacher->name }} {{ $selectedTeacher->last_name }}" readonly>
                                         <input type="hidden" name="teacher_id" value="{{ $selectedTeacher->id }}">
                                     </div>
 
-                                    <div class="form-group">
-                                        <label>Classe Assignée</label>
+                                    <div class="mb-4">
+                                        <label class="form-label fw-semibold">Classe Assignée</label>
                                         @if ($classes->count() > 1)
-                                            <select name="class_id" id="classSelect" class="form-control" required
+                                            <select name="class_id" id="classSelect" class="form-select" required
                                                 onchange="window.location.href='?class_id='+this.value">
                                                 @foreach ($classes as $c)
                                                     <option value="{{ $c->id }}"
@@ -56,22 +52,22 @@
                                         @endif
                                     </div>
 
-                                    <div class="form-group">
-                                        <label>Année Académique</label>
+                                    <div class="mb-4">
+                                        <label class="form-label fw-semibold">Année Académique</label>
                                         <input type="text" class="form-control" value="{{ $academicYear->name }}"
                                             readonly>
                                         <input type="hidden" name="academic_year_id" value="{{ $academicYear->id }}">
                                     </div>
 
-                                    <div class="form-group">
-                                        <label>Matières Disponibles</label>
-                                        <select name="subject_ids[]" class="form-control" multiple required>
+                                    <div class="mb-4">
+                                        <label class="form-label fw-semibold">Matières Disponibles</label>
+                                        <select name="subject_ids[]" class="form-select" multiple required size="8"
+                                            style="min-height: 200px;">
                                             @foreach ($subjects as $subject)
                                                 @php $isAssigned = in_array($subject->id, $assignedSubjectIds) @endphp
                                                 <option value="{{ $subject->id }}" {{ $isAssigned ? 'selected' : '' }}>
-                                                    {{ $subject->name }} ({{ $subject->code }})
-                                                    @if ($isAssigned)
-                                                        - Déjà assigné
+                                                    {{ $subject->name }} ({{ $subject->code }}) @if ($isAssigned)
+                                                        - <em>Déjà assigné</em>
                                                     @endif
                                                 </option>
                                             @endforeach
@@ -79,36 +75,72 @@
                                         <small class="text-muted">Les matières déjà assignées sont présélectionnées</small>
                                     </div>
 
-
-
-                                    <button type="submit" class="btn btn-primary">Assigner</button>
+                                    <div class="d-flex justify-content-end">
+                                        <button type="submit" class="btn btn-primary px-4 py-2 fw-semibold shadow-sm">
+                                            Assigner
+                                        </button>
+                                    </div>
                                 </form>
                             </div>
-
                         </div>
 
-                        <div id="customModal" class="modal">
-                            <div class="modal-content">
-                                <span class="close">&times;</span>
-                                <p id="modalMessage"></p>
+                        <!-- Modal (optionnel) -->
+                        <div id="customModal" class="modal fade" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content rounded-4 shadow">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Information</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p id="modalMessage"></p>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary"
+                                            data-bs-dismiss="modal">Fermer</button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
-
-
-
                     </div>
-
-                    <!--/.col (left) -->
-                    <!-- right column -->
-
-                    <!--/.col (right) -->
                 </div>
-                <!-- /.row -->
-            </div><!-- /.container-fluid -->
+            </div>
         </section>
-        <!-- /.content -->
     </div>
+
+    <style>
+        .card {
+            border-radius: 1.5rem;
+        }
+
+        .form-label {
+            font-weight: 600;
+        }
+
+        .form-select:focus,
+        input.form-control:focus {
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, .25);
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, #0d6efd 60%, #0dcaf0 100%);
+            border: none;
+            transition: background 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(90deg, #0dcaf0 0%, #0d6efd 100%);
+        }
+
+        select[multiple] option {
+            padding: 0.3rem 0.5rem;
+        }
+    </style>
+
+
 @endsection
 
 

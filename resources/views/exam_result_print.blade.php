@@ -231,21 +231,33 @@
         <!-- Header with print button -->
         <header class="header">
             <button onclick="window.print()"><i class="fas fa-print"></i> Imprimer</button>
-            {{-- <i class="fa-solid fa-file-pdf"></i> --}}
         </header>
 
         <!-- Title section with logo and school details -->
-        <div class="title-section">
-            <img src="{{ $getSetting->getLogo() }}" alt="Logo de l'établissement" class="school-logo"> <br>
-            <h2>RÉPUBLIQUE DÉMOCRATIQUE DU CONGO</h2>
-            <h2>INSTITUT SUPERIEUR D'INFORMATIQUE <br>PROGRAMMATION ET ANALYSE</h2>
-            <h2>I.S.I.P.A</h2>
-            <h3>SECRÉTARIAT GÉNÉRAL ACADÉMIQUE</h3>
-            <h3>{{ $getStudent->departement }}</h3>
-            <h3>OPTION: {{ $getClass->class_opt }}</h3>
-            <h3>{{ $getClass->class_name ?? 'Inconnu' }}, ANNÉE ACADÉMIQUE {{ now()->year }}</h3>
-            <h2>Examen : {{ $getExam->name }}</h2>
+        <div class="title-section" style="text-align:center;padding: 20px 0 30px 0; border-bottom: 2px solid #101c4d;">
+            <img src="{{ $getSetting->getLogo() }}" alt="Logo de l'établissement" class="school-logo"
+                style="width:90px; margin-bottom: 15px;"><br>
+
+            <h2 style="margin-bottom: 3px; font-weight: bold; letter-spacing:2px;">RÉPUBLIQUE DÉMOCRATIQUE DU CONGO</h2>
+            <h2 style="margin-bottom: 5px; font-size: 1.4em;">INSTITUT SUPERIEUR D'INFORMATIQUE <br>PROGRAMMATION ET
+                ANALYSE</h2>
+            <h2 style="margin: 0 0 12px 0; color: #0074c7; font-size: 2em;">I.S.I.P.A</h2>
+
+            <hr style="border-top: 1px solid #929292; margin: 15px 0; width: 45%;">
+
+            <h3 style="margin-bottom: 1px; font-weight: 500;">SECRÉTARIAT GÉNÉRAL ACADÉMIQUE</h3>
+            <h3 style="margin-bottom: 2px;">{{ $getStudent->departement ?? 'Département inconnu' }}</h3>
+            <h3 style="margin-bottom: 2px;">Classe : {{ $getClass->class_name ?? 'Inconnue' }}
+                {{ $getClass->class_opt ?? 'Inconnue' }}</h3>
+            <h3 style="margin-bottom: 18px;">
+                ANNÉE ACADÉMIQUE
+                <span style="color:#101c4d; font-weight:700;">
+                    {{ $getClass->academic_year_name ?? 'N/A' }}
+                </span>
+            </h3>
+            <h2 style="margin-top: 20px;">Examen : {{ $getExam->name ?? 'Non renseigné' }}</h2>
         </div>
+
 
         @php
             $zeroScoreFound = false;
@@ -410,9 +422,6 @@
                         @endif
                     </td>
                     <td>{{ $echefsLourd }}</td>
-                    {{-- <td>
-                        {{ !$zeroScoreFound && $credits_obtenus >= 36 && $echefsLourd < 1 && $echefsLeger < 4 ? 'Admis' : 'Ajourné' }}
-                    </td> --}}
                     <td>
                         @php
                             if ($zeroScoreFound) {
@@ -430,35 +439,9 @@
             </table>
         </div>
 
-        {{-- <footer class="footer">
-            <div class="certification">
-                <p><strong>Certification :</strong> Je certifie que les informations ci-dessus sont exactes.</p>
-                <p>Fait à {{ now()->format('d/m/Y') }}</p>
-                <p>Signature : ______________________</p>
-            </div>
-        </footer> --}}
-
         <footer class="footer">
             <div class="certification">
                 <p><strong>Certification :</strong> Je certifie que les informations ci-dessus sont exactes.</p>
-
-                <!-- Affichage de la décision -->
-                {{-- <p>
-                    Décision :
-                    @php
-                        if ($zeroScoreFound) {
-                            echo 'DEF'; // Défaillant
-                        } elseif ($credits_obtenus == $full_marks) {
-                            echo 'ADM'; // Admis avec capitalisation
-                        } elseif ($credits_obtenus >= 0.75 * $full_marks) {
-                            echo 'COMP'; // Admis avec compensation
-                        } else {
-                            echo 'AJ'; // Ajourné
-                        }
-                    @endphp
-                </p> --}}
-
-
                 <p>
                     Décision :
                     @php

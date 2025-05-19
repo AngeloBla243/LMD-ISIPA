@@ -81,21 +81,6 @@ class AssignClassTeacherController extends Controller
 
 
 
-    // public function edit($id)
-    // {
-    //     $getRecord = AssignClassTeacherModel::getSingle($id);
-    //     if (!empty($getRecord)) {
-    //         $data['getRecord'] = $getRecord;
-    //         $data['getAssignTeacherID'] = AssignClassTeacherModel::getAssignTeacherID($getRecord->class_id);
-    //         $data['getClass'] = ClassModel::getClass();
-    //         $data['getTeacher'] = User::getTeacherClass();
-    //         $data['header_title'] = "Edit Assign Class Teacher";
-    //         return view('admin.assign_class_teacher.edit', $data);
-    //     } else {
-    //         abort(404);
-    //     }
-    // }
-
     public function edit($id)
     {
         $getRecord = AssignClassTeacherModel::getSingle($id);
@@ -220,45 +205,6 @@ class AssignClassTeacherController extends Controller
         return response()->json($subjects);
     }
 
-    // public function insert_assign_subject(Request $request)
-    // {
-    //     $request->validate([
-    //         'teacher_id' => 'required|exists:users,id',
-    //         'class_id' => 'required|exists:class,id',
-    //         'academic_year_id' => 'required|exists:academic_years,id',
-    //         'subject_ids' => 'required|array',
-    //         'subject_ids.*' => 'exists:subject,id'
-    //     ]);
-
-    //     // Récupérer toutes les assignations existantes avec subject_id = null
-    //     $existingAssignments = AssignClassTeacherModel::where([
-    //         'teacher_id' => $request->teacher_id,
-    //         'class_id' => $request->class_id,
-    //         'academic_year_id' => $request->academic_year_id,
-    //         'is_delete' => 0
-    //     ])
-    //         ->whereNull('subject_id')
-    //         ->get();
-
-    //     // Vérifier qu'il y a assez d'assignations à mettre à jour
-    //     if ($existingAssignments->count() < count($request->subject_ids)) {
-    //         return back()->with('error', 'Trop de matières sélectionnées pour les assignations existantes');
-    //     }
-
-    //     // Mettre à jour les assignations existantes
-    //     foreach ($request->subject_ids as $index => $subject_id) {
-    //         if (isset($existingAssignments[$index])) {
-    //             $existingAssignments[$index]->update([
-    //                 'subject_id' => $subject_id,
-    //                 'status' => 0,
-    //                 'created_by' => Auth::id()
-    //             ]);
-    //         }
-    //     }
-
-    //     return redirect()->route('admin.assign_class_teacher.list')
-    //         ->with('success', 'Matières mises à jour avec succès');
-    // }
 
     public function insert_assign_subject(Request $request)
     {
@@ -299,32 +245,6 @@ class AssignClassTeacherController extends Controller
         return redirect()->route('admin.assign_class_teacher.list')
             ->with('success', 'Matières mises à jour avec succès');
     }
-
-
-
-
-
-
-
-    // Nouvelle méthode pour récupérer les détails de l'enseignant
-    // public function getTeacherDetails(Request $request)
-    // {
-    //     $teacherId = $request->input('teacher_id');
-
-    //     $assignment = AssignClassTeacherModel::where('teacher_id', $teacherId)
-    //         ->with(['class.academicYear'])
-    //         ->first();
-
-    //     if (!$assignment || !$assignment->class) {
-    //         return response()->json(['error' => 'Cet enseignant n\'est assigné à aucune classe'], 404);
-    //     }
-
-    //     return response()->json([
-    //         'academic_year_name' => $assignment->class->academicYear->name ?? 'N/A',
-    //         'class_name' => $assignment->class->name ?? 'N/A',
-    //     ]);
-    // }
-
 
 
 
@@ -378,12 +298,28 @@ class AssignClassTeacherController extends Controller
 
     // teacher side work
 
+    // public function MyClassSubject()
+    // {
+    //     $data['getRecord'] = AssignClassTeacherModel::getMyClassSubject(Auth::user()->id);
+    //     $data['header_title'] = "My Class & Subject";
+    //     return view('teacher.my_class_subject', $data);
+    // }
+
     public function MyClassSubject()
     {
-        $data['getRecord'] = AssignClassTeacherModel::getMyClassSubject(Auth::user()->id);
-        $data['header_title'] = "My Class & Subject";
+        // Récupérer l'année académique sélectionnée
+        $academicYearId = session('academic_year_id', AcademicYear::where('is_active', 1)->value('id'));
+
+        $data = [
+            'getRecord' => AssignClassTeacherModel::getMyClassSubject(Auth::user()->id, $academicYearId),
+            'academicYears' => AcademicYear::orderBy('start_date', 'desc')->get(),
+            'selectedAcademicYear' => AcademicYear::find($academicYearId),
+            'header_title' => "Mes Classes & Matières"
+        ];
+
         return view('teacher.my_class_subject', $data);
     }
+
 
     public function getClassesByYear($yearId)
     {

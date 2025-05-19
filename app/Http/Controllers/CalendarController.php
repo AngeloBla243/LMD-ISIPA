@@ -8,26 +8,84 @@ use App\Models\WeekModel;
 use App\Models\ClassSubjectTimetableModel;
 use App\Models\ExamScheduleModel;
 use App\Models\AssignClassTeacherModel;
+use App\Models\AcademicYear;
+use Illuminate\Support\Facades\DB;
 use App\Models\User;
 
 use Illuminate\Support\Facades\Auth;
 
 class CalendarController extends Controller
 {
+    // public function MyCalendar()
+    // {
+    //     // Récupère l'ID de l'année académique dans l'ordre de priorité :
+    //     // 1. Session > 2. Requête GET > 3. Année active par défaut
+    //     $academicYearId = session(
+    //         'academic_year_id',
+    //         request()->get(
+    //             'academic_year_id',
+    //             AcademicYear::where('is_active', 1)->value('id')
+    //         )
+    //     );
+
+    //     // Passe academicYearId aux méthodes
+    //     $data['getMyTimetable'] = $this->getTimetable(
+    //         Auth::user()->class_id,
+    //         $academicYearId
+    //     );
+
+    //     $data['getExamTimetable'] = $this->getExamTimetable(
+    //         Auth::user()->class_id,
+    //         $academicYearId
+    //     );
+
+    //     // Pour le filtre dans la vue
+    //     $data['academicYears'] = AcademicYear::orderBy('start_date', 'desc')->get();
+    //     $data['selectedAcademicYear'] = AcademicYear::find($academicYearId);
+
+    //     return view('student.my_calendar', $data);
+    // }
+
     public function MyCalendar()
     {
+        // 1. Récupérer l'année académique
+        $academicYearId = session(
+            'academic_year_id',
+            request()->get(
+                'academic_year_id',
+                AcademicYear::where('is_active', 1)->value('id')
+            )
+        );
 
-        $data['getMyTimetable'] = $this->getTimetable(Auth::user()->class_id);
-        $data['getExamTimetable'] = $this->getExamTimetable(Auth::user()->class_id);
+        // 2. Récupérer la classe de l'étudiant pour cette année académique
+        $studentClass = DB::table('student_class')
+            ->where('student_id', Auth::id())
+            ->where('academic_year_id', $academicYearId)
+            ->value('class_id');
 
-        $data['header_title'] = "My Calendar";
+        // 3. Vérifier si la classe existe
+        if (!$studentClass) {
+            return redirect()->back()->with('error', 'Aucune classe assignée pour cette année académique.');
+        }
+
+        // 4. Récupérer les données avec la classe correcte
+        $data['getMyTimetable'] = $this->getTimetable($studentClass, $academicYearId);
+        $data['getExamTimetable'] = $this->getExamTimetable($studentClass, $academicYearId);
+
+        // 5. Données pour le filtre
+        $data['academicYears'] = AcademicYear::orderBy('start_date', 'desc')->get();
+        $data['selectedAcademicYear'] = AcademicYear::find($academicYearId);
+
         return view('student.my_calendar', $data);
     }
 
 
-    public function getExamTimetable($class_id)
+
+    public function getExamTimetable($class_id, $academic_year_id)
     {
-        $getExam = ExamScheduleModel::getExam($class_id);
+        $getExam = ExamScheduleModel::getExam($class_id, $academic_year_id); // Passer 2 arguments
+        // $getExam = ExamScheduleModel::getExam($class_id);
+
         $result = array();
         foreach ($getExam as $value) {
             $dataE = array();
@@ -53,10 +111,15 @@ class CalendarController extends Controller
         return $result;
     }
 
-    public function getTimetable($class_id)
+    public function getTimetable($class_id, $academic_year_id)
     {
         $result = array();
-        $getRecord = ClassSubjectModel::MySubject($class_id);
+
+        // Ajouter academic_year_id dans la requête
+        $getRecord = ClassSubjectModel::MySubject($class_id, $academic_year_id);
+
+
+        // $getRecord = ClassSubjectModel::MySubject($class_id);
         foreach ($getRecord as $value) {
             $dataS['name'] = $value->subject_name;
 

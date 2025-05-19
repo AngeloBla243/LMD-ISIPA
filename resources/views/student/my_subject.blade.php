@@ -94,94 +94,94 @@
             cursor: not-allowed;
             opacity: 0.6;
         }
+
+        .table-primary th {
+            background-color: #cfe2ff;
+            color: #084298;
+        }
+
+        .btn-outline-primary:hover {
+            background-color: #084298;
+            color: #fff;
+            border-color: #084298;
+        }
+
+        .fw-semibold {
+            font-weight: 600;
+        }
     </style>
 @endsection
 @section('content')
     <div class="content-wrapper">
         <!-- Content Header (Page header) -->
-        <section class="content-header">
+        <section class="content-header py-3 bg-light border-bottom mb-4">
             <div class="container-fluid">
-                <div class="row mb-2">
+                <div class="row mb-2 align-items-center">
                     <div class="col-sm-6">
-                        <h1>My Subject</h1>
+                        <h1 class="h3 fw-bold text-primary">Mes Cours</h1>
                     </div>
-
-
-
-
                 </div>
-            </div><!-- /.container-fluid -->
+            </div>
         </section>
-
-
-
 
         <!-- Main content -->
         <section class="content">
-
-
             <div class="container-fluid">
+
                 <div class="row">
-
-                    <!-- /.col -->
                     <div class="col-md-12">
-
-
-
-
-
-
 
                         @include('_message')
 
-                        <!-- /.card -->
-
-                        <div class="card">
-                            <div class="card-header">
-                                <h3 class="card-title">My Subject</h3>
+                        <div class="card shadow-sm border-0 rounded-3">
+                            <div class="card-header bg-primary text-white">
+                                <h3 class="card-title mb-0">Liste des cours</h3>
                             </div>
-                            <!-- /.card-header -->
-                            <div class="card-body p-0" style="overflow: auto;">
-                                <table class="table styled-table table-bordered table-striped">
-                                    <thead>
+
+                            <div class="card-body p-0 table-responsive">
+                                <table class="table table-hover table-bordered align-middle mb-0">
+                                    <thead class="table-primary text-center text-uppercase small">
                                         <tr>
-                                            <th>Subject Name</th>
-                                            <th>Subject Type</th>
-                                            <th>Recours</th>
+                                            <th>Nom du cours</th>
+                                            <th>Type de cours</th>
+                                            <th style="min-width: 180px;">Recours</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach ($getRecord as $value)
+                                        @forelse ($getRecord as $value)
                                             <tr>
-                                                <td>{{ $value->subject_name }}</td>
-                                                <td>{{ $value->subject_type }}</td>
-                                                <td style="min-width: 300px;"><a href="" data-toggle="modal"
-                                                        data-target="#addFeesModal"
+                                                <td class="fw-semibold">{{ $value->subject_name }}</td>
+                                                <td class="text-center text-muted text-capitalize">
+                                                    {{ $value->subject_type }}</td>
+                                                <td class="text-center">
+                                                    <a href="#" data-toggle="modal" data-target="#addFeesModal"
                                                         data-subjectid="{{ $value->subject_id }}"
-                                                        class="btn btn-info openModal"><i class="fas fa-edit"></i> Faire
-                                                        votre recours</a>
+                                                        class="btn btn-sm btn-outline-primary openModal shadow-sm">
+                                                        <i class="fas fa-edit me-1"></i> Faire votre recours
+                                                    </a>
                                                 </td>
                                             </tr>
-                                        @endforeach
+                                        @empty
+                                            <tr>
+                                                <td colspan="3" class="text-center text-muted py-4">
+                                                    Aucun cours disponible pour cette année académique.
+                                                </td>
+                                            </tr>
+                                        @endforelse
                                     </tbody>
                                 </table>
-
-
                             </div>
-
                             <!-- /.card-body -->
                         </div>
                         <!-- /.card -->
-                    </div>
-                    <!-- /.col -->
-                </div>
-                <!-- /.row -->
 
-                <!-- /.row -->
-            </div><!-- /.container-fluid -->
+                    </div>
+                </div>
+
+            </div>
         </section>
-        <!-- /.content -->
     </div>
+
 
     <div class="modal fade" id="addFeesModal" tabindex="-1" role="dialog" aria-labelledby="addFeesModalLabel"
         aria-hidden="true">
@@ -196,8 +196,12 @@
                 </div>
                 <form id="recoursForm" action="" method="POST">
                     {{ csrf_field() }}
-                    <input type="hidden" name="subject_id" id="subject_id">
 
+                    <!-- Récupère l'année depuis l'URL -->
+                    {{-- <input type="hidden" name="academic_year_id" value="{{ Request::get('academic_year_id') }}"> --}}
+                    <input type="hidden" name="academic_year_id" value="{{ $academic_year_id }}">
+
+                    <input type="hidden" name="subject_id" id="subject_id">
 
                     <div class="container">
                         <div class="header">
@@ -206,19 +210,30 @@
                         </div>
 
                         <div class="form-group">
-                            <label>Section / Département : {{ Auth::user()->class->opt }} / {{ Auth::user()->note }}</label>
+                            @php
+                                $currentClass = Auth::user()->getCurrentClass();
+                            @endphp
+
+                            @if ($currentClass)
+                                <label>Section / Département : {{ $currentClass->opt }} /
+                                    {{ Auth::user()->departement ?? 'N/A' }}</label>
+                            @else
+                                <label class="text-danger">Aucune classe assignée pour cette année académique.</label>
+                            @endif
                         </div>
 
                         <div class="form-group">
-                            <label>Promotion : <b>{{ Auth::user()->class->name }}</b></label>
+                            <label>Promotion : <b>{{ $currentClass->name ?? 'N/A' }}
+                                    {{ $currentClass->opt ?? 'N/A' }}</b></label>
                         </div>
 
                         <div class="form-group">
                             <label>Nom et Post-nom : <b>{{ Auth::user()->name }} {{ Auth::user()->last_name }}</b></label>
-
                         </div>
+
                         <h4 class="section-title">I. Objet (Prière de cocher la case concernée)</h4>
                         <div class="checkbox-group">
+                            <!-- Les cases à cocher ici -->
                             <div>
                                 <input type="checkbox" name="objet[]"
                                     value="Omission des cotes sur la grille de délibération" class="single-checkbox">
@@ -257,7 +272,6 @@
                                 Identification confuse des copies
                             </div>
 
-                            <!-- Ajoute les autres options -->
                         </div>
 
                         <div class="note-section">
@@ -269,7 +283,6 @@
                                 <li>Le recours ne garantit pas la réussite</li>
                             </ul>
                         </div>
-
 
                         <button type="submit" class="btn btn-primary">Soumettre</button>
                     </div>
@@ -294,7 +307,8 @@
                 // Récupérer les informations de l'utilisateur
                 var studentName = "{{ Auth::user()->name }}";
                 var studentName1 = "{{ Auth::user()->last_name }}"; // Nom de l'étudiant
-                var className = "{{ Auth::user()->class->name }}"; // Classe de l'étudiant
+                var className =
+                    "{{ optional(Auth::user()->class)->name ?? 'N/A' }}"; // Classe de l'étudiant
                 var subjectName = $(this).data('subjectname'); // Nom du cours sélectionnéµ
                 var subjectId = $(this).data('subjectid');
 

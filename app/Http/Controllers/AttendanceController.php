@@ -9,6 +9,8 @@ use App\Models\StudentAttendanceModel;
 use App\Models\AssignClassTeacherModel;
 use App\Exports\ExportAttendance;
 use Illuminate\Support\Facades\Auth;
+use App\Models\AcademicYear;
+use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 
 
@@ -104,40 +106,42 @@ class AttendanceController extends Controller
     //     return view('student.my_attendance', $data);
     // } Version Simple
 
-    public function MyAttendanceStudent()
-    {
-        // Récupération des classes et des enregistrements de présence de l'étudiant
-        $data['getClass'] = studentAttendanceModel::getClassStudent(Auth::user()->id);
-        $attendanceRecords = studentAttendanceModel::getRecordStudent(Auth::user()->id);
-        $totalDays = $attendanceRecords->count();
 
-        // Compter le nombre de présences, absences, retards, demi-journées
+    public function MyAttendanceStudent(Request $request)
+    {
+        // Récupérer l'année académique depuis la session ou l'année active par défaut
+        $academicYearId = session('academic_year_id', AcademicYear::where('is_active', 1)->value('id'));
+
+        // Récupérer les classes de l'étudiant
+        $data['getClass'] = StudentAttendanceModel::getClassStudent(Auth::user()->id);
+
+        // Récupérer les présences avec filtre académique
+        $attendanceRecords = StudentAttendanceModel::getRecordStudent(
+            Auth::user()->id,
+            $academicYearId,
+            $request->all() // Filtres supplémentaires
+        );
+
+        // Calculs des statistiques
+        $totalDays = $attendanceRecords->count();
         $presentDays = $attendanceRecords->where('attendance_type', 1)->count();
         $absentDays = $attendanceRecords->where('attendance_type', 3)->count();
-        $lateDays = $attendanceRecords->where('attendance_type', 2)->count();
-        $halfDays = $attendanceRecords->where('attendance_type', 4)->count();
 
-        // Calculer les pourcentages
-        $presentPercentage = ($presentDays / $totalDays) * 100;
-        $absentPercentage = ($absentDays / $totalDays) * 100;
-        $latePercentage = ($lateDays / $totalDays) * 100;
-        $halfDayPercentage = ($halfDays / $totalDays) * 100;
+        $presentPercentage = $totalDays > 0 ? ($presentDays / $totalDays) * 100 : 0;
+        $absentPercentage = $totalDays > 0 ? ($absentDays / $totalDays) * 100 : 0;
 
-        $attendanceRate1 = $presentPercentage;
-        $attendanceRate2 = $absentPercentage;
-        $attendanceRate = $latePercentage;
-        $attendanceRate = $halfDayPercentage;
-
-
-        // Ajouter le taux de présence aux données envoyées à la vue
-        $data['attendanceRate'] = $attendanceRate1;
-        $data['attendanceRate1'] = $attendanceRate2;
-        $data['getRecord'] = $attendanceRecords; // Passer les enregistrements à la vue
+        // Données pour la vue
+        $data['academicYears'] = AcademicYear::orderBy('start_date', 'desc')->get();
+        $data['selectedAcademicYear'] = AcademicYear::find($academicYearId);
+        $data['attendanceRate'] = round($presentPercentage, 2);
+        $data['absenceRate'] = round($absentPercentage, 2);
+        $data['getRecord'] = $attendanceRecords;
         $data['header_title'] = "My Attendance";
 
-        // Retourner la vue avec les données
         return view('student.my_attendance', $data);
     }
+
+
 
 
     // parent side work

@@ -9,6 +9,7 @@ use App\Models\recours;
 use App\Models\User;
 use App\Models\AcademicYear;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 use Carbon\Carbon;
 
@@ -89,18 +90,85 @@ class SubjectController extends Controller
 
         return redirect()->back()->with('success', "Subject Sucessfully Deleted");
     }
-
-
     // student side
 
     public function MySubject()
     {
+        // Récupérer l'année académique active
+        $academicYearId = session('academic_year_id', AcademicYear::where('is_active', 1)->value('id'));
 
-        $data['getRecord'] = ClassSubjectModel::MySubject(Auth::user()->class_id);
+        // Récupérer la classe de l'étudiant pour cette année via student_class
+        $studentClass = DB::table('student_class')
+            ->where('student_id', Auth::id())
+            ->where('academic_year_id', $academicYearId)
+            ->first();
 
-        $data['header_title'] = "My Subject";
+        if (!$studentClass) {
+            return redirect()->back()->with('error', 'Aucune classe assignée pour cette année académique.');
+        }
+
+        // Passer l'année académique à la vue
+        $data['academic_year_id'] = $academicYearId;
+        $data['getRecord'] = ClassSubjectModel::MySubject($studentClass->class_id, $academicYearId);
+        $data['header_title'] = "Mes Matières";
+
         return view('student.my_subject', $data);
     }
+
+    public function MySubjectRecours(Request $request)
+    {
+        // Validation incluant l'année académique
+        $request->validate([
+            'academic_year_id' => 'required|exists:academic_years,id',
+            'subject_id' => 'required|exists:subject,id',
+            'objet' => 'required|array'
+        ]);
+
+        try {
+            $academicYearId = $request->academic_year_id;
+
+            // Récupérer la classe de l'étudiant pour CETTE année académique
+            $studentClass = DB::table('student_class')
+                ->where('student_id', Auth::id())
+                ->where('academic_year_id', $academicYearId)
+                ->first();
+
+            if (!$studentClass) {
+                return response()->json([
+                    'error' => 'Vous n\'êtes pas inscrit dans une classe pour cette année académique.'
+                ], 400);
+            }
+
+            // Numéro de recours incrémenté par année académique
+            $lastRecours = Recours::where('academic_year_id', $academicYearId)
+                ->orderBy('numero', 'desc')
+                ->first();
+
+            $nextNumero = $lastRecours ? $lastRecours->numero + 1 : 1;
+
+            $save = new Recours();
+            $save->numero = $nextNumero;
+            $save->student_id = Auth::id();
+            $save->class_id = $studentClass->class_id; // <-- Classe pour l'année sélectionnée
+            $save->academic_year_id = $academicYearId;
+            $save->subject_id = $request->subject_id;
+            $save->objet = implode(', ', $request->objet);
+            $save->session_year = Carbon::now()->format('F Y');
+            $save->save();
+
+            return response()->json([
+                'success' => true,
+                'nextNumero' => $nextNumero,
+                'session_year' => $save->session_year
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Erreur création recours : ' . $e->getMessage());
+            return response()->json([
+                'error' => 'Une erreur est survenue lors de la création du recours'
+            ], 500);
+        }
+    }
+
 
 
     // parent side
@@ -112,42 +180,5 @@ class SubjectController extends Controller
         $data['getRecord'] = ClassSubjectModel::MySubject($user->class_id);
         $data['header_title'] = "Student Subject";
         return view('parent.my_student_subject', $data);
-    }
-
-
-    public function MySubjectRecours(Request $request)
-    {
-        // Récupère le dernier numéro inséré
-        $lastRecours = Recours::orderBy('numero', 'desc')->first();
-
-        // Assigne le prochain numéro
-        $nextNumero = $lastRecours ? $lastRecours->numero + 1 : 1; // Commence à 1 si aucun numéro n'existe
-
-        $getStudent = Auth::user();
-
-        // Récupérer la date actuelle
-        $currentDate = Carbon::now();
-        $currentMonth = $currentDate->format('F'); // Mois en format texte (ex : January)
-        $currentYear = $currentDate->year; // Année (ex : 2024)
-
-
-        // Insérer les données dans la table 'recours'
-        $save = new Recours();
-        $save->numero = $nextNumero;
-        $save->student_id = $getStudent->id;
-        $save->class_id = $getStudent->class_id;
-        $save->subject_id = $request->input('subject_id');  // ID du sujet (subject_id)
-        $save->objet = implode(', ', $request->objet);  // Texte de l'objet de recours
-        $save->session_year = "{$currentMonth} {$currentYear}"; // Utiliser le mois et l'année
-
-
-        $save->save();
-
-        return response()->json([
-            'nextNumero' => $nextNumero,
-            'session_year' => $save->session_year // Vous pouvez également le renvoyer ici
-
-
-        ]);
     }
 }

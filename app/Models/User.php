@@ -215,11 +215,32 @@ class User extends Authenticatable
 
     static public function getStudent($remove_pagination = 0)
     {
-        $return = self::select('users.*', 'class.name as class_name', 'class.opt as class_opt', 'parent.name as parent_name', 'parent.last_name as parent_last_name')
+
+        $return = self::select(
+            'users.*',
+            'parent.name as parent_name',
+            'parent.last_name as parent_last_name'
+        )
+            ->with(['studentClasses.academicYear']) // Charger les classes et l'année académique
             ->join('users as parent', 'parent.id', '=', 'users.parent_id', 'left')
-            ->join('class', 'class.id', '=', 'users.class_id', 'left')
             ->where('users.user_type', '=', 3)
             ->where('users.is_delete', '=', 0);
+
+        // $return = self::select(
+        //     'users.*',
+        //     'class.name as class_name',
+        //     'class.opt as class_opt',
+        //     'parent.name as parent_name',
+        //     'parent.last_name as parent_last_name'
+        // )
+        //     ->with('studentClasses') // Chargement des relations
+        //     ->leftJoin('student_class', 'student_class.student_id', '=', 'users.id')
+        //     ->leftJoin('class', 'class.id', '=', 'student_class.class_id')
+        //     // ->join('users as parent', 'parent.id', '=', 'users.parent_id', 'left')
+        //     ->leftJoin('users as parent', 'parent.id', '=', 'users.parent_id')
+        //     ->where('users.user_type', '=', 3)
+        //     ->where('users.is_delete', '=', 0)
+        //     ->groupBy('users.id');
 
         if (!empty(Request::get('name'))) {
             $return = $return->where('users.name', 'like', '%' . Request::get('name') . '%');
@@ -367,52 +388,119 @@ class User extends Authenticatable
             ->get();
     }
 
-    static public function getStudentClass($class_id)
+    // static public function getStudentClass($class_id)
+    // {
+    //     return self::select('users.id', 'users.name', 'users.last_name')
+    //         ->where('users.user_type', '=', 3)
+    //         ->where('users.is_delete', '=', 0)
+    //         ->where('users.class_id', '=', $class_id)
+    //         ->orderBy('users.id', 'asc')
+    //         ->get();
+    // }
+
+    // Dans User.php
+    static public function getStudentClass($class_id, $academic_year_id = null)
     {
-        return self::select('users.id', 'users.name', 'users.last_name')
-            ->where('users.user_type', '=', 3)
-            ->where('users.is_delete', '=', 0)
-            ->where('users.class_id', '=', $class_id)
+        return self::select(
+            'users.id',
+            'users.name',
+            'users.last_name',
+            'student_class.academic_year_id'
+        )
+            ->join('student_class', 'student_class.student_id', '=', 'users.id')
+            ->where('student_class.class_id', $class_id)
+            ->when($academic_year_id, function ($query) use ($academic_year_id) {
+                $query->where('student_class.academic_year_id', $academic_year_id);
+            })
+            ->where('users.user_type', 3) // Étudiants uniquement
+            ->where('users.is_delete', 0)
+            ->groupBy('users.id')
             ->orderBy('users.id', 'asc')
             ->get();
     }
 
 
 
-    static public function getTeacherStudent($teacher_id)
+    // static public function getTeacherStudent($teacher_id)
+    // {
+    //     $return = self::select('users.*', 'class.name as class_name', 'class.opt as class_opt')
+    //         ->join('class', 'class.id', '=', 'users.class_id')
+    //         ->join('assign_class_teacher', 'assign_class_teacher.class_id', '=', 'class.id')
+    //         ->where('assign_class_teacher.teacher_id', '=', $teacher_id)
+    //         ->where('assign_class_teacher.status', '=', 0)
+    //         ->where('assign_class_teacher.is_delete', '=', 0)
+    //         ->where('users.user_type', '=', 3)
+    //         ->where('users.is_delete', '=', 0);
+    //     $return = $return->orderBy('users.id', 'desc')
+    //         ->groupBy('users.id')
+    //         ->paginate(20);
+
+    //     return $return;
+    // }
+
+    static public function getTeacherStudent($teacher_id, $academic_year_id = null)
     {
-        $return = self::select('users.*', 'class.name as class_name', 'class.opt as class_opt')
-            ->join('class', 'class.id', '=', 'users.class_id')
-            ->join('assign_class_teacher', 'assign_class_teacher.class_id', '=', 'class.id')
-            ->where('assign_class_teacher.teacher_id', '=', $teacher_id)
-            ->where('assign_class_teacher.status', '=', 0)
-            ->where('assign_class_teacher.is_delete', '=', 0)
-            ->where('users.user_type', '=', 3)
-            ->where('users.is_delete', '=', 0);
-        $return = $return->orderBy('users.id', 'desc')
+        $return = self::select(
+            'users.*',
+            'class.name as class_name',
+            'class.opt as class_opt',
+            'academic_years.name as academic_year'
+        )
+            ->join('student_class', 'student_class.student_id', '=', 'users.id')
+            ->join('class', 'class.id', '=', 'student_class.class_id')
+            ->join('assign_class_teacher', function ($join) use ($teacher_id, $academic_year_id) {
+                $join->on('assign_class_teacher.class_id', '=', 'class.id')
+                    ->where('assign_class_teacher.teacher_id', '=', $teacher_id)
+                    ->when($academic_year_id, function ($q) use ($academic_year_id) {
+                        $q->where('assign_class_teacher.academic_year_id', $academic_year_id);
+                    });
+            })
+            ->join('academic_years', 'academic_years.id', '=', 'student_class.academic_year_id')
+            ->where('users.user_type', 3)
+            ->where('users.is_delete', 0)
+            ->when($academic_year_id, function ($q) use ($academic_year_id) {
+                $q->where('student_class.academic_year_id', $academic_year_id);
+            })
             ->groupBy('users.id')
+            ->orderBy('users.id', 'desc')
             ->paginate(20);
 
         return $return;
     }
 
 
-    static public function getTeacherStudentCount($teacher_id)
+
+    // static public function getTeacherStudentCount($teacher_id)
+    // {
+    //     $return = self::select('users.id')
+    //         ->join('class', 'class.id', '=', 'users.class_id')
+    //         ->join('assign_class_teacher', 'assign_class_teacher.class_id', '=', 'class.id')
+    //         ->where('assign_class_teacher.teacher_id', '=', $teacher_id)
+    //         ->where('assign_class_teacher.status', '=', 0)
+    //         ->where('assign_class_teacher.is_delete', '=', 0)
+    //         ->where('users.user_type', '=', 3)
+    //         ->where('users.is_delete', '=', 0)
+    //         ->orderBy('users.id', 'asc')
+    //         ->groupBy('users.id')
+    //         ->count();
+
+    //     return $return;
+    // }
+
+    static public function getTeacherStudentCount($teacher_id, $academic_year_id = null)
     {
-        $return = self::select('users.id')
-            ->join('class', 'class.id', '=', 'users.class_id')
-            ->join('assign_class_teacher', 'assign_class_teacher.class_id', '=', 'class.id')
-            ->where('assign_class_teacher.teacher_id', '=', $teacher_id)
+        return self::select('users.id')
+            ->join('student_class', 'student_class.student_id', '=', 'users.id')
+            ->join('assign_class_teacher', 'assign_class_teacher.class_id', '=', 'student_class.class_id')
+            ->where('assign_class_teacher.teacher_id', $teacher_id)
+            ->when($academic_year_id, function ($q) use ($academic_year_id) {
+                $q->where('student_class.academic_year_id', $academic_year_id);
+            })
             ->where('assign_class_teacher.status', '=', 0)
             ->where('assign_class_teacher.is_delete', '=', 0)
-            ->where('users.user_type', '=', 3)
-            ->where('users.is_delete', '=', 0)
-            ->orderBy('users.id', 'asc')
-            ->groupBy('users.id')
             ->count();
-
-        return $return;
     }
+
 
 
     static public function getTeacherClass()
@@ -518,6 +606,7 @@ class User extends Authenticatable
         return $student_ids;
     }
 
+
     static public function getMyStudentClassIds($parent_id)
     {
         $return = self::select('users.class_id')
@@ -579,5 +668,39 @@ class User extends Authenticatable
     static public function getAttendance($student_id, $class_id, $attendance_date)
     {
         return StudentAttendanceModel::CheckAlreadyAttendance($student_id, $class_id, $attendance_date);
+    }
+
+    public function studentClasses()
+    {
+        return $this->belongsToMany(
+            \App\Models\ClassModel::class,
+            'student_class',
+            'student_id',
+            'class_id'
+        )->withPivot('academic_year_id')->with('academicYear');
+    }
+
+    public function classes()
+    {
+        return $this->belongsToMany(
+            ClassModel::class,     // Modèle relié
+            'student_class',       // Table pivot
+            'student_id',          // Clé étrangère de User sur student_class
+            'class_id'             // Clé étrangère de Class sur student_class
+        )->withPivot('academic_year_id'); // Pour récupérer l'année
+    }
+
+    public function getCurrentClass()
+    {
+        $academicYearId = session('academic_year_id', AcademicYear::where('is_active', 1)->value('id'));
+
+        return $this->belongsToMany(
+            ClassModel::class,
+            'student_class',
+            'student_id',
+            'class_id'
+        )
+            ->wherePivot('academic_year_id', $academicYearId)
+            ->first(); // Retourne la première classe de l'année active
     }
 }

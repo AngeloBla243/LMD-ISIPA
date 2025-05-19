@@ -70,185 +70,154 @@
 @endsection
 @section('content')
     <div class="content-wrapper">
-        <section class="content-header">
+        <section class="content-header py-3 bg-light border-bottom mb-4">
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-12">
-                        <h1>My Submitted Homework</h1>
+                        <h1 class="h3 fw-bold text-primary">
+                            <i class="fa-solid fa-file-circle-check me-2"></i>Mes Devoirs Soumis
+                        </h1>
                     </div>
                 </div>
             </div>
         </section>
-        <section class="content">
+        <section class="content pb-4">
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-md-12">
 
-
-                        <div class="card">
-                            <div class="card-header">
-                                <h3 class="card-title">Search My Submitted Homework</h3>
+                        <!-- Recherche (placeholder, à compléter si besoin) -->
+                        <div class="card shadow-sm rounded-4 border-0 mb-4">
+                            <div class="card-header bg-primary text-white rounded-top-4">
+                                <h3 class="card-title mb-0">
+                                    <i class="fa-solid fa-magnifying-glass me-2"></i>Rechercher un devoir soumis
+                                </h3>
                             </div>
-                            <form method="get" action="">
-                                <div class="card-body">
-                                    <div class="row">
-
-                                        <div class="form-group col-md-2">
-                                            <label>Class</label>
-                                            <input type="text" class="form-control"
-                                                value="{{ Request::get('class_name') }}" name="class_name"
-                                                placeholder="Class Name">
-                                        </div>
-
-
-                                        <div class="form-group col-md-2">
-                                            <label>Subject</label>
-                                            <input type="text" class="form-control"
-                                                value="{{ Request::get('subject_name') }}" name="subject_name"
-                                                placeholder="Subject Name">
-                                        </div>
-
-
-
-                                        <div class="form-group col-md-2">
-                                            <label>From Homework Date</label>
-                                            <input type="date" class="form-control" name="from_homework_date"
-                                                value="{{ Request::get('from_homework_date') }}">
-                                        </div>
-
-                                        <div class="form-group col-md-2">
-                                            <label>To Homework Date</label>
-                                            <input type="date" class="form-control" name="to_homework_date"
-                                                value="{{ Request::get('to_homework_date') }}">
-                                        </div>
-
-
-                                        <div class="form-group col-md-2">
-                                            <label>From Submission Date</label>
-                                            <input type="date" class="form-control" name="from_submission_date"
-                                                value="{{ Request::get('from_submission_date') }}">
-                                        </div>
-
-                                        <div class="form-group col-md-2">
-                                            <label>To Submission Date</label>
-                                            <input type="date" class="form-control" name="to_submission_date"
-                                                value="{{ Request::get('to_submission_date') }}">
-                                        </div>
-
-
-                                        <div class="form-group col-md-2">
-                                            <label>From Submitted Created Date</label>
-                                            <input type="date" class="form-control" name="from_created_date"
-                                                value="{{ Request::get('from_created_date') }}">
-                                        </div>
-
-                                        <div class="form-group col-md-2">
-                                            <label>To Submitted Created Date</label>
-                                            <input type="date" class="form-control" name="to_created_date"
-                                                value="{{ Request::get('to_created_date') }}">
-                                        </div>
-
-
-
-                                        <div class="form-group col-md-3">
-                                            <button class="btn btn-primary" type="submit" style="margin-top: 30px;"><i
-                                                    class="fa-solid fa-magnifying-glass"></i> Search</button>
-                                            <a href="{{ url('student/my_submitted_homework') }}" class="btn btn-success"
-                                                style="margin-top: 30px;">Reset</a>
-
-                                        </div>
-
-                                    </div>
-                                </div>
-                            </form>
+                            <!-- Ajoute ici ton formulaire de recherche si besoin -->
                         </div>
 
-
                         @include('_message')
-                        <div class="card">
-                            <div class="card-header">
-                                <h3 class="card-title">Submitted Homework List</h3>
+
+                        <div class="card shadow-sm rounded-4 border-0">
+                            <div class="card-header bg-primary text-white rounded-top-4">
+                                <h3 class="card-title mb-0">
+                                    <i class="fa-solid fa-list-check me-2"></i>Liste des devoirs soumis
+                                </h3>
                             </div>
-                            <div class="card-body p-0" style="overflow: auto;">
-                                <table class="table styled-table table-bordered table-striped">
-                                    <thead>
+                            <div class="card-body p-0 table-responsive">
+                                <table class="table table-hover table-bordered align-middle mb-0">
+                                    <thead class="table-primary text-center text-uppercase small">
                                         <tr>
                                             <th>#</th>
-                                            <th>Class</th>
-                                            <th>Subject</th>
-                                            <th style="min-width: 200px;">Homework Date</th>
-                                            <th style="min-width: 200px;">Submission Date</th>
+                                            <th>Classe</th>
+                                            <th>Matière</th>
+                                            <th>Date du devoir</th>
+                                            <th>Date de remise</th>
                                             <th>Document</th>
                                             <th>Description</th>
-                                            <th style="min-width: 200px;">Created Date</th>
-
-                                            <th style="min-width: 200px;">Submitted Document</th>
-                                            <th style="min-width: 200px;">Submitted Description</th>
-                                            <th style="min-width: 300px;">Submitted Created Date</th>
+                                            <th>Créé le</th>
+                                            <th>Document soumis</th>
+                                            <th>Description soumise</th>
+                                            <th>Date de soumission</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @forelse($getRecord as $value)
                                             <tr>
-                                                <td>{{ $value->id }}</td>
-                                                <td style="min-width: 200px;">{{ $value->class_name }}</td>
-                                                <td style="min-width: 200px;">{{ $value->subject_name }}</td>
+                                                <td class="text-center">{{ $value->id }}</td>
+                                                <td style="min-width: 200px;">{{ $value->getHomework->class->name }}
+                                                    {{ $value->getHomework->class->opt }}</td>
+                                                <td style="min-width: 200px;">
+                                                    <i class="fa-solid fa-book text-info me-1"></i>
+                                                    {{ $value->getHomework->subject->name }}
+                                                </td style="min-width: 200px;">
                                                 <td style="min-width: 200px;">
                                                     {{ date('d-m-Y', strtotime($value->getHomework->homework_date)) }}</td>
                                                 <td style="min-width: 200px;">
                                                     {{ date('d-m-Y', strtotime($value->getHomework->submission_date)) }}
                                                 </td>
-                                                <td style="min-width: 200px;">
+                                                <td class="text-center">
                                                     @if (!empty($value->getHomework->getDocument()))
-                                                        {{-- <a href="{{ $value->getHomework->getDocument() }}" class="btn btn-primary" download="">Download</a> --}}
-                                                        <button class="download-btn" id="downloadBtn">
-                                                            <i class="fas fa-download"></i> <a
-                                                                href="{{ $value->getHomework->getDocument() }}"
-                                                                class="btn" download="">Download</a>
-                                                        </button>
+                                                        <a href="{{ $value->getHomework->getDocument() }}"
+                                                            class="btn btn-outline-primary btn-sm" download
+                                                            title="Télécharger">
+                                                            <i class="fas fa-download me-1"></i> Télécharger
+                                                        </a>
                                                     @endif
                                                 </td>
-                                                <td style="min-width: 300px;">
-                                                    {!! $value->getHomework->description !!}
-                                                </td>
-                                                <td>{{ date('d-m-Y', strtotime($value->getHomework->created_at)) }}</td>
-
-
+                                                <td>{!! $value->getHomework->description !!}</td>
                                                 <td style="min-width: 200px;">
+                                                    {{ date('d-m-Y', strtotime($value->getHomework->created_at)) }}</td>
+                                                <td class="text-center" style="min-width: 200px;">
                                                     @if (!empty($value->getDocument()))
-                                                        {{-- <a href="{{ $value->getDocument() }}" class="btn btn-primary" download="">Download</a> --}}
-                                                        <button class="download-btn" id="downloadBt">
-                                                            <i class="fas fa-download"></i> <a
-                                                                href="{{ $value->getDocument() }}" class="btn"
-                                                                download="">Download</a>
-                                                        </button>
+                                                        <a href="{{ $value->getDocument() }}"
+                                                            class="btn btn-outline-success btn-sm" download
+                                                            title="Télécharger">
+                                                            <i class="fas fa-download me-1"></i> Télécharger
+                                                        </a>
                                                     @endif
                                                 </td>
+                                                <td>{!! $value->description !!}</td>
                                                 <td style="min-width: 200px;">
-                                                    {!! $value->description !!}
-                                                </td>
-                                                <td>{{ date('d-m-Y', strtotime($value->created_at)) }}</td>
-
+                                                    {{ date('d-m-Y', strtotime($value->created_at)) }}</td>
                                             </tr>
                                         @empty
                                             <tr>
-                                                <td colspan="100%">Record not found</td>
+                                                <td colspan="11" class="text-center text-muted py-4">
+                                                    <i class="fa-solid fa-face-frown-open fa-2x mb-2"></i><br>
+                                                    Aucun devoir soumis trouvé.
+                                                </td>
                                             </tr>
                                         @endforelse
-
                                     </tbody>
                                 </table>
-                                <div style="padding: 10px; float: right;">
-                                    {!! $getRecord->appends(Illuminate\Support\Facades\Request::except('page'))->links() !!}
-                                </div>
+                                @if ($getRecord instanceof \Illuminate\Pagination\AbstractPaginator && $getRecord->hasPages())
+                                    <div class="mt-3 d-flex justify-content-end px-3">
+                                        {!! $getRecord->appends(Request::except('page'))->links() !!}
+                                    </div>
+                                @endif
                             </div>
                         </div>
+
                     </div>
                 </div>
             </div>
         </section>
-
     </div>
+
+    <style>
+        .card {
+            border-radius: 1.25rem;
+        }
+
+        .card-header {
+            border-radius: 1.25rem 1.25rem 0 0;
+        }
+
+        .table-primary th {
+            background-color: #cfe2ff !important;
+            color: #084298 !important;
+            font-weight: 600;
+        }
+
+        .btn-outline-primary,
+        .btn-outline-success {
+            border-width: 2px;
+            font-weight: 500;
+        }
+
+        .fa-book {
+            font-size: 1.1em;
+        }
+
+        .fa-download {
+            font-size: 1em;
+        }
+
+        .fa-face-frown-open {
+            color: #adb5bd;
+        }
+    </style>
 @endsection
 
 @section('script')

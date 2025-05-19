@@ -16,152 +16,126 @@
 @endsection
 @section('content')
     <div class="content-wrapper">
-        <!-- Content Header (Page header) -->
         <section class="content-header">
-            <div class="container-fluid">
-                <div class="row mb-2">
-                    <div class="col-sm-6">
-                        <h1>My Exam Result</h1>
-                    </div>
+            <div class="row mb-3">
+                <div class="col-md-12">
+                    <form method="GET" action="">
+                        <div class="input-group mb-2">
+                            {{-- <select name="academic_year_id" class="form-select" style="max-width:240px;"
+                                onchange="this.form.submit()">
+                                @foreach ($academicYears as $year)
+                                    <option value="{{ $year->id }}"
+                                        {{ $selectedAcademicYear && $selectedAcademicYear->id == $year->id ? 'selected' : '' }}>
+                                        {{ $year->name }}{{ $year->is_active ? ' (Active)' : '' }}
+                                    </option>
+                                @endforeach
+                            </select> --}}
+                            @if ($selectedAcademicYear && !$selectedAcademicYear->is_active)
+                                <span class="ms-3 align-items-center" style="color: #ffc107;">
+                                    <i class="fas fa-exclamation-triangle"></i> Vous n'êtes pas dans l'année active !
+                                </span>
+                            @endif
+                        </div>
+                    </form>
                 </div>
-            </div><!-- /.container-fluid -->
-        </section>
+            </div>
 
-        <section class="content">
-            <div class="container-fluid">
-                <div class="row">
+            @if (!empty($getRecord))
+                @foreach ($getRecord as $value)
+                    <div class="card mb-4 shadow-sm">
+                        <div class="card-header bg-secondary text-white">
+                            <strong>{{ $value['exam_name'] }}</strong>
 
-                    @foreach ($getRecord as $value)
-                        <div class="col-md-12">
-                            <div class="card">
-                                <div class="card-header">
-                                    <h3 class="card-title">{{ $value['exam_name'] }}</h3>
-                                    <a class="btn btn-primary btn-sm" style="float: right;" target="_blank"
-                                        href="{{ url('student/my_exam_result/print?exam_id=' . $value['exam_id'] . '&student_id=' . Auth::user()->id) }}">Print</a>
-                                </div>
-                                <div class="card-body p-0" style="overflow: auto;">
-                                    <table class="table styled-table table-bordered table-striped">
-                                        <thead>
-                                            <tr>
-                                                <th>UE</th>
-                                                {{-- <th>Class Work</th>
-                            <th>Test Work</th>
-                            <th>Home work</th>
-                            <th>Exam</th> --}}
-                                                <th>Crédit du Cours</th>
-                                                <th>Note/20</th>
-                                                {{-- <th>Passing Marks</th>
-                            <th>Full Marks</th> --}}
-                                                <th>Décision</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
+                            <a class="btn btn-primary btn-sm" style="float: right;" target="_blank"
+                                href="{{ url('student/my_exam_result/print?exam_id=' . $value['exam_id'] . '&student_id=' . Auth::user()->id) }}">Print</a>
+                        </div>
+                        <div class="card-body p-0">
+                            @if (!empty($value['subject']))
+                                <table class="table styled-table table-bordered table-striped m-0">
+                                    <thead>
+                                        <tr>
+                                            <th>UE</th>
+                                            <th>Crédit du Cours</th>
+                                            <th>Note/20</th>
+                                            <th>Décision</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @php
+                                            $Grandtotals_score = 0;
+                                            $credits_obtenus = 0;
+                                            $full_marks = 0;
+                                            $fail_count = 0;
+                                        @endphp
+                                        @foreach ($value['subject'] as $exam)
                                             @php
-
-                                                $Grandtotals_score = 0;
-                                                $credits_obtenus = 0;
-                                                $full_marks = 0;
-                                                $fail_count = 0;
+                                                $Grandtotals_score += $exam['totals_score'] ?? 0;
+                                                $total_score = $exam['total_score'] ?? 0;
+                                                $passing_mark = $exam['passing_mark'] ?? 0;
+                                                $full_marks += $exam['ponde'] ?? 0;
+                                                if ($total_score >= 10) {
+                                                    $credits_obtenus += $exam['ponde'] ?? 0;
+                                                }
                                             @endphp
-                                            @foreach ($value['subject'] as $exam)
-                                                @php
-                                                    $Grandtotals_score = $Grandtotals_score + $exam['totals_score'];
-                                                    $total_score = $exam['total_score'] ?? 0;
-                                                    $passing_mark = $exam['passing_mark'] ?? 0;
-                                                    $full_marks += $exam['ponde'];
-
-                                                    if ($total_score >= 10) {
-                                                        $credits_obtenus += $exam['ponde'] ?? 0;
-                                                    }
-
-                                                @endphp
-                                                <tr>
-                                                    <td style="width: 200px">{{ $exam['subject_name'] }}</td>
-                                                    {{-- <td>{{ $exam['class_work'] }}</td>
-                                <td>{{ $exam['test_work'] }}</td>
-                                <td>{{ $exam['home_work'] }}</td>
-                                <td>{{ $exam['exam'] }}</td> --}}
-                                                    <td>{{ $exam['ponde'] }}</td>
-                                                    {{-- <td>
+                                            <tr>
+                                                <td style="width: 200px">{{ $exam['subject_name'] ?? 'N/A' }}</td>
+                                                <td>{{ $exam['ponde'] ?? 0 }}</td>
+                                                <td>
+                                                    @if (($exam['total_score'] ?? 0) == 0)
+                                                        <span style="color: gray; font-weight: bold;">ND</span>
+                                                    @else
                                                         @if ($exam['total_score'] >= $exam['passing_mark'])
                                                             <span
                                                                 style="color: green; font-weight: bold;"><b>{{ $exam['total_score'] }}</b></span>
                                                         @else
                                                             <span
                                                                 style="color: red; font-weight: bold;"><b>{{ $exam['total_score'] }}</b></span>
-                                                            @php
-                                                                $fail_count++;
-                                                            @endphp
+                                                            @php $fail_count++; @endphp
                                                         @endif
-                                                    </td> --}}
-                                                    <td>
-                                                        @if ($exam['total_score'] == 0)
-                                                            <span style="color: gray; font-weight: bold;">ND</span>
-                                                        @else
-                                                            @if ($exam['total_score'] >= $exam['passing_mark'])
-                                                                <span
-                                                                    style="color: green; font-weight: bold;"><b>{{ $exam['total_score'] }}</b></span>
-                                                            @else
-                                                                <span
-                                                                    style="color: red; font-weight: bold;"><b>{{ $exam['total_score'] }}</b></span>
-                                                                @php
-                                                                    $fail_count++;
-                                                                @endphp
-                                                            @endif
-                                                        @endif
-                                                    </td>
-
-                                                    <td>
-                                                        @if ($exam['total_score'] >= 10)
-                                                            <span style="color: green; font-weight: bold;"><b>VAL</b></span>
-                                                        @else
-                                                            <span style="color: red; font-weight: bold;"><b>NVL</b></span>
-                                                            @php
-                                                                $fail_count++;
-                                                            @endphp
-                                                        @endif
-                                                    </td>
-
-
-
-
-                                                    {{-- <td><b>{{ $exam['total_score'] }}</b></td> --}}
-                                                    {{-- <td>{{ $exam['passing_marks'] }}</td>
-                                <td><b>{{ $exam['full_marks'] }}</b></td> --}}
-
-                                                </tr>
-                                            @endforeach
-
-                                            <tr>
-                                                <td colspan="1">
-                                                    <canvas id="creditsChart" width="50" height="50"></canvas>
+                                                    @endif
                                                 </td>
-                                                <td colspan="3">
-                                                    <b>Grand Total: {{ $credits_obtenus }}/{{ $full_marks }}</b>
-
+                                                <td>
+                                                    @if (($exam['total_score'] ?? 0) >= 10)
+                                                        <span style="color: green; font-weight: bold;"><b>VAL</b></span>
+                                                    @else
+                                                        <span style="color: red; font-weight: bold;"><b>NVL</b></span>
+                                                        @php $fail_count++; @endphp
+                                                    @endif
                                                 </td>
                                             </tr>
-                                        </tbody>
-                                    </table>
+                                        @endforeach
+                                        {{-- <tr>
+                                            <td colspan="1">
+                                                <canvas id="creditsChart" width="50" height="50"></canvas>
+                                            </td>
+                                            <td colspan="3">
+                                                <b>Grand Total: {{ $credits_obtenus }}/{{ $full_marks }}</b>
+                                            </td>
+                                        </tr> --}}
+                                    </tbody>
+                                </table>
+                            @else
+                                <div class="alert alert-info m-3">
+                                    <i class="fas fa-info-circle"></i> Aucun résultat d'examen enregistré pour cette
+                                    session.
                                 </div>
-                            </div>
+                            @endif
                         </div>
-                    @endforeach
-
-
+                    </div>
+                @endforeach
+            @else
+                <div class="alert alert-warning mt-4">
+                    <i class="fas fa-info-circle"></i> Aucun résultat d'examen disponible pour le moment.
                 </div>
-                <!-- /.row -->
-
-                <!-- /.row -->
-            </div><!-- /.container-fluid -->
+            @endif
         </section>
-        <!-- /.content -->
     </div>
 @endsection
 
+
 @section('script')
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
+    {{-- <script>
         document.addEventListener("DOMContentLoaded", function() {
             var ctx = document.getElementById('creditsChart').getContext('2d');
             var creditsChart = new Chart(ctx, {
@@ -183,5 +157,5 @@
                 }
             });
         });
-    </script>
+    </script> --}}
 @endsection

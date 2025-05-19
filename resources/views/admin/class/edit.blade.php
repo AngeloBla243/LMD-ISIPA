@@ -2,111 +2,147 @@
 
 @section('content')
     <div class="content-wrapper">
-        <!-- Content Header (Page header) -->
-        <section class="content-header">
+        <!-- Content Header -->
+        <section class="content-header py-3 bg-light border-bottom mb-4">
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h1>Edit Class</h1>
+                        <h1 class="h3 fw-bold text-primary">Modifier une classe</h1>
                     </div>
-
                 </div>
-            </div><!-- /.container-fluid -->
+            </div>
         </section>
 
         <!-- Main content -->
-        <section class="content">
-            <div class="container-fluid">
-                <div class="row">
-                    <!-- left column -->
-                    <div class="col-md-12">
-                        <div class="card card-primary">
-                            <form method="post" action="">
-                                {{ csrf_field() }}
-                                <div class="card-body">
+        <section class="content pb-5">
+            <div class="container">
+                <div class="card shadow-sm rounded-4 border-0 mx-auto" style="max-width: 700px;">
+                    <form method="post" action="" novalidate>
+                        @csrf
+                        <div class="card-body">
+                            <div class="mb-4">
+                                <label for="academic_year_id" class="form-label fw-semibold">Année Académique <span
+                                        class="text-danger">*</span></label>
+                                <select id="academic_year_id" name="academic_year_id"
+                                    class="form-select @error('academic_year_id') is-invalid @enderror" required>
+                                    @foreach ($academicYears as $year)
+                                        <option value="{{ $year->id }}"
+                                            {{ $getRecord->academic_year_id == $year->id ? 'selected' : '' }}>
+                                            {{ $year->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('academic_year_id')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
 
-                                    <div class="mb-3">
-                                        <label class="form-label">Année Académique</label>
-                                        <select name="academic_year_id" class="form-select" required>
-                                            @foreach ($academicYears as $year)
-                                                <option value="{{ $year->id }}"
-                                                    {{ $getRecord->academic_year_id == $year->id ? 'selected' : '' }}>
-                                                    {{ $year->name }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Class Name</label>
-                                        <input type="text" class="form-control" value="{{ $getRecord->name }}"
-                                            name="name" required placeholder="Class Name">
-                                    </div>
+                            <div class="mb-4">
+                                <label for="name" class="form-label fw-semibold">Nom de la classe <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" id="name" name="name"
+                                    class="form-control @error('name') is-invalid @enderror" value="{{ $getRecord->name }}"
+                                    placeholder="Nom de la classe" required>
+                                @error('name')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
 
-                                    <div class="form-group">
-                                        <label>Option</label>
-                                        <select class="form-control" name="opt">
-                                            <option
-                                                {{ $getRecord->opt == 'Administration Réseau et Telecommunication' ? 'selected' : '' }}
-                                                value="Administration Réseau et Telecommunication">Administration Réseau et
-                                                Télécommunication</option>
-                                            <option
-                                                {{ $getRecord->opt == 'Administration des Bases de données' ? 'selected' : '' }}
-                                                value="Administration des Bases de données">Administration des Bases de
-                                                données</option>
-                                            <option {{ $getRecord->opt == 'Intelligence artificielle' ? 'selected' : '' }}
-                                                value="Intelligence artificielle">Intelligence artificielle</option>
-                                            <option {{ $getRecord->opt == 'Génie Logiciel' ? 'selected' : '' }}
-                                                value="Génie Logiciel">Génie Logiciel</option>
-                                            <option {{ $getRecord->opt == 'Fiscalité' ? 'selected' : '' }}
-                                                value="Fiscalite">Fiscalité</option>
-                                            <option {{ $getRecord->opt == 'Gestion Financière' ? 'selected' : '' }}
-                                                value="Gestion Financiere">Gestion Financière</option>
-                                            <option {{ $getRecord->opt == 'Commerce extérieur' ? 'selected' : '' }}
-                                                value="Commerce extérieur">Commerce extérieur</option>
-                                            <option {{ $getRecord->opt == 'Communication numérique' ? 'selected' : '' }}
-                                                value="Communication numérique">Communication numérique</option>
-                                            <option {{ $getRecord->opt == 'Science informatique' ? 'selected' : '' }}
-                                                value="Science informatique">Science informatique</option>
-                                        </select>
-                                    </div>
+                            <div class="mb-4">
+                                <label for="opt" class="form-label fw-semibold">Option</label>
+                                <select id="opt" name="opt"
+                                    class="form-select @error('opt') is-invalid @enderror">
+                                    @php
+                                        $options = [
+                                            'Administration Réseau et Telecommunication',
+                                            'Administration des Bases de données',
+                                            'Intelligence artificielle',
+                                            'Génie Logiciel',
+                                            'Fiscalité',
+                                            'Gestion Financière',
+                                            'Commerce extérieur',
+                                            'Communication numérique',
+                                            'Science informatique',
+                                        ];
+                                    @endphp
+                                    @foreach ($options as $option)
+                                        <option value="{{ $option }}"
+                                            {{ $getRecord->opt == $option ? 'selected' : '' }}>
+                                            {{ $option }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('opt')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
 
-                                    <div class="form-group">
-                                        <label>Amount ($)</label>
-                                        <input type="number" class="form-control" name="amount"
-                                            value="{{ $getRecord->amount }}" required placeholder="Amount">
-                                    </div>
+                            <div class="mb-4">
+                                <label for="amount" class="form-label fw-semibold">Montant ($) <span
+                                        class="text-danger">*</span></label>
+                                <input type="number" id="amount" name="amount"
+                                    class="form-control @error('amount') is-invalid @enderror"
+                                    value="{{ $getRecord->amount }}" placeholder="Montant" required min="0"
+                                    step="0.01">
+                                @error('amount')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
 
-                                    <div class="form-group">
-                                        <label>Status</label>
-                                        <select class="form-control" name="status">
-                                            <option {{ $getRecord->status == 0 ? 'selected' : '' }} value="0">Active
-                                            </option>
-                                            <option {{ $getRecord->status == 1 ? 'selected' : '' }} value="1">
-                                                Inactive</option>
-                                        </select>
-
-                                    </div>
-
-
-                                </div>
-                                <!-- /.card-body -->
-
-                                <div class="card-footer">
-                                    <button type="submit" class="btn btn-primary">Update</button>
-                                </div>
-                            </form>
+                            <div class="mb-4">
+                                <label for="status" class="form-label fw-semibold">Statut <span
+                                        class="text-danger">*</span></label>
+                                <select id="status" name="status"
+                                    class="form-select @error('status') is-invalid @enderror" required>
+                                    <option value="0" {{ $getRecord->status == 0 ? 'selected' : '' }}>Actif</option>
+                                    <option value="1" {{ $getRecord->status == 1 ? 'selected' : '' }}>Inactif</option>
+                                </select>
+                                @error('status')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
                         </div>
 
-
-                    </div>
-                    <!--/.col (left) -->
-                    <!-- right column -->
-
-                    <!--/.col (right) -->
+                        <div class="card-footer d-flex justify-content-end bg-white border-0">
+                            <button type="submit" class="btn btn-primary px-4 py-2 fw-semibold shadow-sm">
+                                Mettre à jour
+                            </button>
+                        </div>
+                    </form>
                 </div>
-                <!-- /.row -->
-            </div><!-- /.container-fluid -->
+            </div>
         </section>
-        <!-- /.content -->
     </div>
+
+    <style>
+        .card {
+            border-radius: 1.5rem;
+            max-width: 700px;
+            margin: auto;
+        }
+
+        .form-label {
+            font-weight: 600;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, .25);
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, #0d6efd 60%, #0dcaf0 100%);
+            border: none;
+            transition: background 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(90deg, #0dcaf0 0%, #0d6efd 100%);
+        }
+
+        .invalid-feedback {
+            display: block;
+        }
+    </style>
 @endsection

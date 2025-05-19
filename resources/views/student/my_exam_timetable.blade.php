@@ -38,84 +38,104 @@
             background-color: #f1f1f1;
             cursor: pointer;
         }
+
+        .table-primary th {
+            background-color: #cfe2ff;
+            color: #084298;
+        }
+
+        .fw-semibold {
+            font-weight: 600;
+        }
+
+        .alert-info {
+            background-color: #e7f1ff;
+            color: #084298;
+            border-color: #b6d4fe;
+        }
     </style>
 @endsection
 @section('content')
     <div class="content-wrapper">
-        <!-- Content Header (Page header) -->
-        <section class="content-header">
+        <!-- Content Header -->
+        <section class="content-header py-3 bg-light border-bottom mb-4">
             <div class="container-fluid">
-                <div class="row mb-2">
+                <div class="row align-items-center">
                     <div class="col-sm-6">
-                        <h1>My Exam Timetable</h1>
+                        <h1 class="h3 fw-bold text-primary">Mon Emploi du Temps des Examens</h1>
                     </div>
-
                 </div>
-            </div><!-- /.container-fluid -->
+            </div>
         </section>
 
         <!-- Main content -->
         <section class="content">
             <div class="container-fluid">
-                <div class="row">
 
-                    <!-- /.col -->
-                    <div class="col-md-12">
+                @include('_message')
 
-                        @include('_message')
-
-                        @foreach ($getRecord as $value)
-                            <div class="card">
-                                <div class="card-header">
-                                    <h3 class="card-title">{{ $value['name'] }}</h3>
+                <div class="row g-4">
+                    @forelse ($getRecord as $value)
+                        <div class="col-12">
+                            <div class="card shadow-sm rounded-3 border-0">
+                                <div class="card-header bg-primary text-white">
+                                    <h3 class="card-title mb-0">{{ $value['name'] }}</h3>
                                 </div>
-                                <!-- /.card-header -->
-                                <div class="card-body p-0" style="overflow: auto;">
-                                    <table class="table styled-table table-bordered table-striped">
-                                        <thead>
+                                <div class="card-body p-0 table-responsive">
+                                    <table class="table table-striped table-bordered align-middle mb-0">
+                                        <thead class="table-primary text-center text-uppercase small">
                                             <tr>
-                                                <th style="min-width: 200px;">Nom de sujet</th>
-                                                <th>Day</th>
-                                                <th style="min-width: 200px;">Exam Date</th>
-                                                <th style="min-width: 200px;">Start Time </th>
-                                                <th style="min-width: 200px;">End Time </th>
-                                                <th style="min-width: 200px;">Room Number</th>
-                                                <th style="min-width: 200px;">Full Marks </th>
-                                                <th style="min-width: 200px;">Passing Marks </th>
+                                                <th style="min-width: 250px;">Nom du sujet</th>
+                                                <th>Jour</th>
+                                                <th style="min-width: 150px;">Date d'examen</th>
+                                                <th style="min-width: 120px;">Heure début</th>
+                                                <th style="min-width: 120px;">Heure fin</th>
+                                                <th style="min-width: 150px;">Numéro de salle</th>
+                                                <th style="min-width: 120px;">Note maximale</th>
+                                                <th style="min-width: 120px;">Note de passage</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             @foreach ($value['exam'] as $valueS)
                                                 <tr>
-                                                    <td style="min-width: 300px;">{{ $valueS['subject_name'] }}</td>
-                                                    <td>{{ date('l', strtotime($valueS['exam_date'])) }}</td>
-                                                    <td>{{ date('d-m-Y', strtotime($valueS['exam_date'])) }}</td>
-                                                    <td>{{ date('h:i A', strtotime($valueS['start_time'])) }}</td>
-                                                    <td>{{ date('h:i A', strtotime($valueS['end_time'])) }}</td>
-                                                    <td>{{ $valueS['room_number'] }}</td>
-                                                    <td>{{ $valueS['full_marks'] }}</td>
-                                                    <td>{{ $valueS['passing_mark'] }}</td>
+                                                    <td class="fw-semibold" style="min-width: 250px;">
+                                                        {{ $valueS['subject_name'] }}</td>
+                                                    <td class="text-center">
+                                                        {{ \Carbon\Carbon::parse($valueS['exam_date'])->translatedFormat('l') }}
+                                                    </td>
+                                                    <td class="text-center" style="min-width: 150px;">
+                                                        {{ \Carbon\Carbon::parse($valueS['exam_date'])->format('d-m-Y') }}
+                                                    </td>
+                                                    <td class="text-center" style="min-width: 120px;">
+                                                        {{ \Carbon\Carbon::parse($valueS['start_time'])->format('h:i A') }}
+                                                    </td>
+                                                    <td class="text-center" style="min-width: 120px;">
+                                                        {{ \Carbon\Carbon::parse($valueS['end_time'])->format('h:i A') }}
+                                                    </td>
+                                                    <td class="text-center" style="min-width: 150px;">
+                                                        {{ $valueS['room_number'] ?? '-' }}</td>
+                                                    <td class="text-center" style="min-width: 120px;">
+                                                        {{ $valueS['full_marks'] ?? '-' }}</td>
+                                                    <td class="text-center" style="min-width: 120px;">
+                                                        {{ $valueS['passing_mark'] ?? '-' }}</td>
                                                 </tr>
                                             @endforeach
                                         </tbody>
                                     </table>
                                 </div>
                             </div>
-                        @endforeach
-
-                    </div>
-
-                    <!-- /.card-body -->
+                        </div>
+                    @empty
+                        <div class="col-12">
+                            <div class="alert alert-info text-center shadow-sm rounded-3">
+                                Aucun emploi du temps d'examen disponible pour cette année académique.
+                            </div>
+                        </div>
+                    @endforelse
                 </div>
-                <!-- /.card -->
-            </div>
-            <!-- /.col -->
-    </div>
-    <!-- /.row -->
 
-    <!-- /.row -->
-    </div><!-- /.container-fluid -->
-    </section>
-    <!-- /.content -->
+            </div>
+        </section>
     </div>
+
 @endsection

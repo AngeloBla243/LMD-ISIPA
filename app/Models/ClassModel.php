@@ -95,4 +95,21 @@ class ClassModel extends Model
             ->orderBy('name', 'asc')
             ->get();
     }
+
+    public function students()
+    {
+        return $this->belongsToMany(
+            User::class,
+            'student_class',
+            'class_id',     // clé class dans student_class
+            'student_id'    // clé student dans student_class
+        )->withPivot('academic_year_id');
+    }
+
+    public function student()
+    {
+        return $this->belongsToMany(User::class, 'student_class', 'class_id', 'student_id')
+            ->withPivot('academic_year_id')
+            ->wherePivot('academic_year_id', session('academic_year_id'));
+    }
 }

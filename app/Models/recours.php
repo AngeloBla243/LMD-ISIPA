@@ -44,7 +44,7 @@ class Recours extends Model
 
     protected $table = 'recours';
 
-    protected $fillable = ['student_id', 'class_id', 'subject_id', 'objet', 'numero', 'session_year'];
+    protected $fillable = ['student_id', 'class_id', 'subject_id', 'objet', 'numero', 'session_year', 'academic_year_id'];
 
     // Relation avec le modèle Student
     public function student()

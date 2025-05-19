@@ -1,220 +1,213 @@
 @extends('layouts.app')
 @section('style')
+    <style type="text/css">
+        .styled-table {
+            border-collapse: collapse;
+            margin: 25px 0;
+            min-width: 400px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+            border-radius: 8px;
+            overflow: hidden;
+        }
 
-<style type="text/css">
-.styled-table {
-    border-collapse: collapse;
-    margin: 25px 0;
-    min-width: 400px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
-    border-radius: 8px;
-    overflow: hidden;
-}
-.styled-table thead tr {
-    background-color: #009879;
-    color: #ffffff;
-    text-align: left;
-}
-.styled-table th,
-.styled-table td {
-    padding: 12px 15px;
-}
-.styled-table tbody tr {
-    border-bottom: 1px solid #dddddd;
-}
+        .styled-table thead tr {
+            background-color: #009879;
+            color: #ffffff;
+            text-align: left;
+        }
 
-.styled-table tbody tr:nth-of-type(even) {
-    background-color: #f3f3f3;
-}
+        .styled-table th,
+        .styled-table td {
+            padding: 12px 15px;
+        }
 
-.styled-table tbody tr:last-of-type {
-    border-bottom: 2px solid #009879;
-}
+        .styled-table tbody tr {
+            border-bottom: 1px solid #dddddd;
+        }
 
-/* Effet survol (hover) */
-.styled-table tbody tr:hover {
-    background-color: #f1f1f1;
-    cursor: pointer;
-}
+        .styled-table tbody tr:nth-of-type(even) {
+            background-color: #f3f3f3;
+        }
 
-.present {
-    color: white;
-    background-color: #28a745;
-    padding: 5px 10px;
-    border-radius: 5px;
-}
+        .styled-table tbody tr:last-of-type {
+            border-bottom: 2px solid #009879;
+        }
 
-.absent {
-    color: white;
-    background-color: #dc3545;
-    padding: 5px 10px;
-    border-radius: 5px;
-}
+        /* Effet survol (hover) */
+        .styled-table tbody tr:hover {
+            background-color: #f1f1f1;
+            cursor: pointer;
+        }
 
-.half {
-    color: white;
-    background-color: #282aa7;
-    padding: 5px 10px;
-    border-radius: 5px;
+        .present {
+            color: white;
+            background-color: #28a745;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
 
-}
+        .absent {
+            color: white;
+            background-color: #dc3545;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
 
-.late {
-    color: white;
-    background-color: #dc9435;
-    padding: 5px 10px;
-    border-radius: 5px;
-}
+        .half {
+            color: white;
+            background-color: #282aa7;
+            padding: 5px 10px;
+            border-radius: 5px;
 
-</style>
+        }
 
+        .late {
+            color: white;
+            background-color: #dc9435;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+
+        .table-primary th {
+            background-color: #cfe2ff;
+            color: #084298;
+        }
+
+        .badge {
+            font-size: 0.9rem;
+            padding: 0.4em 0.75em;
+        }
+
+        .progress-bar {
+            border-radius: 12px;
+        }
+
+        .alert-warning {
+            font-size: 1rem;
+        }
+    </style>
 @endsection
 @section('content')
-<div class="content-wrapper">
-    <section class="content-header">
-      <div class="container-fluid">
-        <div class="row mb-2">
-          <div class="col-sm-6">
-            <h1>My Attendance <span style="color:blue">( Total : {{ $getRecord->total() }} )</span></h1>
-          </div>
-        </div>
-      </div>
-    </section>
-    <section class="content">
-      <div class="container-fluid">
-        <div class="row">
-
-
-
-         <div class="col-md-12">
-
-
-              <div class="card">
-                <div class="card-header">
-                  <h3 class="card-title">Search My Attendance</h3>
+    <div class="content-wrapper">
+        <!-- Content Header -->
+        <section class="content-header py-3 bg-light border-bottom mb-4">
+            <div class="container-fluid">
+                <div class="row align-items-center">
+                    <div class="col-sm-6">
+                        <h1 class="h3 fw-bold text-primary">
+                            Mes Présences
+                            <small class="text-muted" style="font-weight: 500;">
+                                (Total : <span class="text-info">{{ $getRecord->total() }}</span>)
+                            </small>
+                        </h1>
+                    </div>
                 </div>
-                <form method="get" action="">
-                  <div class="card-body">
-                    <div class="row">
-                    <div class="form-group col-md-2">
-                      <label>Class</label>
-                      <select class="form-control" name="class_id" >
-                          <option value="">Select</option>
-                          @foreach($getClass as $class)
-                            <option {{ (Request::get('class_id') == $class->class_id) ? 'selected' : '' }} value="{{ $class->class_id }}">{{ $class->class_name }} {{ $class->class_opt }}</option>
-                          @endforeach
-                      </select>
-                    </div>
+            </div>
+        </section>
 
-                    <div class="form-group col-md-2">
-                      <label>Attendance Type</label>
-                      <select class="form-control" name="attendance_type">
-                          <option value="">Select</option>
-                          <option {{ (Request::get('attendance_type') == 1) ? 'selected' : '' }} value="1">Present</option>
-                          <option {{ (Request::get('attendance_type') == 2) ? 'selected' : '' }} value="2">Late</option>
-                          <option {{ (Request::get('attendance_type') == 3) ? 'selected' : '' }} value="3">Absent</option>
-                          <option {{ (Request::get('attendance_type') == 4) ? 'selected' : '' }} value="4">Half Day</option>
-                      </select>
-                    </div>
+        <!-- Main content -->
+        <section class="content">
+            <div class="container-fluid">
 
+                <div class="row">
+                    <div class="col-md-12">
 
+                        <div class="card shadow-sm rounded-3 border-0">
+                            <div class="card-header bg-primary text-white">
+                                <h3 class="card-title mb-0">Détails des présences</h3>
+                            </div>
 
-                    <div class="form-group col-md-2">
-                      <label style="min-width: 300px;">Start Attendance Date</label>
-                      <input type="date" class="form-control"  value="{{ Request::get('start_attendance_date') }}" name="start_attendance_date">
-                    </div>
+                            <div class="card-body p-0 table-responsive">
+                                @if ($getRecord->count() > 0)
+                                    <table class="table table-striped table-bordered align-middle mb-0">
+                                        <thead class="table-primary text-center text-uppercase small">
+                                            <tr>
+                                                <th>Classe</th>
+                                                <th>Type</th>
+                                                <th>Date</th>
+                                                <th>Créé le</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach ($getRecord as $value)
+                                                <tr>
+                                                    <td class="fw-semibold text-center">
+                                                        {{ $value->class_name }} {{ $value->class_opt }}
+                                                    </td>
+                                                    <td class="text-center">
+                                                        @switch($value->attendance_type)
+                                                            @case(1)
+                                                                <span class="badge bg-success">Présent</span>
+                                                            @break
 
-                     <div class="form-group col-md-2">
-                      <label style="min-width: 300px;">End Attendance Date</label>
-                      <input type="date" class="form-control"  value="{{ Request::get('end_attendance_date') }}" name="end_attendance_date">
-                    </div>
+                                                            @case(2)
+                                                                <span class="badge bg-warning text-dark">Retard</span>
+                                                            @break
 
+                                                            @case(3)
+                                                                <span class="badge bg-danger">Absent</span>
+                                                            @break
 
+                                                            @case(4)
+                                                                <span class="badge bg-info text-dark">Demi-journée</span>
+                                                            @break
 
-                    <div class="form-group col-md-3">
-                      <button class="btn btn-primary" type="submit" style="margin-top: 30px;"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
-                      <a href="{{ url('student/my_attendance') }}" class="btn btn-success" style="margin-top: 30px;">Reset</a>
-                    </div>
-                    </div>
-                  </div>
-                </form>
-              </div>
+                                                            @default
+                                                                <span class="badge bg-secondary">Inconnu</span>
+                                                        @endswitch
+                                                    </td>
+                                                    <td class="text-center">
+                                                        {{ \Carbon\Carbon::parse($value->attendance_date)->format('d-m-Y') }}
+                                                    </td>
+                                                    <td class="text-center">
+                                                        {{ \Carbon\Carbon::parse($value->created_at)->format('d-m-Y H:i') }}
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                @else
+                                    <div
+                                        class="alert alert-warning m-4 d-flex align-items-center gap-2 rounded-3 shadow-sm">
+                                        <i class="fas fa-exclamation-triangle fs-4"></i>
+                                        <span class="fs-6">Aucune présence trouvée pour cette période.</span>
+                                    </div>
+                                @endif
+                            </div>
 
-
-                 <div class="card">
-                    <div class="card-header">
-                      <h3 class="card-title">My Attendance</h3>
-                    </div>
-
-                    <div class="card-body p-0" style="overflow: auto;">
-                        <table class="table styled-table table-bordered table-striped">
-                        <thead>
-                          <tr>
-                            <th>Class Name</th>
-                            <th>Attendance Type</th>
-                            <th>Attendance Date</th>
-                            <th>Created Date</th>
-                          </tr>
-                        </thead>
-
-                        <tbody>
-                          @forelse($getRecord as $value)
-                              <tr>
-                                <td>{{ $value->class_name }} {{ $value->class_opt }}</td>
-                                <td>
-                                    @if($value->attendance_type == 1)
-                                     <b class="present">P</b>
-                                    @elseif($value->attendance_type == 2)
-                                      <b class="late">L</b>
-                                    @elseif($value->attendance_type == 3)
-                                      <b class="absent">A</b>
-                                    @elseif($value->attendance_type == 4)
-                                      <b class="half">H</b>
-                                    @endif
-                                </td>
-                                <td> {{ date('d-m-Y', strtotime($value->attendance_date)) }} </td>
-                                <td> {{ date('d-m-Y H:i A', strtotime($value->created_at)) }} </td>
-                              </tr>
-                          @empty
-                            <tr>
-                              <td colspan="100%">Record not found</td>
-                            </tr>
-                          @endforelse
-                            <tr>
-                                <td colspan="1"></td>
-                                <td colspan="2">
-                                    @if(isset($attendanceRate))
-                                        <div class="progress progress-sm">
-                                            <div class="progress-bar bg-green" role="progressbar" aria-valuenow="{{ $attendanceRate }}%" aria-valuemin="0" aria-valuemax="100" style="width: 47%">
+                            @if ($getRecord->count() > 0)
+                                <div class="card-footer bg-white">
+                                    <div class="row align-items-center">
+                                        <div class="col-md-6">
+                                            <div class="progress" style="height: 25px; border-radius: 12px;">
+                                                <div class="progress-bar bg-success fw-bold" role="progressbar"
+                                                    style="width: {{ $attendanceRate }}%; font-size: 1rem; line-height: 25px;"
+                                                    aria-valuenow="{{ $attendanceRate }}" aria-valuemin="0"
+                                                    aria-valuemax="100">
+                                                    {{ $attendanceRate }}% Présence
+                                                </div>
                                             </div>
                                         </div>
-                                        <small>
-                                            <b>{{ number_format($attendanceRate, 2) }}% de presence</b>
-                                            {{-- <b>{{ number_format($attendanceRate1, 2) }}% de Abscence</b> --}}
-                                        </small>
-                                    @endif
-                                </td>
-                                <td colspan="1"></td>
-                            </tr>
-                        </tbody>
-                      </table>
+                                        <div class="col-md-6 text-end">
+                                            {!! $getRecord->appends(request()->except('page'))->links() !!}
+                                        </div>
+                                    </div>
+                                </div>
+                            @endif
 
-                          <div style="padding: 10px; float: right;">
-                            {!! $getRecord->appends(Illuminate\Support\Facades\Request::except('page'))->links() !!}
-                          </div>
+                        </div>
 
                     </div>
-                  </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  </div>
+                </div>
+
+            </div>
+        </section>
+    </div>
 
 @endsection
 
-@section('script').
 
 
-
+@section('script')
+    .
 @endsection

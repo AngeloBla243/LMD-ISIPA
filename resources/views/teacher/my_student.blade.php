@@ -107,7 +107,9 @@
                                                 <td style="min-width: 150px;">{{ $value->email }}</td>
                                                 <td style="min-width: 150px;">{{ $value->admission_number }}</td>
                                                 <td style="min-width: 150px;">{{ $value->roll_number }}</td>
-                                                <td style="min-width: 150px;">{{ $value->class_name }} {{ $value->class_opt }}</td>
+                                                <td style="min-width: 150px;">{{ $value->class_name }}
+                                                    {{ $value->class_opt }}</td>
+                                                {{-- <td>{{ $student->className }}</td> --}}
                                                 <td style="min-width: 150px;">{{ $value->gender }}</td>
                                                 <td style="min-width: 150px;">
                                                     @if (!empty($value->date_of_birth))
@@ -129,11 +131,20 @@
                                                     {{ date('d-m-Y H:i A', strtotime($value->created_at)) }}</td>
                                                 <td style="min-width: 150px;">
                                                     @if (isset($value->attendanceRate))
-                                                        <div class="progress progress-sm">
+                                                        {{-- <div class="progress progress-sm">
                                                             <div class="progress-bar bg-green" role="progressbar"
                                                                 aria-valuenow="{{ $value->attendanceRate }}"
                                                                 aria-valuemin="0" aria-valuemax="100"
                                                                 style="width: {{ $value->attendanceRate }}%;">
+                                                            </div>
+                                                        </div> --}}
+
+                                                        <div class="progress">
+                                                            <div class="progress-bar bg-success" role="progressbar"
+                                                                style="width: {{ $value->attendanceRate }}%"
+                                                                aria-valuenow="{{ $value->attendanceRate }}"
+                                                                aria-valuemin="0" aria-valuemax="100">
+                                                                {{ round($value->attendanceRate, 2) }}%
                                                             </div>
                                                         </div>
                                                         <small><b>{{ number_format($value->attendanceRate, 2) }}% de
@@ -148,7 +159,10 @@
                                     </tbody>
                                 </table>
                                 <div style="padding: 10px; float: right;">
-                                    {!! $getRecord->appends(Illuminate\Support\Facades\Request::except('page'))->links() !!}
+                                    @if ($getRecord instanceof \Illuminate\Pagination\AbstractPaginator)
+                                        {!! $getRecord->appends(Illuminate\Support\Facades\Request::except('page'))->links() !!}
+                                    @endif
+
                                 </div>
 
                             </div>
