@@ -24,7 +24,8 @@ use App\Http\Controllers\RecoursController;
 use App\Http\Controllers\ThesisController;
 use App\Http\Controllers\AdminThesisController;
 use App\Http\Controllers\AcademicYearController;
-
+use App\Http\Controllers\UeController;
+use App\Http\Controllers\SemesterController;
 
 
 
@@ -69,17 +70,6 @@ Route::get('lang/{locale}', function ($locale) {
     return redirect()->back();
 });
 
-// Route::get('/set-academic-year/{id}', function ($id) {
-//     $year = App\Models\AcademicYear::findOrFail($id);
-//     session(['academic_year_id' => $year->id]);
-//     return redirect()->back();
-// })->name('set_academic_year')->middleware('auth');
-
-// Route::get('/set-academic-year', function (\Illuminate\Http\Request $request) {
-//     $year = App\Models\AcademicYear::findOrFail($request->academic_year_id);
-//     session(['academic_year_id' => $year->id]);
-//     return redirect()->back();
-// })->name('set_academic_year')->middleware('auth');
 
 // filtre academique
 Route::get('/set-academic-year-student', function (\Illuminate\Http\Request $request) {
@@ -121,6 +111,8 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin']], function 
     Route::put('admin/theses/{id}', [AdminThesisController::class, 'update'])->name('admin.theses.update');
     Route::get('admin/theses/{id}/download', [AdminThesisController::class, 'downloadReport'])
         ->name('admin.theses.download');
+    Route::get('admin/theses/export', [AdminThesisController::class, 'exportThesesPDF'])
+        ->name('admin.theses.export');
 });
 
 Route::group(['middleware' => 'student'], function () {
@@ -130,12 +122,11 @@ Route::group(['middleware' => 'student'], function () {
 
     // Route pour afficher le résultat (étudiant)
     Route::get('student/result/{id}', [ThesisController::class, 'result'])->name('thesis.result');
+    Route::get('student/mes-soumissions', [ThesisController::class, 'mySubmissions'])
+        ->name('student.submissions');
 
     // // Route pour télécharger le rapport
     Route::get('student/thesis/download/{id}', [ThesisController::class, 'downloadReport'])->name('downloadReport');
-
-    // Route::get('student/thesis/download/{id}', [ThesisController::class, 'downloadReport'])
-    //     ->name('thesis.download');
 });
 
 
@@ -378,8 +369,29 @@ Route::group(['middleware' => 'admin'], function () {
 
     Route::get('admin/recours/mark_register_modal', [ExaminationsController::class, 'markRegisterModal'])
         ->name('admin.recours.mark_register_modal');
+
     Route::post('admin/recours/update_mark', [ExaminationsController::class, 'updateSingleMark'])
         ->name('admin.recours.update_mark');
+    Route::delete('admin/recours/delete/{id}', [RecoursController::class, 'destroy'])
+        ->name('admin.recours.delete')
+        ->middleware('admin');
+
+
+    // UE (Unités d'Enseignement)
+    Route::get('admin/ue/list', [UeController::class, 'list'])->name('admin.ue.list');
+    Route::get('admin/ue/add', [UeController::class, 'add'])->name('admin.ue.add');
+    Route::post('admin/ue/add', [UeController::class, 'insert'])->name('admin.ue.insert');
+    Route::get('admin/ue/edit/{id}', [UeController::class, 'edit'])->name('admin.ue.edit');
+    Route::post('admin/ue/edit/{id}', [UeController::class, 'update'])->name('admin.ue.update');
+    Route::get('admin/ue/delete/{id}', [UeController::class, 'delete'])->name('admin.ue.delete');
+    Route::post('admin/examinations/exam/{id}/toggle', [ExaminationsController::class, 'toggleExamActive'])
+        ->name('admin.examinations.exam.toggle');
+
+
+    // Semestre
+    Route::get('admin/examinations/semestre/list', [SemesterController::class, 'list'])->name('admin.semester.list');
+    Route::get('admin/examinations/semestre/create', [SemesterController::class, 'createForm'])->name('admin.semester.create.form');
+    Route::post('admin/examinations/semestre/create', [SemesterController::class, 'create'])->name('admin.semester.create');
 });
 
 
@@ -429,7 +441,12 @@ Route::group(['middleware' => 'teacher'], function () {
 
     Route::get('teacher/homework/homework', [HomeworkController::class, 'HomeworkTeacher']);
     Route::get('teacher/homework/homework/add', [HomeworkController::class, 'addTeacher']);
-    Route::post('teacher/ajax_get_subject', [HomeworkController::class, 'ajax_get_subject']);
+    // Route::post('teacher/ajax_get_subject', [HomeworkController::class, 'ajax_get_subject']);
+    Route::get('/get-subjects-by-class', [HomeworkController::class, 'getSubjectsByClass'])->name('getSubjectsByClass');
+    Route::get('/get-subject-by-class', [HomeworkController::class, 'getSubjectByClass'])->name('getSubjectByClass');
+
+
+
     Route::post('teacher/homework/homework/add', [HomeworkController::class, 'insertTeacher']);
     Route::get('teacher/homework/homework/edit/{id}', [HomeworkController::class, 'editTeacher']);
     Route::post('teacher/homework/homework/edit/{id}', [HomeworkController::class, 'updateTeacher']);
@@ -446,6 +463,14 @@ Route::group(['middleware' => 'teacher'], function () {
         ->name('teacher.recours.mark_register_modal');
     Route::post('teacher/recours/update_mark', [ExaminationsController::class, 'updateSingleMark'])
         ->name('teacher.recours.update_mark');
+
+    // Pour la liste
+    Route::get('teacher/mes-encadres', [TeacherController::class, 'myStudents'])
+        ->name('teacher.encadres');
+
+    // Pour le PDF
+    Route::get('teacher/encadres/export', [TeacherController::class, 'exportEncadresPDF'])
+        ->name('teacher.encadres.export');
 });
 
 
@@ -478,6 +503,22 @@ Route::group(['middleware' => 'student'], function () {
 
     Route::get('student/my_exam_result', [ExaminationsController::class, 'myExamResult']);
     Route::get('student/my_exam_result/print', [ExaminationsController::class, 'myExamResultPrint']);
+
+    Route::get('student/my_exam_result', [ExaminationsController::class, 'myExamResult'])
+        ->name('student.exam_result');
+
+    // Pour les étudiants
+    Route::post('student/my_subject', [ExaminationsController::class, 'MySubjectRecours'])
+        ->name('student.my_subject');
+
+
+
+    // Route pour l'impression PDF
+    Route::get('student/my_exam_result/print/{academic_year_id}/{student_id}', [ExaminationsController::class, 'generateAnnualResultPrint'])
+        ->name('student.year_result.print');
+
+
+
 
 
     Route::get('student/my_attendance', [AttendanceController::class, 'MyAttendanceStudent']);

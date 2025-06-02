@@ -153,7 +153,7 @@
                                                 <td style="min-width: 200px;">{{ $recour->subject->name }}</td>
                                                 <td style="min-width: 250px;">{{ $recour->objet }}</td>
                                                 <td style="min-width: 200px;">{{ $recour->session_year }}</td>
-                                                <td class="text-center" style="min-width: 200px;">
+                                                <td class="text-center" style="min-width: 300px;">
                                                     <!-- Bouton de validation : pouce bleu ou rouge selon $recour->status -->
                                                     <form method="POST"
                                                         action="{{ route('admin.recours.toggle_status', $recour->id) }}"
@@ -176,6 +176,18 @@
                                                             <i class="fas fa-pencil-alt"></i> Traité
                                                         </button>
                                                     @endif
+
+                                                    <!-- Nouveau bouton Supprimer -->
+                                                    <form method="POST"
+                                                        action="{{ route('admin.recours.delete', $recour->id) }}"
+                                                        style="display:inline;"
+                                                        onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce recours ?')">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="btn btn-danger">
+                                                            <i class="fas fa-trash-alt"></i>
+                                                        </button>
+                                                    </form>
                                                 </td>
                                             </tr>
                                         @endforeach

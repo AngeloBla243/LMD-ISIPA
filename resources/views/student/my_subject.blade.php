@@ -144,7 +144,7 @@
                                         <tr>
                                             <th>Nom du cours</th>
                                             <th>Type de cours</th>
-                                            <th style="min-width: 180px;">Recours</th>
+                                            {{-- <th style="min-width: 180px;">Recours</th> --}}
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -153,13 +153,13 @@
                                                 <td class="fw-semibold">{{ $value->subject_name }}</td>
                                                 <td class="text-center text-muted text-capitalize">
                                                     {{ $value->subject_type }}</td>
-                                                <td class="text-center">
+                                                {{-- <td class="text-center">
                                                     <a href="#" data-toggle="modal" data-target="#addFeesModal"
                                                         data-subjectid="{{ $value->subject_id }}"
                                                         class="btn btn-sm btn-outline-primary openModal shadow-sm">
                                                         <i class="fas fa-edit me-1"></i> Faire votre recours
                                                     </a>
-                                                </td>
+                                                </td> --}}
                                             </tr>
                                         @empty
                                             <tr>

@@ -8,7 +8,7 @@
                 <div class="row mb-2">
                     <div class="col-sm-6">
                         <h1 class="h3 fw-bold text-primary">
-                            <i class="fa-solid fa-chalkboard-user me-2"></i>Modifier un enseignant
+                            <i class="fa-solid fa-chalkboard-user me-2"></i> Modifier un enseignant
                         </h1>
                     </div>
                 </div>
@@ -49,17 +49,15 @@
                                         <div class="col-md-6">
                                             <label class="form-label fw-semibold">Genre <span
                                                     class="text-danger">*</span></label>
-                                            <select class="form-select @error('gender') is-invalid @enderror" required
-                                                name="gender">
+                                            <select class="form-select form-control @error('gender') is-invalid @enderror"
+                                                required name="gender">
                                                 <option value="">Sélectionner</option>
-                                                <option
-                                                    {{ old('gender', $getRecord->gender) == 'Male' ? 'selected' : '' }}
+                                                <option {{ old('gender', $getRecord->gender) == 'Male' ? 'selected' : '' }}
                                                     value="Male">Homme</option>
                                                 <option
                                                     {{ old('gender', $getRecord->gender) == 'Female' ? 'selected' : '' }}
                                                     value="Female">Femme</option>
-                                                <option
-                                                    {{ old('gender', $getRecord->gender) == 'Other' ? 'selected' : '' }}
+                                                <option {{ old('gender', $getRecord->gender) == 'Other' ? 'selected' : '' }}
                                                     value="Other">Autre</option>
                                             </select>
                                             @error('gender')
@@ -138,13 +136,34 @@
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
                                         </div>
-                                        <div class="col-md-6">
+                                        {{-- <div class="col-md-6">
                                             <label class="form-label fw-semibold">Qualification</label>
                                             <textarea class="form-control @error('qualification') is-invalid @enderror" name="qualification">{{ old('qualification', $getRecord->qualification) }}</textarea>
                                             @error('qualification')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
+                                        </div> --}}
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-semibold">Qualification</label>
+                                            <select
+                                                class="form-select form-control @error('qualification') is-invalid @enderror"
+                                                name="qualification">
+                                                <option value="">Sélectionner une qualification</option>
+                                                <option value="Prof"
+                                                    {{ old('qualification', $getRecord->qualification ?? '') == 'Prof' ? 'selected' : '' }}>
+                                                    Prof</option>
+                                                <option value="Ct"
+                                                    {{ old('qualification', $getRecord->qualification ?? '') == 'Ct' ? 'selected' : '' }}>
+                                                    Ct</option>
+                                                <option value="Ass"
+                                                    {{ old('qualification', $getRecord->qualification ?? '') == 'Ass' ? 'selected' : '' }}>
+                                                    Ass</option>
+                                            </select>
+                                            @error('qualification')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
                                         </div>
+
                                         <div class="col-md-6">
                                             <label class="form-label fw-semibold">Expérience professionnelle</label>
                                             <textarea class="form-control @error('work_experience') is-invalid @enderror" name="work_experience">{{ old('work_experience', $getRecord->work_experience) }}</textarea>
@@ -162,8 +181,8 @@
                                         <div class="col-md-6">
                                             <label class="form-label fw-semibold">Statut <span
                                                     class="text-danger">*</span></label>
-                                            <select class="form-select @error('status') is-invalid @enderror" required
-                                                name="status">
+                                            <select class="form-select form-control @error('status') is-invalid @enderror"
+                                                required name="status">
                                                 <option value="">Sélectionner</option>
                                                 <option {{ old('status', $getRecord->status) == 0 ? 'selected' : '' }}
                                                     value="0">Actif</option>

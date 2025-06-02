@@ -24,7 +24,8 @@
                                 <label for="academic_year_id" class="form-label fw-semibold">Année Académique <span
                                         class="text-danger">*</span></label>
                                 <select id="academic_year_id" name="academic_year_id"
-                                    class="form-select @error('academic_year_id') is-invalid @enderror" required>
+                                    class="form-select form-control @error('academic_year_id') is-invalid @enderror"
+                                    required>
                                     <option value="">Sélectionner</option>
                                     @foreach ($academicYears as $year)
                                         <option value="{{ $year->id }}"
@@ -36,6 +37,18 @@
                                 @error('academic_year_id')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
+                            </div>
+
+                            <div class="form-group">
+                                <label>UE <span class="text-danger">*</span></label>
+                                <select name="ue_id" class="form-control">
+                                    <option value="">Sélectionner une UE</option>
+                                    @foreach ($ueList as $ue)
+                                        <option value="{{ $ue->id }}" {{ old('ue_id') == $ue->id ? 'selected' : '' }}>
+                                            {{ $ue->code }} - {{ $ue->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
                             </div>
 
                             <div class="mb-4">
@@ -64,7 +77,7 @@
                                 <label for="type" class="form-label fw-semibold">Type de matière <span
                                         class="text-danger">*</span></label>
                                 <select id="type" name="type"
-                                    class="form-select @error('type') is-invalid @enderror" required>
+                                    class="form-select form-control @error('type') is-invalid @enderror" required>
                                     <option value="">Sélectionner le type</option>
                                     <option value="Theory" {{ old('type') == 'Theory' ? 'selected' : '' }}>Théorique
                                     </option>
@@ -79,7 +92,7 @@
                             <div class="mb-4">
                                 <label for="status" class="form-label fw-semibold">Statut</label>
                                 <select id="status" name="status"
-                                    class="form-select @error('status') is-invalid @enderror">
+                                    class="form-select form-control @error('status') is-invalid @enderror">
                                     <option value="0" {{ old('status') == '0' ? 'selected' : '' }}>Actif</option>
                                     <option value="1" {{ old('status') == '1' ? 'selected' : '' }}>Inactif</option>
                                 </select>

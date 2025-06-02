@@ -5,33 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-// class recours extends Model
-// {
-//     use HasFactory;
-
-//     protected $table = 'recours';
-
-//     protected $fillable = ['student_id', 'objet', 'description'];
-
-//     public function user()
-//     {
-//         return $this->belongsTo(User::class, 'user_id'); // Assurez-vous que 'user_id' est la clé étrangère dans votre table 'recours'
-//     }
-
-//     // Méthode pour récupérer tous les recours
-//     public static function getAllRecours()
-//     {
-//         return self::with('user')->get(); // Cela charge les utilisateurs associés
-//     }
-
-
-
-//     static public function getSingle()
-//     {
-//         return self::find(1);
-//     }
-// }
-
 
 namespace App\Models;
 
@@ -44,7 +17,18 @@ class Recours extends Model
 
     protected $table = 'recours';
 
-    protected $fillable = ['student_id', 'class_id', 'subject_id', 'objet', 'numero', 'session_year', 'academic_year_id'];
+    // protected $fillable = ['student_id', 'class_id', 'subject_id', 'objet', 'numero', 'session_year', 'academic_year_id'];
+    protected $fillable = [
+        'numero',
+        'student_id',
+        'class_id',
+        'academic_year_id',
+        'subject_id',
+        'exam_id',
+        'session',
+        'objet',
+        'session_year'
+    ];
 
     // Relation avec le modèle Student
     public function student()

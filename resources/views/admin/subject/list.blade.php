@@ -125,8 +125,9 @@
                                 <tr>
                                     <th>#</th>
                                     <th>Année Académique</th>
+                                    <th>Code Ue</th>
                                     <th>Nom</th>
-                                    <th>Code</th>
+                                    <th>Code Ec</th>
                                     <th>Type</th>
                                     <th>Statut</th>
                                     <th>Créé par</th>
@@ -141,8 +142,9 @@
                                             {{ ($getRecord->currentPage() - 1) * $getRecord->perPage() + $loop->iteration }}
                                         </td>
                                         <td style="min-width: 200px;">{{ $value->academic_year_name ?? 'N/A' }}</td>
+                                        <td style="min-width: 200px;">{{ $value->ue_code ?? 'N/A' }}</td>
                                         <td style="min-width: 200px;">{{ $value->name }}</td>
-                                        <td style="min-width: 200px;">{{ $value->code }}</td>
+                                        <td style="min-width: 200px;">{{ $value->code ?? 'N/A' }}</td>
                                         <td style="min-width: 200px;">
                                             @if ($value->type == 'Theory')
                                                 <span class="badge bg-info text-dark">Théorique</span>

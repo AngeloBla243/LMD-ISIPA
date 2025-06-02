@@ -219,4 +219,24 @@ class RecoursController extends Controller
 
         return redirect()->back()->with('success', 'Statut du recours mis à jour !');
     }
+
+    public function destroy($id)
+    {
+        $recour = Recours::findOrFail($id);
+
+        // Vérification des permissions
+        if (Auth::user()->user_type != 1) { // Si ce n'est pas un admin
+            $isAllowed = AssignClassTeacherModel::where('teacher_id', Auth::id())
+                ->where('class_id', $recour->class_id)
+                ->where('subject_id', $recour->subject_id)
+                ->exists();
+
+            if (!$isAllowed) {
+                return redirect()->back()->with('error', 'Action non autorisée');
+            }
+        }
+
+        $recour->delete();
+        return redirect()->back()->with('success', 'Recours supprimé avec succès');
+    }
 }

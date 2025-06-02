@@ -13,13 +13,17 @@
             --header-bg-color: #f4f4f4;
             --button-bg-color: #27ae60;
             --button-hover-bg-color: #219653;
-            --red: red;
-            --green: green;
+            --red: #e74c3c;
+            --green: #27ae60;
+            --yellow: #f1c40f;
+            --ue-grey: #ededed;
         }
 
         body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
+            /* font-family: Arial, sans-serif; */
+            font-family: 'Roboto', Helvetica, Arial, sans-serif;
+
+            margin: 25px;
             background-color: var(--main-bg-color);
         }
 
@@ -30,7 +34,6 @@
             background-color: var(--container-bg-color);
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            page-break-inside: avoid;
         }
 
         h1,
@@ -44,7 +47,7 @@
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
-            font-size: 0.9em;
+            font-size: 0.95em;
         }
 
         th,
@@ -80,14 +83,6 @@
             background-color: var(--button-hover-bg-color);
         }
 
-        .note-rouge {
-            color: var(--red);
-        }
-
-        .note-verte {
-            color: var(--green);
-        }
-
         .school-logo {
             width: 100px;
             height: 100px;
@@ -96,7 +91,6 @@
         }
 
         .badge {
-            transition: transform 0.2s;
             display: inline-block;
             padding: 0.25em 0.5em;
             font-size: 0.9em;
@@ -105,39 +99,52 @@
             border-radius: 5px;
         }
 
-        .badge:hover {
-            transform: scale(1.1);
-        }
-
         .badge-adm {
-            background-color: #27ae60;
+            background-color: var(--green);
         }
 
         .badge-comp {
-            background-color: #f1c40f;
+            background-color: var(--yellow);
+            color: #333;
         }
 
         .badge-def {
-            background-color: #e74c3c;
+            background-color: var(--red);
         }
 
-        .badge-aj {
-            background-color: #e67e22;
+        .ue-row {
+            background: var(--ue-grey);
+            color: #222;
+            font-weight: bold;
         }
 
-        .title-section {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-bottom: 20px;
-            text-align: center;
+        .ec-row {
+            background: #fff;
+        }
+
+        .ec-indent {
+            text-align: left;
+            padding-left: 25px;
+        }
+
+        .note-rouge {
+            color: var(--red);
+        }
+
+        .note-verte {
+            color: var(--green);
+        }
+
+        .ue-composee {
+            color: var(--red);
+            font-size: 0.90em;
+            font-weight: bold;
         }
 
         .table-container {
             width: 100%;
             overflow-x: auto;
         }
-
 
         .summary-table {
             width: 100%;
@@ -154,7 +161,31 @@
             min-width: 100px;
         }
 
-        /* Responsive adjustments */
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 0.95em;
+            color: #333;
+            border-top: 1px solid #ddd;
+            padding-top: 15px;
+        }
+
+        .certification {
+            margin-bottom: 10px;
+        }
+
+        .animated-message {
+            opacity: 0;
+            animation: fadeIn 1s forwards;
+            margin-bottom: 20px;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+
         @media (max-width: 768px) {
             body {
                 font-size: 0.9em;
@@ -178,19 +209,15 @@
             .table-container {
                 overflow-x: auto;
                 -webkit-overflow-scrolling: touch;
-                /* Améliore le défilement sur mobile */
             }
-
         }
 
-        /* Print styling */
         @media print {
 
             .header,
             .button {
                 display: none;
             }
-
 
             .container {
                 max-width: 100%;
@@ -202,14 +229,11 @@
                 overflow: visible !important;
             }
 
-            /* Forcer les couleurs d'impression */
             body {
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
             }
 
-
-            /* Forcing print to multiple pages */
             table,
             .summary-table {
                 page-break-inside: auto;
@@ -219,32 +243,29 @@
                 page-break-inside: avoid;
                 page-break-after: auto;
             }
+
+            .footer {
+                border-top: none;
+            }
         }
     </style>
-
-
-
 </head>
 
 <body>
     <div class="container">
-        <!-- Header with print button -->
         <header class="header">
             <button onclick="window.print()"><i class="fas fa-print"></i> Imprimer</button>
         </header>
-
-        <!-- Title section with logo and school details -->
         <div class="title-section" style="text-align:center;padding: 20px 0 30px 0; border-bottom: 2px solid #101c4d;">
             <img src="{{ $getSetting->getLogo() }}" alt="Logo de l'établissement" class="school-logo"
                 style="width:90px; margin-bottom: 15px;"><br>
-
-            <h2 style="margin-bottom: 3px; font-weight: bold; letter-spacing:2px;">RÉPUBLIQUE DÉMOCRATIQUE DU CONGO</h2>
-            <h2 style="margin-bottom: 5px; font-size: 1.4em;">INSTITUT SUPERIEUR D'INFORMATIQUE <br>PROGRAMMATION ET
-                ANALYSE</h2>
+            <h2 style="margin-bottom: 3px; font-weight: bold; letter-spacing:2px;">RÉPUBLIQUE DÉMOCRATIQUE DU CONGO
+            </h2>
+            {{-- <h2 style="margin-bottom: 5px; font-size: 1.4em;">INSTITUT SUPERIEUR D'INFORMATIQUE <br>PROGRAMMATION ET
+                ANALYSE</h2> --}}
+            <h2 style="margin-bottom: 5px; font-size: 1.4em;">{{ $setting->school_name ?? '' }}</h2>
             <h2 style="margin: 0 0 12px 0; color: #0074c7; font-size: 2em;">I.S.I.P.A</h2>
-
-            <hr style="border-top: 1px solid #929292; margin: 15px 0; width: 45%;">
-
+            <hr style="border-top: 1px solid #929292; margin: 15px 0; width: 100%;">
             <h3 style="margin-bottom: 1px; font-weight: 500;">SECRÉTARIAT GÉNÉRAL ACADÉMIQUE</h3>
             <h3 style="margin-bottom: 2px;">{{ $getStudent->departement ?? 'Département inconnu' }}</h3>
             <h3 style="margin-bottom: 2px;">Classe : {{ $getClass->class_name ?? 'Inconnue' }}
@@ -257,227 +278,283 @@
             </h3>
             <h2 style="margin-top: 20px;">Examen : {{ $getExam->name ?? 'Non renseigné' }}</h2>
         </div>
-
-
-        @php
-            $zeroScoreFound = false;
-            $moyenne = 0;
-
-            // Calcul de la moyenne et vérification des scores nuls
-            foreach ($getExamMark as $exam) {
-                $total_score = $exam['total_score'] ?? 0;
-
-                if ($total_score === 0) {
-                    $zeroScoreFound = true;
-                }
-
-                if ($total_score >= 0 && $total_score <= 20) {
-                    $moyenne += $total_score;
-                }
-            }
-
-            // Calcul de la moyenne en prenant en compte uniquement les scores valides
-            $moyenne = $zeroScoreFound ? 0 : min(round($moyenne / count($getExamMark), 2), 20);
-
-        @endphp
-
         <p><strong>Étudiant : {{ $getStudent->name }} {{ $getStudent->last_name }}</strong></p>
-
         @php
-            if (!$zeroScoreFound) {
-                $message = '';
-                $backgroundColor = '';
-
-                if ($moyenne >= 18) {
-                    $message = 'Félicitations pour votre excellent travail !';
-                    $backgroundColor = '#27ae60'; // vert foncé
-                } elseif ($moyenne >= 16) {
-                    $message = 'Très bon travail, continuez ainsi !';
-                    $backgroundColor = '#2ecc71'; // vert
-                } elseif ($moyenne >= 14) {
-                    $message = 'Bon travail, vous êtes sur la bonne voie !';
-                    $backgroundColor = '#f1c40f'; // jaune
-                } elseif ($moyenne >= 12) {
-                    $message = 'Encouragements à persévérer !';
-                    $backgroundColor = '#e67e22'; // orange
-                } elseif ($moyenne >= 10) {
-                    $message = 'Vous avez atteint le niveau de passage.';
-                    $backgroundColor = '#e74c3c'; // rouge clair
+            // Regroupement par UE et calculs
+            $uesData = [];
+            $subjectsWithoutUe = [];
+            $totalCreditsObtenus = 0;
+            $totalCreditsPossibles = 0;
+            $moyenneGenerale = 0;
+            $totalUeValidees = 0;
+            $nombreEchecsLourds = 0;
+            $nombreEchecsLegers = 0;
+            $nbEC = 0;
+            foreach ($getExamMark as $examData) {
+                $subject = \App\Models\SubjectModel::with('ue')->find($examData['subject_id'] ?? null);
+                $ueId = $subject->ue_id ?? null;
+                $note = $examData['total_score'];
+                $credit = $examData['ponde'] ?? 0;
+                if ($ueId && $subject->ue) {
+                    if (!isset($uesData[$ueId])) {
+                        $uesData[$ueId] = [
+                            'ue' => $subject->ue,
+                            'subjects' => [],
+                            'moyenne' => 0,
+                            'credits_obtenus' => 0,
+                            'is_compensated' => false,
+                        ];
+                    }
+                    $uesData[$ueId]['subjects'][] = array_merge($examData, [
+                        'note_finale' => $note,
+                        'subject_obj' => $subject,
+                    ]);
                 } else {
-                    $message = 'Reprenez les matières nécessaires pour améliorer vos résultats.';
-                    $backgroundColor = '#c0392b'; // rouge foncé
+                    $subjectsWithoutUe[] = array_merge($examData, [
+                        'note_finale' => $note,
+                        'subject_obj' => $subject,
+                    ]);
                 }
+            }
+            foreach ($uesData as $ueId => &$ueData) {
+                $totalNotes = 0;
+                $totalCoeff = 0;
+                $ueCredits = $ueData['ue']->credits;
+                foreach ($ueData['subjects'] as $subject) {
+                    $coeff = $subject['ponde'] ?? 1;
+                    $note = $subject['note_finale'];
+                    $totalNotes += $note * $coeff;
+                    $totalCoeff += $coeff;
+                    $nbEC++;
+                    if ($note < 8) {
+                        $nombreEchecsLourds++;
+                    } elseif ($note < 10) {
+                        $nombreEchecsLegers++;
+                    }
+                }
+                $moyenneUe = $totalCoeff > 0 ? $totalNotes / $totalCoeff : 0;
+                $ueData['moyenne'] = round($moyenneUe, 2);
+                if ($moyenneUe >= 10) {
+                    $ueData['credits_obtenus'] = $ueCredits;
+                    $totalCreditsObtenus += $ueCredits;
+                    $totalUeValidees++;
+                } elseif ($moyenneUe >= 8) {
+                    $ueData['is_compensated'] = true;
+                }
+                $totalCreditsPossibles += $ueCredits;
+                $moyenneGenerale += $ueData['moyenne'];
+            }
+            unset($ueData);
+            foreach ($subjectsWithoutUe as $subject) {
+                $credits = $subject['ponde'];
+                $note = $subject['note_finale'];
+                $nbEC++;
+                if ($note >= 10) {
+                    $totalCreditsObtenus += $credits;
+                }
+                $totalCreditsPossibles += $credits;
+                $moyenneGenerale += $note;
+                if ($note < 8) {
+                    $nombreEchecsLourds++;
+                } elseif ($note < 10) {
+                    $nombreEchecsLegers++;
+                }
+            }
+            $totalUes = count($uesData) + count($subjectsWithoutUe);
+            // $moyenneGenerale = $totalUes > 0 ? round($moyenneGenerale / $totalUes, 2) : 0;
+            // Initialisation des variables pour le calcul pondéré
+            $totalNotePonderee = 0;
+            $totalCreditsPourMoyenne = 0;
 
-                echo "<div style='background-color: $backgroundColor; color: #fff; padding: 10px; border-radius: 5px; margin-top: 10px; text-align: center; font-weight: bold;'>$message</div>";
+            // Calcul pour les UE
+            foreach ($uesData as $ueData) {
+                $creditsUE = $ueData['ue']->credits;
+                $moyenneUE = $ueData['moyenne'];
+
+                $totalNotePonderee += $moyenneUE * $creditsUE;
+                $totalCreditsPourMoyenne += $creditsUE;
+            }
+
+            // Calcul pour les EC autonomes (considérés comme UE de 1 crédit)
+            foreach ($subjectsWithoutUe as $ec) {
+                $noteEC = $ec['note_finale'];
+                $creditsEC = $ec['ponde']; // Utilisation de ponde comme crédits
+
+                $totalNotePonderee += $noteEC * $creditsEC;
+                $totalCreditsPourMoyenne += $creditsEC;
+            }
+
+            // Calcul final de la moyenne générale
+            $moyenneGenerale =
+                $totalCreditsPourMoyenne > 0 ? round($totalNotePonderee / $totalCreditsPourMoyenne, 2) : 0;
+
+            //POURCENTAGE
+            $pourcentageCredits =
+                $totalCreditsPossibles > 0 ? ($totalCreditsObtenus / $totalCreditsPossibles) * 100 : 0;
+            $decision = $pourcentageCredits >= 75 ? 'VAL' : 'NVL';
+            $mention = 'Insuffisant';
+            if ($moyenneGenerale >= 16) {
+                $mention = 'Très Bien';
+            } elseif ($moyenneGenerale >= 14) {
+                $mention = 'Bien';
+            } elseif ($moyenneGenerale >= 12) {
+                $mention = 'Assez Bien';
+            } elseif ($moyenneGenerale >= 10) {
+                $mention = 'Passable';
+            }
+            // Message d'animation
+$message = '';
+$backgroundColor = '';
+$icon = '';
+if ($moyenneGenerale >= 18) {
+    $message = 'Félicitations pour votre excellent travail !';
+    $backgroundColor = '#27ae60';
+    $icon = '🥇';
+} elseif ($moyenneGenerale >= 16) {
+    $message = 'Très bon travail, continuez ainsi !';
+    $backgroundColor = '#2ecc71';
+    $icon = '🏅';
+} elseif ($moyenneGenerale >= 14) {
+    $message = 'Bon travail, vous êtes sur la bonne voie !';
+    $backgroundColor = '#f1c40f';
+    $icon = '👍';
+} elseif ($moyenneGenerale >= 12) {
+    $message = 'Encouragements à persévérer !';
+    $backgroundColor = '#e67e22';
+    $icon = '💪';
+} elseif ($moyenneGenerale >= 10) {
+    $message = 'Vous avez atteint le niveau de passage.';
+    $backgroundColor = '#e74c3c';
+    $icon = '✔️';
+} else {
+    $message = 'Reprenez les matières nécessaires pour améliorer vos résultats.';
+    $backgroundColor = '#c0392b';
+    $icon = '⚠️';
             }
         @endphp
-
-        <!-- Academic results table -->
+        <div class="animated-message"
+            style="background:{{ $backgroundColor }};color:#fff;padding:12px 0;border-radius:6px;margin:15px 0 20px 0;text-align:center;font-weight:bold;transition:background 0.4s;">
+            <span style="font-size:1.2em;margin-right:7px;">{!! $icon !!}</span> {!! $message !!}
+        </div>
         <table>
             <thead>
                 <tr>
-                    <th>Code UE</th>
+                    <th rowspan="2" style="background:#fff;">Code UE</th>
+                    <th rowspan="2" style="background:#fff;">Intitulé UE/EC</th>
+                    <th colspan="2" style="background:#fff;">Crédit</th>
+                    <th colspan="2" style="background:#fff;">Note / 20</th>
+                    <th rowspan="2" style="background:#fff;">Décision</th>
+                </tr>
+                <tr>
+                    {{-- <th style="background:#fff;"></th>
+                    <th style="background:#fff;"></th> --}}
+                    <th>EC</th>
                     <th>UE</th>
-                    <th>Crédit UC</th>
-                    <th>Note / 20</th>
-                    <th>Décision</th>
+                    <th>EC</th>
+                    <th>UE</th>
+                    {{-- <th style="background:#fff;"></th> --}}
                 </tr>
             </thead>
             <tbody>
-                @php
-                    $Grandtotals_score = 0;
-                    $full_marks = 0;
-                    $credits_obtenus = 0;
-                    $echefsLourd = 0;
-                    $echefsLeger = 0;
-                    $hasFailed = false;
-                    $zeroScoreFound = false;
-                    $total_scores = 0;
-                    $valid_scores_count = 0;
-                @endphp
-
-                @foreach ($getExamMark as $exam)
-                    @php
-                        $total_score = $exam['total_score'] ?? 0;
-                        $Grandtotals_score += $exam['totals_score'] ?? 0;
-                        $full_marks += $exam['ponde'];
-
-                        if ($total_score === 0) {
-                            $zeroScoreFound = true;
-                        }
-
-                        if ($total_score < 10) {
-                            $echefsLourd++;
-                            $hasFailed = true;
-                        }
-
-                        if ($total_score >= 10) {
-                            $credits_obtenus += $exam['ponde'] ?? 0;
-                        }
-
-                        if ($total_score >= 0 && $total_score <= 20) {
-                            $total_scores += $total_score;
-                            $valid_scores_count++;
-                        }
-                    @endphp
-                    <tr>
-                        <td>{{ $exam['subject_code'] }}</td>
-                        <td>{{ $exam['subject_name'] }}</td>
-                        <td>{{ $exam['ponde'] }}</td>
-                        <td
-                            class="{{ $total_score === 0 ? 'note-rouge' : ($total_score < 10 ? 'note-rouge' : 'note-verte') }}">
-                            {{ $total_score === 0 ? 'ND' : $total_score }}
+                @foreach ($uesData as $ueId => $ueData)
+                    <tr class="ue-row">
+                        <td><strong>{{ $ueData['ue']->code }}</strong></td>
+                        <td>
+                            <strong>{{ $ueData['ue']->name }}</strong>
+                            @if (count($ueData['subjects']) > 1)
+                                <div class="ue-composee"></div>
+                            @endif
                         </td>
-                        <td class="{{ $total_score < 10 ? 'note-rouge' : 'note-verte' }}">
-                            {{ $total_score < 10 ? 'NVL' : 'VAL' }}
+                        <td></td>
+                        <td rowspan="{{ count($ueData['subjects']) + 1 }}">
+                            <strong>{{ $ueData['ue']->credits }}</strong>
+                        </td>
+                        <td></td>
+                        <td rowspan="{{ count($ueData['subjects']) + 1 }}">
+                            {{-- <strong>{{ $ueData['moyenne'] }}</strong> --}}
+                            <strong>{{ round($ueData['moyenne'], 0, PHP_ROUND_HALF_UP) }}</strong>
+                        </td>
+                        <td rowspan="{{ count($ueData['subjects']) + 1 }}" style="background:#fff;">
+                            @if ($ueData['is_compensated'])
+                                <span class="badge
+                            badge-comp">Compensée</span>
+                            @else
+                                <span class="badge {{ $ueData['moyenne'] >= 10 ? 'badge-adm' : 'badge-def' }}">
+                                    {{ $ueData['moyenne'] >= 10 ? 'VAL' : 'NVL' }}
+                                </span>
+                            @endif
+                        </td>
+                    </tr>
+                    @foreach ($ueData['subjects'] as $subject)
+                        <tr class="ec-row">
+                            <td></td>
+                            <td class="ec-indent">→ {{ $subject['subject_name'] }}</td>
+                            <td>{{ $subject['ponde'] }}</td>
+                            {{-- <td></td> --}}
+                            <td class="{{ $subject['note_finale'] < 10 ? 'note-rouge' : 'note-verte' }}">
+                                {{ $subject['note_finale'] }}
+                            </td>
+
+                        </tr>
+                    @endforeach
+                @endforeach
+                @foreach ($subjectsWithoutUe as $subject)
+                    <tr class="ue-row">
+                        <td>{{ $subject['subject_code'] ?? 'AUTO' }}</td>
+                        <td><strong>{{ $subject['subject_name'] }} (UE Autonome)</strong></td>
+                        <td style="background:#fff;"></td>
+                        <td>{{ $subject['ponde'] }}</td>
+                        <td class="{{ $subject['note_finale'] < 10 ? 'note-rouge' : 'note-verte' }}"
+                            style="background:#fff;">
+                            {{-- {{ $subject['note_finale'] }} --}}
+                        </td>
+                        <td>{{ $subject['note_finale'] }}</td>
+                        <td style="background:#fff;">
+                            <span class="badge {{ $subject['note_finale'] >= 10 ? 'badge-adm' : 'badge-def' }}">
+                                {{ $subject['note_finale'] >= 10 ? 'VAL' : 'NVL' }}
+                            </span>
                         </td>
                     </tr>
                 @endforeach
             </tbody>
         </table>
-
-        <!-- Summary table for credits and decision -->
         <div class="table-container">
             <table class="summary-table">
                 <tr>
-                    <th>Total des crédits obtenu / {{ $full_marks }}</th>
+                    <th>Total crédits obtenus / {{ $totalCreditsPossibles }}</th>
                     <th>Moyenne / 20</th>
                     <th>Mention</th>
-                    <th>Nombre d'echec(s)</th>
+                    <th>Nb EC à reprendre</th>
                     <th>Décision</th>
                 </tr>
                 <tr>
-                    <td>{{ $credits_obtenus > 0 ? $credits_obtenus : 'ND' }}</td>
+                    <td>{{ $totalCreditsObtenus }}</td>
+                    {{-- <td>{{ $moyenneGenerale }}</td> --}}
+                    <td>{{ round($moyenneGenerale, 0, PHP_ROUND_HALF_UP) }}</td>
+                    <td>{{ $mention }}</td>
+                    <td>{{ $nombreEchecsLourds + $nombreEchecsLegers }}</td>
                     <td>
-                        @php
-                            if (!$zeroScoreFound) {
-                                $moyenne = min(round($total_scores / $valid_scores_count, 2), 20);
-                                echo $moyenne;
-                            } else {
-                                echo 'ND';
-                            }
-                        @endphp
-                    </td>
-                    <td>
-                        @if (!$zeroScoreFound)
-                            @php
-                                if ($moyenne >= 18) {
-                                    echo 'Excellent';
-                                } elseif ($moyenne >= 16) {
-                                    echo 'Très Bien';
-                                } elseif ($moyenne >= 14) {
-                                    echo 'Bien';
-                                } elseif ($moyenne >= 12) {
-                                    echo 'Assez Bien';
-                                } elseif ($moyenne >= 10) {
-                                    echo 'Passable';
-                                } elseif ($moyenne >= 8) {
-                                    echo 'Insuffisant';
-                                } else {
-                                    echo 'Insatisfaisant';
-                                }
-                            @endphp
+                        @if ($decision == 'VAL')
+                            <span class="badge badge-adm">VAL</span>
                         @else
-                            ND
+                            <span class="badge badge-def">NVL</span>
                         @endif
-                    </td>
-                    <td>{{ $echefsLourd }}</td>
-                    <td>
-                        @php
-                            if ($zeroScoreFound) {
-                                echo 'DEF'; // Manque de note
-                            } elseif ($credits_obtenus == $full_marks) {
-                                echo 'ADM'; // Admis avec capitalisation définitive des crédits
-                            } elseif ($credits_obtenus >= 0.75 * $full_marks) {
-                                echo 'COMP'; // Admis avec compensation des notes
-                            } else {
-                                echo 'AJ'; // Ajourné ou non admis
-                            }
-                        @endphp
                     </td>
                 </tr>
             </table>
         </div>
-
         <footer class="footer">
             <div class="certification">
                 <p><strong>Certification :</strong> Je certifie que les informations ci-dessus sont exactes.</p>
-                <p>
+                {{-- <p>
                     Décision :
-                    @php
-                        if ($zeroScoreFound) {
-                            $decision = 'DEF';
-                            $icon = '<i class="fa fa-times-circle" style="color: #e74c3c;"></i>'; // Icône pour défaillant
-                            $badgeColor = 'badge-def';
-                            $badgeText = 'Défaillant';
-                        } elseif ($credits_obtenus == $full_marks) {
-                            $decision = 'ADM';
-                            $icon = '<i class="fa fa-check-circle" style="color: #27ae60;"></i>'; // Icône pour admis avec capitalisation
-                            $badgeColor = 'badge-adm';
-                            $badgeText = 'Admis avec Capitalisation';
-                        } elseif ($credits_obtenus >= 0.75 * $full_marks) {
-                            $decision = 'COMP';
-                            $icon = '<i class="fa fa-balance-scale" style="color: #f1c40f;"></i>'; // Icône pour admis avec compensation
-                            $badgeColor = 'badge-comp';
-                            $badgeText = 'Admis avec Compensation';
-                        } else {
-                            $decision = 'AJ';
-                            $icon = '<i class="fa fa-exclamation-circle" style="color: #e67e22;"></i>'; // Icône pour ajourné
-                            $badgeColor = 'badge-aj';
-                            $badgeText = 'Ajourné';
-                        }
-                        echo $icon . " <span class='badge $badgeColor'>$decision - $badgeText</span>";
-                    @endphp
-                </p>
-                <!-- Affichage des crédits accumulés pour le cycle -->
-                <p>Crédits accumulés pour le cycle en cours (Licence {{ $getClass->class_name }}) :
-                    <b>{{ $credits_obtenus }}/{{ $full_marks }}</b>
-                </p>
-
-                <p>Fait à {{ now()->format('d/m/Y') }}</p>
-
-                <!-- Zone pour le saut de l'établissement -->
-                <p>Saut de l'établissement : ______________________</p>
+                    @if ($decision == 'VAL')
+                        <span class="badge badge-adm">Admis</span>
+                    @else
+                        <span class="badge badge-def">Ajourné</span>
+                    @endif
+                </p> --}}
+                <p style="margin-top: 10px;">Fait à Kinshasa, le {{ now()->format('d/m/Y') }}</p>
             </div>
         </footer>
     </div>

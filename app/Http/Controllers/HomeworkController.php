@@ -248,29 +248,106 @@ class HomeworkController extends Controller
 
 
 
+    // public function addTeacher()
+    // {
+    //     // Récupérer les classes assignées à l'enseignant connecté
+    //     $assignedClasses = AssignClassTeacherModel::getMyClassSubjectGroup(Auth::user()->id);
+
+    //     // Récupérer les IDs de classes assignées
+    //     $class_ids = $assignedClasses->pluck('class_id')->toArray();
+
+    //     // Récupérer les matières assignées aux classes de cet enseignant
+    //     $assignedSubjects = SubjectModel::whereIn('id', function ($query) use ($class_ids) {
+    //         $query->select('subject_id')
+    //             ->from('assign_class_teacher')
+    //             ->whereIn('class_id', $class_ids)
+    //             ->where('is_delete', 0); // Optionnel : vérifie si l'assignation n'est pas supprimée
+    //     })->get();
+
+    //     // Passer les données à la vue
+    //     $data['getClass'] = $assignedClasses; // Garder les classes assignées si besoin
+    //     $data['getSubjects'] = $assignedSubjects; // Passer les matières assignées
+    //     $data['header_title'] = 'Add New Homework';
+
+    //     return view('teacher.homework.add', $data);
+    // }
     public function addTeacher()
     {
-        // Récupérer les classes assignées à l'enseignant connecté
-        $assignedClasses = AssignClassTeacherModel::getMyClassSubjectGroup(Auth::user()->id);
+        // Récupérer l'année académique active ou sélectionnée
+        $academicYearId = session('academic_year_id', AcademicYear::where('is_active', true)->value('id'));
 
-        // Récupérer les IDs de classes assignées
+        // 1. Classes assignées à l'enseignant pour l'année courante
+        $assignedClasses = AssignClassTeacherModel::where('teacher_id', Auth::id())
+            ->where('academic_year_id', $academicYearId)
+            ->where('is_delete', 0)
+            ->with(['class', 'subject'])
+            ->get();
+
+        // 2. Extraction des IDs de classes
         $class_ids = $assignedClasses->pluck('class_id')->toArray();
 
-        // Récupérer les matières assignées aux classes de cet enseignant
-        $assignedSubjects = SubjectModel::whereIn('id', function ($query) use ($class_ids) {
+        // 3. Récupération des matières assignées avec filtre académique
+        $assignedSubjects = SubjectModel::whereIn('id', function ($query) use ($class_ids, $academicYearId) {
             $query->select('subject_id')
                 ->from('assign_class_teacher')
                 ->whereIn('class_id', $class_ids)
-                ->where('is_delete', 0); // Optionnel : vérifie si l'assignation n'est pas supprimée
+                ->where('academic_year_id', $academicYearId) // Filtre académique
+                ->where('is_delete', 0);
         })->get();
 
-        // Passer les données à la vue
-        $data['getClass'] = $assignedClasses; // Garder les classes assignées si besoin
-        $data['getSubjects'] = $assignedSubjects; // Passer les matières assignées
-        $data['header_title'] = 'Add New Homework';
+        // 4. Préparation des données pour la vue
+        $data = [
+            'getClass' => $assignedClasses,
+            'getSubjects' => $assignedSubjects,
+            'academicYear' => AcademicYear::find($academicYearId),
+            'header_title' => 'Add New Homework'
+        ];
 
         return view('teacher.homework.add', $data);
     }
+
+
+
+    public function getSubjectsByClass(Request $request)
+    {
+        $classId = $request->class_id;
+        $subjects = AssignClassTeacherModel::where('class_id', $classId)
+            ->where('teacher_id', Auth::user()->id)
+            ->where('is_delete', 0)
+            ->with('subject')
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'id' => $item->subject->id,
+                    'name' => $item->subject->name
+                ];
+            });
+        return response()->json($subjects);
+    }
+    // edit
+    public function getSubjectByClass(Request $request)
+    {
+        $classId = $request->class_id;
+        $teacherId = Auth::id();
+
+        $subjects = AssignClassTeacherModel::with('subject')
+            ->where([
+                'class_id' => $classId,
+                'teacher_id' => $teacherId,
+                'is_delete' => 0
+            ])
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'id' => $item->subject->id,
+                    'name' => $item->subject->name . ' (' . $item->subject->code . ')'
+                ];
+            });
+
+        return response()->json($subjects);
+    }
+
+
 
     public function insertTeacher(Request $request)
     {
@@ -298,15 +375,49 @@ class HomeworkController extends Controller
     }
 
 
+    // public function editTeacher($id)
+    // {
+    // $getRecord = HomeworkModel::getSingle($id);
+    // $data['getRecord'] = $getRecord;
+    // $data['getSubject'] = ClassSubjectModel::MySubject($getRecord->class_id);
+    // $data['getClass'] = AssignClassTeacherModel::getMyClassSubjectGroup(Auth::user()->id);
+    // $data['header_title'] = 'Edit Homework';
+    // return view('teacher.homework.edit', $data);
+    // }
+
     public function editTeacher($id)
     {
-        $getRecord = HomeworkModel::getSingle($id);
-        $data['getRecord'] = $getRecord;
-        $data['getSubject'] = ClassSubjectModel::MySubject($getRecord->class_id);
-        $data['getClass'] = AssignClassTeacherModel::getMyClassSubjectGroup(Auth::user()->id);
-        $data['header_title'] = 'Edit Homework';
-        return view('teacher.homework.edit', $data);
+        $teacher = Auth::user();
+        $homework = HomeworkModel::findOrFail($id);
+
+        // 1. Récupérer l'année académique du devoir
+        $academicYearId = $homework->academic_year_id;
+
+        // 2. Classes assignées à l'enseignant (pour le select)
+        $assignedClasses = AssignClassTeacherModel::getMyClassSubjectGroup($teacher->id);
+
+        // 3. Matières assignées pour la classe du devoir (filtrage académique + enseignant)
+        $assignedSubjects = SubjectModel::whereIn('id', function ($query) use ($homework, $teacher) {
+            $query->select('subject_id')
+                ->from('assign_class_teacher')
+                ->where('class_id', $homework->class_id)
+                ->where('teacher_id', $teacher->id)
+                ->where('academic_year_id', $homework->academic_year_id)
+                ->where('is_delete', 0);
+        })->get();
+
+        return view('teacher.homework.edit', [
+            'getRecord' => $homework,
+            'getSubjects' => $assignedSubjects,
+            'getClass' => $assignedClasses,
+            'academicYear' => AcademicYear::find($academicYearId),
+            'header_title' => 'Modifier le devoir'
+        ]);
     }
+
+
+
+
 
     public function updateTeacher(Request $request, $id)
     {

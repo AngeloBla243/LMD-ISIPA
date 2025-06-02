@@ -39,6 +39,20 @@
                                 @enderror
                             </div>
 
+                            <div class="form-group">
+                                <label>UE <span class="text-danger">*</span></label>
+                                <select name="ue_id" class="form-control" required>
+                                    <option value="">Sélectionner une UE</option>
+                                    @foreach ($ueList as $ue)
+                                        <option value="{{ $ue->id }}"
+                                            {{ old('ue_id', $getRecord->ue_id) == $ue->id ? 'selected' : '' }}>
+                                            {{ $ue->code }} - {{ $ue->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+
                             <div class="mb-4">
                                 <label for="name" class="form-label fw-semibold">Nom de la matière <span
                                         class="text-danger">*</span></label>

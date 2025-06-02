@@ -8,6 +8,9 @@ use App\Exports\ExportTeacher;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use App\Models\AcademicYear;
+use Barryvdh\DomPDF\Facade\PDF;
+use App\Models\ThesisSubmissio;
 use Maatwebsite\Excel\Facades\Excel;
 
 class TeacherController extends Controller
@@ -153,5 +156,58 @@ class TeacherController extends Controller
         } else {
             abort(404);
         }
+    }
+
+
+    // public function myStudents()
+    // {
+    //     $teacher = Auth::user();
+
+    //     $submissions = ThesisSubmissio::with(['student.classes', 'academicYear'])
+    //         ->where(function ($query) use ($teacher) {
+    //             $query->where('encadreur_id', $teacher->id)
+    //                 ->orWhere('directeur_id', $teacher->id);
+    //         })
+    //         ->orderBy('created_at', 'desc')
+    //         ->get();
+
+    //     return view('teacher.encadres', compact('submissions'));
+    // }
+
+    public function myStudents()
+    {
+        $teacher = Auth::user();
+        $allAcademicYears = AcademicYear::orderBy('start_date', 'desc')->get();
+
+        // Récupération de l'année académique active ou celle sélectionnée
+        $academicYearId = session('academic_year_id', $allAcademicYears->where('is_active', 1)->first()?->id);
+        $academicYear = AcademicYear::find($academicYearId);
+
+        $submissions = ThesisSubmissio::with(['student.classes', 'academicYear'])
+            ->where(function ($query) use ($teacher) {
+                $query->where('encadreur_id', $teacher->id)
+                    ->orWhere('directeur_id', $teacher->id);
+            })
+            ->where('academic_year_id', $academicYear->id)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('teacher.encadres', compact('submissions', 'academicYear', 'allAcademicYears'));
+    }
+
+    public function exportEncadresPDF()
+    {
+        $teacher = Auth::user();
+
+        $submissions = ThesisSubmissio::with(['student.classes', 'academicYear'])
+            ->where(function ($query) use ($teacher) {
+                $query->where('encadreur_id', $teacher->id)
+                    ->orWhere('directeur_id', $teacher->id);
+            })
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $pdf = PDF::loadView('teacher.encadres-pdf', compact('submissions'));
+        return $pdf->download('mes_encadres_' . now()->format('Ymd') . '.pdf');
     }
 }

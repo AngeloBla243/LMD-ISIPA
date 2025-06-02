@@ -15,7 +15,8 @@ class SubjectModel extends Model
         'name',
         'code',
         'type',
-        'academic_year_id', // Ajouté
+        'academic_year_id',
+        'ue_id', // Ajouté// Ajouté
         'status',
         'created_by'
     ];
@@ -62,10 +63,16 @@ class SubjectModel extends Model
         $return = SubjectModel::select(
             'subject.*',
             'users.name as created_by_name',
-            'academic_years.name as academic_year_name'
+            'academic_years.name as academic_year_name',
+            'ue.code as ue_code', // Ajout du code UE
+            'ue.name as ue_name'  // (optionnel) Ajout du nom UE
         )
-            ->join('users', 'users.id', 'subject.created_by')
-            ->leftJoin('academic_years', 'academic_years.id', '=', 'subject.academic_year_id'); // <-- Ajout
+            ->join('users', 'users.id', '=', 'subject.created_by')
+            ->leftJoin('academic_years', 'academic_years.id', '=', 'subject.academic_year_id')
+            ->leftJoin('ue', 'ue.id', '=', 'subject.ue_id') // Jointure UE
+            ->where('subject.is_delete', '=', 0);
+
+
 
         if (!empty(Request::get('name'))) {
             $return = $return->where('subject.name', 'like', '%' . Request::get('name') . '%');
@@ -131,5 +138,12 @@ class SubjectModel extends Model
     public function academicYear()
     {
         return $this->belongsTo(AcademicYear::class, 'academic_year_id');
+    }
+
+    // app/Models/SubjectModel.php
+
+    public function ue()
+    {
+        return $this->belongsTo(UeModel::class, 'ue_id');
     }
 }
