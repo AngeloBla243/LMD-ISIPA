@@ -68,7 +68,7 @@
                 <div class="card shadow-sm rounded-4 border-0 mb-4">
                     <div class="card-header bg-primary text-white rounded-top-4">
                         <h3 class="card-title mb-0">
-                            <i class="fa-solid fa-magnifying-glass me-2"></i>Recherche Enseignant
+                            <i class="fa-solid fa-magnifying-glass me-2"></i> Recherche Enseignant
                         </h3>
                     </div>
                     <form method="get" action="">
@@ -155,7 +155,7 @@
                     <div
                         class="card-header bg-primary text-white rounded-top-4 d-flex justify-content-between align-items-center">
                         <h3 class="card-title mb-0">
-                            <i class="fa-solid fa-chalkboard-user me-2"></i>Liste des Enseignants
+                            <i class="fa-solid fa-chalkboard-user me-2"></i> Liste des Enseignants
                         </h3>
                         <form action="{{ url('admin/teacher/export_excel') }}" method="post"
                             class="d-inline-block ms-auto">

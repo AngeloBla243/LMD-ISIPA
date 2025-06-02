@@ -236,13 +236,23 @@
 
 
                                                                     <div style="margin-bottom: 10px;">
-                                                                        <button type="button"
+                                                                        {{-- <button type="button"
                                                                             class="btn btn-primary SaveSingleSubject"
-                                                                            id="{{ $student->id }}"
+                                                                            data-student-id="{{ $student->id }}"
                                                                             data-val="{{ $subject->subject_id }}"
                                                                             data-exam="{{ Request::get('exam_id') }}"
                                                                             data-schedule="{{ $subject->id }}"
-                                                                            data-class="{{ Request::get('class_id') }}">Save</button>
+                                                                            data-class="{{ Request::get('class_id') }}">Save</button> --}}
+
+                                                                        <button type="button"
+                                                                            class="btn btn-primary SaveSingleSubject"
+                                                                            data-student-id="{{ $student->id }}"
+                                                                            data-subject-id="{{ $subject->subject_id }}"
+                                                                            data-exam-id="{{ Request::get('exam_id') }}"
+                                                                            data-schedule-id="{{ $subject->id }}"
+                                                                            data-class-id="{{ Request::get('class_id') }}">
+                                                                            Save
+                                                                        </button>
 
 
 
@@ -272,9 +282,10 @@
                                                             @endforeach
                                                             <td style="min-width: 230px;">
                                                                 <button type="submit"
-                                                                    class="btn btn-success btn-sm shadow-sm">
+                                                                    class="btn btn-success btn-sm shadow-sm SubmitForm">
                                                                     <i class="fas fa-save"></i> Enregistrer
                                                                 </button>
+
 
                                                                 <a class="btn btn-primary btn-sm shadow-sm"
                                                                     target="_blank"
@@ -354,79 +365,91 @@
 @endsection
 
 @section('script')
-    <script type="text/javascript">
-        $('.SubmitForm').submit(function(e) {
-            e.preventDefault();
-            $.ajax({
-                type: "POST",
-                url: "{{ url('admin/examinations/submit_marks_register') }}",
-                data: $(this).serialize(),
-                dataType: "json",
-                success: function(data) {
-                    data.message.toLowerCase();
-                    if (data.message.includes('successfully saved')) {
-                        Swal.fire({
-                            title: 'Success!',
-                            text: data.message,
-                            icon: 'success',
-                            confirmButtonText: 'OK'
-                        }).then(() => {
-                            location.reload();
-                        });
-                    } else if (data.message.includes('Some Subject mark greater than full mark')) {
-                        Swal.fire({
-                            title: 'Error!',
-                            text: data.message,
-                            icon: 'error',
-                            confirmButtonText: 'OK'
-                        });
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        $(document).ready(function() {
+            // Enregistrement global
+            $('.SubmitForm').submit(function(e) {
+                e.preventDefault();
+                $.ajax({
+                    type: "POST",
+                    url: "{{ url('admin/examinations/submit_marks_register') }}",
+                    data: $(this).serialize(),
+                    dataType: "json",
+                    success: function(response) {
+                        if (response.success) {
+                            Swal.fire({
+                                title: 'Succès !',
+                                text: response.message,
+                                icon: 'success',
+                                confirmButtonText: 'OK'
+                            }).then(() => {
+                                window.location.reload();
+                            });
+                        } else {
+                            Swal.fire({
+                                title: 'Attention !',
+                                text: response.message,
+                                icon: 'warning',
+                                confirmButtonText: 'OK'
+                            });
+                        }
                     }
-                }
+                });
             });
-        });
 
-        $('.SaveSingleSubject').click(function(e) {
-            var student_id = $(this).attr('id');
-            var subject_id = $(this).attr('data-val');
-            var exam_id = $(this).attr('data-exam');
-            var class_id = $(this).attr('data-class');
-            var id = $(this).attr('data-schedule');
-            var class_work = $('#class_work_' + student_id + subject_id).val();
-            var exam = $('#exam_' + student_id + subject_id).val();
+            // Enregistrement individuel
+            $('.SaveSingleSubject').click(function() {
+                // Récupération des données via data() (méthode correcte)
+                const studentId = $(this).data('student-id');
+                const subjectId = $(this).data('subject-id');
+                const examId = $(this).data('exam-id');
+                const classId = $(this).data('class-id');
+                const id = $(this).data('schedule-id'); // Nom d'attribut corrigé
 
-            $.ajax({
-                type: "POST",
-                url: "{{ url('admin/examinations/single_submit_marks_register') }}",
-                data: {
-                    '_token': "{{ csrf_token() }}",
-                    id: id,
-                    student_id: student_id,
-                    subject_id: subject_id,
-                    exam_id: exam_id,
-                    class_id: class_id,
-                    class_work: class_work,
-                    exam: exam,
-                },
-                dataType: "json",
-                success: function(data) {
-                    data.message.toLowerCase();
-                    if (data.message.includes('successfully saved')) {
+                // Sélecteurs avec underscore pour correspondre au HTML
+                const classWork = $('#class_work_' + studentId + subjectId).val() || 0;
+                const examScore = $('#exam_' + studentId + subjectId).val() || 0;
+
+                $.ajax({
+                    type: "POST",
+                    url: "{{ url('admin/examinations/single_submit_marks_register') }}",
+                    data: {
+                        '_token': "{{ csrf_token() }}",
+                        'id': id, // Clé corrigée pour correspondre au contrôleur
+                        'student_id': studentId,
+                        'subject_id': subjectId,
+                        'exam_id': examId,
+                        'class_id': classId,
+                        'class_work': parseFloat(classWork), // Conversion en nombre
+                        'exam': parseFloat(examScore)
+                    },
+                    dataType: "json",
+                    success: function(response) {
+                        if (response.success) {
+                            Swal.fire({
+                                title: 'Succès !',
+                                text: response.message,
+                                icon: 'success',
+                                confirmButtonText: 'OK'
+                            });
+                        } else {
+                            Swal.fire({
+                                title: 'Erreur !',
+                                text: response.message,
+                                icon: 'error',
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    },
+                    error: function(xhr) {
                         Swal.fire({
-                            title: 'Success!',
-                            text: data.message,
-                            icon: 'success',
-                            confirmButtonText: 'OK'
-                        });
-                    } else if (data.message.includes('greather than full mark')) {
-                        Swal.fire({
-                            title: 'Error!',
-                            text: data.message,
-                            icon: 'error',
-                            confirmButtonText: 'OK'
+                            title: 'Erreur technique',
+                            text: xhr.responseJSON?.message || 'Échec de la requête',
+                            icon: 'error'
                         });
                     }
-                }
-
+                });
             });
         });
     </script>

@@ -123,6 +123,20 @@
                                         </div>
                                     </div>
 
+                                    <div class="form-group">
+                                        <label>Session <span class="text-danger">*</span></label>
+                                        <select name="session" class="form-control" required>
+                                            <option value="1">Session 1 (Ordinaire)</option>
+                                            <option value="2">Session 2 (Rattrapage)</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>
+                                            <input type="checkbox" name="is_active" value="1"> Activer cette session
+                                        </label>
+                                    </div>
+
+
                                     <!-- Note -->
                                     <div class="mb-4">
                                         <label for="note" class="form-label fw-semibold">Note</label>

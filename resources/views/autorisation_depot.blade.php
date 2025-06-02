@@ -79,8 +79,13 @@
         <h3>SECRÉTARIAT GÉNÉRAL ACADÉMIQUE</h3>
         <h3>Autorisation de dépôt</h3>
         <h3>
-            Classe : {{ $class ? $class->name : '---' }}{{ $opt ? ' (' . $opt . ')' : '' }}
+            Classe : {{ $class->name ?? 'N/A' }}
+            @if ($class && $class->opt)
+                <span style="font-weight: normal;">({{ $class->opt }})</span>
+            @endif
         </h3>
+
+
         <h3>Session : {{ now()->year }}</h3>
     </div>
     <hr>

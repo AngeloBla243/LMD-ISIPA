@@ -132,6 +132,28 @@ class AssignClassTeacherModel extends Model
             ->where('assign_class_teacher.status', 0)
             ->get();
     }
+    public static function MyClassSubjectGroup($teacherId, $academicYearId = null)
+    {
+        return self::select(
+            'assign_class_teacher.*',
+            'class.name as class_name',
+            'class.opt as class_opt',
+            'class.id as class_id',
+            'subject.name as subject_name',
+            'subject.code as subject_code',
+            'subject.id as subject_id'
+        )
+            ->join('class', 'assign_class_teacher.class_id', '=', 'class.id')
+            ->join('subject', 'assign_class_teacher.subject_id', '=', 'subject.id')
+            ->where('assign_class_teacher.teacher_id', $teacherId)
+            ->when($academicYearId, function ($query) use ($academicYearId) {
+                $query->where('assign_class_teacher.academic_year_id', $academicYearId);
+            })
+            ->where('assign_class_teacher.is_delete', 0)
+            ->where('assign_class_teacher.status', 0)
+            ->distinct()
+            ->get();
+    }
 
 
 

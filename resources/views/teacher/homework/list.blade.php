@@ -1,225 +1,141 @@
 @extends('layouts.app')
-@section('style')
-    <style type="text/css">
-        .styled-table {
-            border-collapse: collapse;
-            margin: 25px 0;
-            min-width: 400px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
-            border-radius: 8px;
-            overflow: hidden;
-        }
 
-        .styled-table thead tr {
-            background-color: #009879;
-            color: #ffffff;
-            text-align: left;
-        }
-
-        .styled-table th,
-        .styled-table td {
-            padding: 12px 15px;
-        }
-
-        .styled-table tbody tr {
-            border-bottom: 1px solid #dddddd;
-        }
-
-        .styled-table tbody tr:nth-of-type(even) {
-            background-color: #f3f3f3;
-        }
-
-        .styled-table tbody tr:last-of-type {
-            border-bottom: 2px solid #009879;
-        }
-
-        /* Effet survol (hover) */
-        .styled-table tbody tr:hover {
-            background-color: #f1f1f1;
-            cursor: pointer;
-        }
-
-        button.download-btn {
-            background-color: #007BFF;
-            /* Couleur de base */
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.3s ease-in-out;
-        }
-
-        button.download-btn i {
-            font-size: 18px;
-            /* Taille de l'icône */
-        }
-
-
-
-        button.download-btn:hover {
-            background-color: #0056b3;
-            box-shadow: 0px 8px 12px rgba(0, 0, 0, 0.2);
-            transform: translateY(-3px);
-        }
-
-        button.download-btn:active {
-            transform: translateY(1px);
-            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
-        }
-    </style>
-@endsection
 @section('content')
     <div class="content-wrapper">
-        <section class="content-header">
+        <!-- Content Header -->
+        <section class="content-header py-3 bg-light border-bottom mb-4">
             <div class="container-fluid">
-                <div class="row mb-2">
+                <div class="row mb-2 align-items-center">
                     <div class="col-sm-6">
-                        <h1>Homework</h1>
+                        <h1 class="h3 fw-bold text-primary">Homework</h1>
                     </div>
-                    <div class="col-sm-6" style="text-align: right;">
-                        <a href="{{ url('teacher/homework/homework/add') }}" class="btn btn-info"><i
-                                class="fa-solid fa-file-circle-plus"></i> Add New Homework</a>
+                    <div class="col-sm-6 text-end">
+                        <a href="{{ url('teacher/homework/homework/add') }}" class="btn btn-info shadow-sm rounded-3">
+                            <i class="fa-solid fa-file-circle-plus me-2"></i> Add New Homework
+                        </a>
                     </div>
                 </div>
             </div>
         </section>
-        <section class="content">
+
+        <!-- Main content -->
+        <section class="content pb-5">
             <div class="container-fluid">
                 <div class="row">
-                    <div class="col-md-12">
+                    <div class="col-12">
 
-
-                        <div class="card">
-                            <div class="card-header">
-                                <h3 class="card-title">Search Homework</h3>
+                        <!-- Search Card -->
+                        <div class="card shadow-sm rounded-4 border-0 mb-4">
+                            <div class="card-header bg-primary text-white rounded-top-4">
+                                <h3 class="card-title mb-0">
+                                    <i class="fa-solid fa-magnifying-glass me-2"></i>Search Homework
+                                </h3>
                             </div>
                             <form method="get" action="">
                                 <div class="card-body">
-                                    <div class="row">
-
-
-                                        <div class="form-group col-md-2">
-                                            <label>Class</label>
-                                            <input type="text" class="form-control"
-                                                value="{{ Request::get('class_name') }}" name="class_name"
-                                                placeholder="Class Name">
+                                    <div class="row g-3">
+                                        <div class="col-md-2">
+                                            <label class="form-label fw-semibold">Class</label>
+                                            <input type="text" class="form-control" name="class_name"
+                                                value="{{ Request::get('class_name') }}" placeholder="Class Name">
                                         </div>
-
-                                        <div class="form-group col-md-2">
-                                            <label>Subject</label>
-                                            <input type="text" class="form-control"
-                                                value="{{ Request::get('subject_name') }}" name="subject_name"
-                                                placeholder="Subject Name">
+                                        <div class="col-md-2">
+                                            <label class="form-label fw-semibold">Subject</label>
+                                            <input type="text" class="form-control" name="subject_name"
+                                                value="{{ Request::get('subject_name') }}" placeholder="Subject Name">
                                         </div>
-
-
-
-                                        <div class="form-group col-md-2">
-                                            <label style="min-width: 180px;">From Homework Date</label>
+                                        <div class="col-md-2">
+                                            <label class="form-label fw-semibold">From Homework Date</label>
                                             <input type="date" class="form-control" name="from_homework_date"
                                                 value="{{ Request::get('from_homework_date') }}">
                                         </div>
-
-                                        <div class="form-group col-md-2">
-                                            <label>To Homework Date</label>
+                                        <div class="col-md-2">
+                                            <label class="form-label fw-semibold">To Homework Date</label>
                                             <input type="date" class="form-control" name="to_homework_date"
                                                 value="{{ Request::get('to_homework_date') }}">
                                         </div>
-
-
-                                        <div class="form-group col-md-2">
-                                            <label style="min-width: 180px;">From Submission Date</label>
+                                        <div class="col-md-2">
+                                            <label class="form-label fw-semibold">From Submission Date</label>
                                             <input type="date" class="form-control" name="from_submission_date"
                                                 value="{{ Request::get('from_submission_date') }}">
                                         </div>
-
-                                        <div class="form-group col-md-2">
-                                            <label>To Submission Date</label>
+                                        <div class="col-md-2">
+                                            <label class="form-label fw-semibold">To Submission Date</label>
                                             <input type="date" class="form-control" name="to_submission_date"
                                                 value="{{ Request::get('to_submission_date') }}">
                                         </div>
-
-
-                                        <div class="form-group col-md-2">
-                                            <label style="min-width: 180px;">From Created Date</label>
+                                        <div class="col-md-2">
+                                            <label class="form-label fw-semibold">From Created Date</label>
                                             <input type="date" class="form-control" name="from_created_date"
                                                 value="{{ Request::get('from_created_date') }}">
                                         </div>
-
-                                        <div class="form-group col-md-2">
-                                            <label>To Created Date</label>
+                                        <div class="col-md-2">
+                                            <label class="form-label fw-semibold">To Created Date</label>
                                             <input type="date" class="form-control" name="to_created_date"
                                                 value="{{ Request::get('to_created_date') }}">
                                         </div>
-
-
-
-                                        <div class="form-group col-md-3">
-                                            <button class="btn btn-primary" type="submit"
-                                                style="margin-top: 30px;">Search</button>
-                                            <a href="{{ url('teacher/homework/homework') }}" class="btn btn-success"
-                                                style="margin-top: 30px;">Reset</a>
-
+                                        <div class="col-md-3 d-flex align-items-end gap-2">
+                                            <button class="btn btn-primary w-100" type="submit">
+                                                <i class="fa-solid fa-magnifying-glass me-1"></i> Search
+                                            </button>
+                                            <a href="{{ url('teacher/homework/homework') }}" class="btn btn-success w-100">
+                                                Reset
+                                            </a>
                                         </div>
-
                                     </div>
                                 </div>
                             </form>
                         </div>
 
-
                         @include('_message')
-                        <div class="card">
-                            <div class="card-header">
-                                <h3 class="card-title">Homework List</h3>
+
+                        <!-- Homework List Card -->
+                        <div class="card shadow-sm rounded-4 border-0">
+                            <div class="card-header bg-primary text-white rounded-top-4">
+                                <h3 class="card-title mb-0">
+                                    <i class="fa-solid fa-list-ul me-2"></i> Homework List
+                                </h3>
                             </div>
-                            <div class="card-body p-0" style="overflow: auto;">
-                                <table class="table styled-table table-bordered table-striped">
-                                    <thead>
+                            <div class="card-body p-0 table-responsive">
+                                <table class="table table-hover table-bordered align-middle mb-0 styled-table">
+                                    <thead class="table-primary text-center text-uppercase small">
                                         <tr>
                                             <th>#</th>
-                                            <th>Class</th>
-                                            <th>Subject</th>
+                                            <th style="min-width: 200px;">Class</th>
+                                            <th style="min-width: 180px;">Subject</th>
                                             <th style="min-width: 180px;">Homework Date</th>
                                             <th style="min-width: 180px;">Submission Date</th>
                                             <th>Document</th>
                                             <th style="min-width: 180px;">Created By</th>
                                             <th style="min-width: 180px;">Created Date</th>
                                             <th style="min-width: 200px;">Compteur</th>
-                                            <th>Action</th>
+                                            <th style="min-width: 300px;">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @forelse($getRecord as $value)
                                             <tr>
-                                                <td>{{ $value->id }}</td>
-                                                <td style="min-width: 200px;">{{ $value->class_name }}
-                                                    {{ $value->class_opt }}</td>
-                                                <td style="min-width: 180px;">{{ $value->subject_name }}</td>
+                                                <td class="text-center">{{ $value->id }}</td>
+                                                <td>{{ $value->class_name }} {{ $value->class_opt }}</td>
+                                                <td>{{ $value->subject_name }}</td>
                                                 <td>{{ date('d-m-Y', strtotime($value->homework_date)) }}</td>
                                                 <td>{{ date('d-m-Y', strtotime($value->submission_date)) }}</td>
-                                                <td style="min-width: 180px;">
+                                                <td>
                                                     @if (!empty($value->getDocument()))
-                                                        {{-- <a href="{{ $value->getDocument() }}" class="btn btn-primary" download="">Download</a> --}}
-                                                        <button class="download-btn" id="downloadBtn">
-                                                            <i class="fas fa-download"></i> <a
-                                                                href="{{ $value->getDocument() }}" class="btn"
-                                                                download="">Download</a>
-                                                        </button>
+                                                        <a href="{{ $value->getDocument() }}"
+                                                            class="btn btn-primary btn-sm" download>
+                                                            <i class="fas fa-download"></i> Download
+                                                        </a>
                                                     @endif
                                                 </td>
                                                 <td>{{ $value->created_by_name }}</td>
-                                                <td style="min-width: 180px;">
-                                                    {{ date('d-m-Y', strtotime($value->created_at)) }}</td>
+                                                <td>{{ date('d-m-Y', strtotime($value->created_at)) }}</td>
                                                 @php
                                                     $now = \Carbon\Carbon::now();
                                                     $submission = \Carbon\Carbon::parse(
                                                         $value->submission_date,
                                                     )->endOfDay();
-
-                                                    // Calcul du nombre total de secondes restantes
                                                     $diffInSeconds = $now->diffInSeconds($submission, false);
-
                                                     if ($diffInSeconds > 0) {
                                                         $days = floor($diffInSeconds / 86400);
                                                         $hours = floor(($diffInSeconds % 86400) / 3600);
@@ -230,46 +146,92 @@
                                                 @endphp
                                                 <td>
                                                     @if ($diffInSeconds <= 0)
-                                                        <span class="text-danger" style="font-weight: bold;">Terminé</span>
+                                                        <span class="text-danger fw-bold">Terminé</span>
                                                     @else
-                                                        <span class="text-success" style="font-weight: bold;">
+                                                        <span class="text-success fw-bold">
                                                             {{ $days }} jour(s)
                                                             {{ $hours }} heure(s)
-                                                            {{ $minutes }} minute(s)
-                                                            restant(s)
+                                                            {{ $minutes }} minute(s) restant(s)
                                                         </span>
                                                     @endif
                                                 </td>
-                                                <td style="min-width: 500px;">
+                                                <td>
                                                     <a href="{{ url('teacher/homework/homework/edit/' . $value->id) }}"
-                                                        class="btn btn-primary"><i class="fas fa-pencil-alt"></i> Edit</a>
+                                                        class="btn btn-primary btn-sm mb-1">
+                                                        <i class="fas fa-pencil-alt"></i> Edit
+                                                    </a>
                                                     <a href="{{ url('teacher/homework/homework/delete/' . $value->id) }}"
-                                                        class="btn btn-danger"><i class="fas fa-trash"></i> Delete</a>
-
+                                                        class="btn btn-danger btn-sm mb-1"
+                                                        onclick="return confirm('Are you sure?')">
+                                                        <i class="fas fa-trash"></i> Delete
+                                                    </a>
                                                     <a href="{{ url('teacher/homework/homework/submitted/' . $value->id) }}"
-                                                        class="btn btn-success"><i class="fas fa-download"></i> Submitted
-                                                        Homework</a>
+                                                        class="btn btn-success btn-sm mb-1">
+                                                        <i class="fas fa-download"></i> Submitted Homework
+                                                    </a>
                                                 </td>
                                             </tr>
                                         @empty
                                             <tr>
-                                                <td colspan="100%">Record not found</td>
+                                                <td colspan="10" class="text-center text-muted py-4">
+                                                    <i class="fa-solid fa-folder-open fa-2x mb-2"></i><br>
+                                                    Record not found
+                                                </td>
                                             </tr>
                                         @endforelse
-
                                     </tbody>
                                 </table>
-                                <div style="padding: 10px; float: right;">
+                                <div class="mt-3 d-flex justify-content-end px-3">
                                     {!! $getRecord->appends(Illuminate\Support\Facades\Request::except('page'))->links() !!}
                                 </div>
                             </div>
                         </div>
+
                     </div>
                 </div>
             </div>
         </section>
-
     </div>
+
+    <style>
+        .card {
+            border-radius: 1.25rem;
+        }
+
+        .card-header {
+            border-radius: 1.25rem 1.25rem 0 0;
+        }
+
+        .table-primary th {
+            background-color: #cfe2ff !important;
+            color: #084298 !important;
+            font-weight: 600;
+            vertical-align: middle;
+        }
+
+        .table td,
+        .table th {
+            vertical-align: middle;
+            font-size: 0.96rem;
+        }
+
+        .styled-table tbody tr:hover {
+            background-color: #e9f0ff;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-info,
+        .btn-danger,
+        .btn-success,
+        .btn-primary {
+            font-weight: 500;
+        }
+
+        .btn-sm {
+            padding: 0.25rem 0.75rem;
+            font-size: 0.9rem;
+        }
+    </style>
 @endsection
 
 @section('script')

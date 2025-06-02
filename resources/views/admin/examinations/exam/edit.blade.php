@@ -21,6 +21,7 @@
                         <div class="card shadow-sm rounded-4 border-0">
                             <form method="post" action="" novalidate>
                                 @csrf
+
                                 <div class="card-body">
                                     <div class="mb-4">
                                         <label for="name" class="form-label fw-semibold">Nom de l'examen <span
@@ -51,6 +52,33 @@
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
                                     </div>
+
+                                    <div class="form-group">
+                                        <label>Session <span class="text-danger">*</span></label>
+                                        <select name="session" class="form-control" required>
+                                            <option value="1" {{ $getRecord->session == 1 ? 'selected' : '' }}>Session
+                                                1 (Ordinaire)</option>
+                                            <option value="2" {{ $getRecord->session == 2 ? 'selected' : '' }}>Session
+                                                2 (Rattrapage)</option>
+                                        </select>
+                                    </div>
+                                    {{-- <div class="form-group">
+                                        <label>
+                                            <input type="checkbox" name="is_active" value="1"
+                                                {{ $getRecord->is_active ? 'checked' : '' }}>
+                                            Activer cette session
+                                        </label>
+                                    </div> --}}
+
+                                    <div class="form-group">
+                                        <label>
+                                            <input type="checkbox" name="is_active" value="1"
+                                                {{ old('is_active', $getRecord->is_active) ? 'checked' : '' }}>
+                                            Activer cette session
+                                        </label>
+                                    </div>
+
+
 
                                     <div class="mb-4">
                                         <label for="note" class="form-label fw-semibold">Note</label>

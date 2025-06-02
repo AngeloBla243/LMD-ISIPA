@@ -24,7 +24,8 @@
                                 <label for="academic_year_id" class="form-label fw-semibold">Année Académique <span
                                         class="text-danger">*</span></label>
                                 <select id="academic_year_id" name="academic_year_id"
-                                    class="form-select @error('academic_year_id') is-invalid @enderror" required>
+                                    class="form-select form-control @error('academic_year_id') is-invalid @enderror"
+                                    required>
                                     <option value="">Sélectionner une année</option>
                                     @foreach ($academicYears as $year)
                                         <option value="{{ $year->id }}"
@@ -52,7 +53,7 @@
                             <div class="mb-4">
                                 <label for="opt" class="form-label fw-semibold">Option</label>
                                 <select id="opt" name="opt"
-                                    class="form-select @error('opt') is-invalid @enderror">
+                                    class="form-select form-control @error('opt') is-invalid @enderror">
                                     <option value="">Sélectionnez une option</option>
                                     <option value="Administration Réseau et Telecommunication">Administration Réseau et
                                         Télécommunication</option>
@@ -85,7 +86,7 @@
                             <div class="mb-4">
                                 <label for="status" class="form-label fw-semibold">Statut</label>
                                 <select id="status" name="status"
-                                    class="form-select @error('status') is-invalid @enderror">
+                                    class="form-select form-control @error('status') is-invalid @enderror">
                                     <option value="0" {{ old('status') == '0' ? 'selected' : '' }}>Actif</option>
                                     <option value="1" {{ old('status') == '1' ? 'selected' : '' }}>Inactif</option>
                                 </select>

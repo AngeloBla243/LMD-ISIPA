@@ -112,4 +112,16 @@ class ClassModel extends Model
             ->withPivot('academic_year_id')
             ->wherePivot('academic_year_id', session('academic_year_id'));
     }
+
+    // Ajoutez ces relations
+
+    public function submissions()
+    {
+        return $this->hasManyThrough(
+            ThesisSubmissio::class,
+            User::class,
+            'class_id', // Clé étrangère de User vers ClassModel
+            'student_id' // Clé étrangère de ThesisSubmissio vers User
+        );
+    }
 }

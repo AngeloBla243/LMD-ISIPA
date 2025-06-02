@@ -51,11 +51,11 @@
                             Exam List (Total : {{ $getRecord->total() }})
                         </h1>
                     </div>
-                    <div class="col-sm-6 text-end">
+                    {{-- <div class="col-sm-6 text-end">
                         <a href="{{ url('admin/examinations/exam/add') }}" class="btn btn-info shadow-sm rounded-3">
                             <i class="fa-solid fa-file-circle-plus me-2"></i> Add New Exam
                         </a>
-                    </div>
+                    </div> --}}
                 </div>
             </div>
         </section>
@@ -113,25 +113,39 @@
                                 <table class="table table-hover table-bordered align-middle mb-0">
                                     <thead class="table-primary text-center text-uppercase small">
                                         <tr>
-                                            <th style="min-width: 50px;">#</th>
-                                            <th style="min-width: 200px;">Année Académique</th>
-                                            <th style="min-width: 200px;">Exam Name</th>
-                                            <th style="min-width: 150px;">Note</th>
-                                            <th style="min-width: 200px;">Created By</th>
-                                            <th style="min-width: 180px;">Created Date</th>
-                                            <th style="min-width: 220px;">Action</th>
+                                            <th>#</th>
+                                            <th>Année Académique</th>
+                                            <th>Session</th>
+                                            <th>Nom</th>
+                                            <th>Note</th>
+                                            <th>Statut</th>
+                                            <th>Date création</th>
+                                            <th>Actions</th>
+
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @foreach ($getRecord as $value)
                                             <tr>
-                                                <td class="text-center">{{ $value->id }}</td>
-                                                <td>{{ $value->academic_year_name ?? 'N/A' }}</td>
-                                                <td>{{ $value->name }}</td>
-                                                <td>{{ $value->note }}</td>
-                                                <td>{{ $value->created_name }}</td>
-                                                <td>{{ date('d-m-Y H:i A', strtotime($value->created_at)) }}</td>
-                                                <td class="text-center">
+                                                <td style="min-width: 200px;" class="text-center">{{ $value->id }}</td>
+                                                <td style="min-width: 200px;" class="text-center">
+                                                    {{ $value->academic_year_name ?? 'N/A' }}</td>
+                                                <td style="min-width: 200px;" class="text-center">{{ $value->session }}</td>
+                                                <td style="min-width: 200px;" class="text-center">{{ $value->name }}</td>
+                                                <td style="min-width: 200px;" class="text-center">{{ $value->note }}</td>
+                                                {{-- <td style="min-width: 200px;" class="text-center">
+                                                    {{ $value->created_name }}</td> --}}
+                                                <td style="min-width: 200px;" class="text-center">
+                                                    Session {{ $value->session }}
+                                                    @if ($value->is_active)
+                                                        <span class="badge bg-success">Active</span>
+                                                    @else
+                                                        <span class="badge bg-secondary">Inactive</span>
+                                                    @endif
+                                                </td>
+                                                <td style="min-width: 200px;" class="text-center">
+                                                    {{ date('d-m-Y H:i A', strtotime($value->created_at)) }}</td>
+                                                <td class="text-center" style="min-width: 200px;" class="text-center">
                                                     <a href="{{ url('admin/examinations/exam/edit/' . $value->id) }}"
                                                         class="btn btn-info btn-sm me-1" title="Edit">
                                                         <i class="fas fa-pencil-alt"></i> Edit
@@ -142,6 +156,8 @@
                                                         <i class="fas fa-trash"></i> Delete
                                                     </a>
                                                 </td>
+
+
                                             </tr>
                                         @endforeach
                                     </tbody>

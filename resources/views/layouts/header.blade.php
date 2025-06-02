@@ -208,6 +208,7 @@
                     </li>
 
                     <li class="nav-item  @if (Request::segment(2) == 'class' ||
+                            Request::segment(2) == 'ue' ||
                             Request::segment(2) == 'subject' ||
                             Request::segment(2) == 'assign_subject' ||
                             Request::segment(2) == 'assign_class_teacher' ||
@@ -216,6 +217,7 @@
                             Request::segment(2) == 'class_timetable') menu-is-opening menu-open @endif">
                         <a href="#" class="nav-link  @if (Request::segment(2) == 'class' ||
                                 Request::segment(2) == 'subject' ||
+                                Request::segment(2) == 'ue' ||
                                 Request::segment(2) == 'assign_subject' ||
                                 Request::segment(2) == 'assign_class_teacher' ||
                                 Request::segment(2) == 'academic-years' ||
@@ -244,6 +246,15 @@
                                     <p>Class</p>
                                 </a>
                             </li>
+
+                            <li class="nav-item">
+                                <a href="{{ url('admin/ue/list') }}"
+                                    class="nav-link @if (Request::segment(2) == 'ue') active @endif">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>UE</p>
+                                </a>
+                            </li>
+
 
 
                             <li class="nav-item">
@@ -329,6 +340,15 @@
                             </p>
                         </a>
                         <ul class="nav nav-treeview">
+
+                            <li class="nav-item">
+                                <a href="{{ route('admin.semester.list') }}"
+                                    class="nav-link @if (Request::segment(3) == 'semestre') active @endif">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Nouveau Semestre</p>
+                                </a>
+                            </li>
+
                             <li class="nav-item">
                                 <a href="{{ url('admin/examinations/exam/list') }}"
                                     class="nav-link @if (Request::segment(3) == 'exam') active @endif">
@@ -354,6 +374,9 @@
                                     <p>Marks Register</p>
                                 </a>
                             </li>
+
+
+
 
 
                             <li class="nav-item">
@@ -569,6 +592,16 @@
                         </a>
                     </li>
 
+                    {{-- Dans resources/views/layouts/sidebar-teacher.blade.php --}}
+                    <li class="nav-item">
+                        <a href="{{ route('teacher.encadres') }}"
+                            class="nav-link @if (Request::is('teacher/encadres*')) active @endif">
+                            <i class="nav-icon fas fa-user-graduate"></i>
+                            <p>Mes encadrés</p>
+                        </a>
+                    </li>
+
+
 
 
                     <li class="nav-item  @if (Request::segment(2) == 'attendance') menu-is-opening menu-open @endif">
@@ -618,6 +651,7 @@
                                     <p>Homework</p>
                                 </a>
                             </li>
+
                         </ul>
                     </li>
 
@@ -684,6 +718,15 @@
                         </a>
                     </li>
 
+                    <li class="nav-item">
+                        <a href="{{ route('student.submissions') }}"
+                            class="nav-link @if (Request::segment(2) == 'submissions') active @endif">
+                            <i class="nav-icon fa-solid fa-file-lines"></i>
+                            <p>
+                                Mes Soumissions
+                            </p>
+                        </a>
+                    </li>
 
 
 

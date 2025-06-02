@@ -8,8 +8,10 @@ use App\Models\ClassSubjectModel;
 use App\Models\recours;
 use App\Models\User;
 use App\Models\AcademicYear;
+use App\Models\UeModel;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 use Carbon\Carbon;
 
@@ -29,9 +31,11 @@ class SubjectController extends Controller
     }
 
 
+
     public function add()
     {
         $data['academicYears'] = AcademicYear::orderBy('start_date', 'desc')->get();
+        $data['ueList'] = UeModel::orderBy('code')->get();
         $data['header_title'] = "Ajouter une Matière";
         return view('admin.subject.add', $data);
     }
@@ -43,6 +47,7 @@ class SubjectController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'code' => 'required|string|max:50',
+            'ue_id' => 'nullable|exists:ue,id', // Validation UE
             'academic_year_id' => 'required|exists:academic_years,id',
             'type' => 'required|string'
         ]);
@@ -51,7 +56,8 @@ class SubjectController extends Controller
         $save->name = trim($request->name);
         $save->code = trim($request->code);
         $save->type = trim($request->type);
-        $save->academic_year_id = $request->academic_year_id; // Ajouté
+        $save->ue_id = $request->ue_id ?: null; // Ajout du UE_ID
+        $save->academic_year_id = $request->academic_year_id;
         $save->status = $request->status;
         $save->created_by = Auth::id();
         $save->save();
@@ -60,10 +66,12 @@ class SubjectController extends Controller
     }
 
 
+
     public function edit($id)
     {
         $data['getRecord'] = SubjectModel::findOrFail($id);
         $data['academicYears'] = AcademicYear::orderBy('start_date', 'desc')->get(); // Ajouté
+        $data['ueList'] = UeModel::orderBy('code')->get();
         $data['header_title'] = "Modifier la Matière";
         return view('admin.subject.edit', $data);
     }
@@ -75,6 +83,7 @@ class SubjectController extends Controller
         $save->name = trim($request->name);
         $save->code = trim($request->code);
         $save->type = trim($request->type);
+        $save->ue_id = $request->ue_id ?: null; // Ajout du UE_ID
         $save->academic_year_id = $request->academic_year_id; // Ajouté
         $save->status = $request->status;
         $save->save();

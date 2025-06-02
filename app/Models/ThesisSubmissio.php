@@ -10,8 +10,16 @@ class ThesisSubmissio extends Model
     use HasFactory;
 
     protected $table = 'thesis1_submissions';
+    protected $casts = [
+        'plagiarism_results' => 'array',
+    ];
 
     protected $fillable = [
+        'type',
+        'directeur_id',
+        'encadreur_id',
+        'class_id',
+        'project_name',
         'student_id',
         'content',
         'content_hash',
@@ -71,5 +79,14 @@ class ThesisSubmissio extends Model
     public function academicYear()
     {
         return $this->belongsTo(AcademicYear::class);
+    }
+    public function directeur()
+    {
+        return $this->belongsTo(User::class, 'directeur_id');
+    }
+
+    public function encadreur()
+    {
+        return $this->belongsTo(User::class, 'encadreur_id');
     }
 }

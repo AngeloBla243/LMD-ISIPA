@@ -23,6 +23,14 @@
                                 <i class="fa-solid fa-magnifying-glass me-1"></i> Rechercher
                             </button>
                         </div>
+                        <div class="col-md-2 col-lg-2">
+
+                            <a href="{{ route('admin.theses.export') }}" class="btn btn-success">
+                                <i class="fas fa-file-pdf"></i> Exporter la liste
+                            </a>
+                        </div>
+
+
                     </div>
                 </form>
             </div>
@@ -39,7 +47,9 @@
                                     <th>#</th>
                                     <th>Étudiant</th>
                                     <th>Classe</th>
-                                    <th>Sujet</th>
+                                    <th>Sujet / Projet</th>
+                                    <th>Type</th>
+                                    <th>Encadrant</th>
                                     <th>Taux de plagiat</th>
                                     <th>Statut</th>
                                     <th>Date de soumission</th>
@@ -53,10 +63,32 @@
                                 @forelse($submissions as $i => $submission)
                                     <tr>
                                         <td class="text-center">{{ $start + $i }}</td>
-                                        <td style="min-width: 200px;">{{ $submission->student->name ?? 'N/A' }}
-                                            {{ $submission->student->last_name ?? '' }}</td>
-                                        <td style="min-width: 200px;">{{ $submission->student->class->name ?? 'N/A' }}</td>
-                                        <td style="min-width: 200px;">{{ $submission->subject }}</td>
+                                        <td style="min-width: 200px;">
+                                            {{ $submission->student->name ?? 'N/A' }}
+                                            {{ $submission->student->last_name ?? '' }}
+                                        </td>
+                                        <td style="min-width: 200px;">
+                                            {{ $submission->student->classes->first()->name ?? 'N/A' }}
+                                            {{ $submission->student->classes->first()->opt ?? 'N/A' }}
+                                        </td>
+
+                                        <td style="min-width: 200px;">
+                                            {{ $submission->type == 1 ? $submission->subject : $submission->project_name }}
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="badge bg-primary">
+                                                {{ $submission->type == 1 ? 'Mémoire' : 'Projet' }}
+                                            </span>
+                                        </td>
+                                        <td style="min-width: 200px;">
+                                            @if ($submission->type == 1)
+                                                {{ $submission->directeur->name ?? 'N/A' }}
+                                                {{ $submission->directeur->last_name ?? '' }}
+                                            @else
+                                                {{ $submission->encadreur->name ?? 'N/A' }}
+                                                {{ $submission->encadreur->last_name ?? '' }}
+                                            @endif
+                                        </td>
                                         <td class="text-center">{{ $submission->plagiarism_rate }}%</td>
                                         <td class="text-center">
                                             @php
@@ -72,7 +104,8 @@
                                             </span>
                                         </td>
                                         <td class="text-center" style="min-width: 200px;">
-                                            {{ $submission->created_at->format('d/m/Y H:i') }}</td>
+                                            {{ $submission->created_at->format('d/m/Y H:i') }}
+                                        </td>
                                         <td class="text-center" style="min-width: 200px;">
                                             <a href="{{ route('admin.theses.show', $submission->id) }}"
                                                 class="btn btn-sm btn-info me-1" title="Voir">
@@ -94,7 +127,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="8" class="text-center text-muted py-4">
+                                        <td colspan="10" class="text-center text-muted py-4">
                                             <i class="fa-solid fa-folder-open fa-2x mb-2"></i><br>
                                             Aucune soumission trouvée.
                                         </td>
@@ -102,6 +135,7 @@
                                 @endforelse
                             </tbody>
                         </table>
+
                     </div>
 
                     <div class="card-footer d-flex justify-content-end bg-white border-0">

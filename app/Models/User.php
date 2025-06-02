@@ -703,4 +703,48 @@ class User extends Authenticatable
             ->wherePivot('academic_year_id', $academicYearId)
             ->first(); // Retourne la première classe de l'année active
     }
+
+    public function studentClass()
+    {
+        return $this->belongsToMany(
+            \App\Models\ClassModel::class,
+            'student_class',
+            'student_id',
+            'class_id'
+        )->withPivot('academic_year_id');
+    }
+
+    public function studentClasse()
+    {
+        return $this->hasMany(ClassModel::class, 'student_id');
+    }
+
+
+    //recuperer la class de l'etudiant
+    public function studentClas()
+    {
+        return $this->belongsToMany(
+            ClassModel::class,
+            'student_class', // Nom de la table pivot
+            'student_id',    // Clé étrangère de l'étudiant
+            'class_id'       // Clé étrangère de la classe
+        )
+            ->withPivot('academic_year_id') // Récupère l'année académique
+            ->withTimestamps();             // Si la pivot table a des timestamps
+    }
+
+    // Pour obtenir la classe actuelle (année académique active)
+    public function currentClass()
+    {
+        $academicYear = AcademicYear::where('is_active', true)->first();
+
+        return $this->belongsToMany(
+            ClassModel::class,
+            'student_class',
+            'student_id',
+            'class_id'
+        )
+            ->wherePivot('academic_year_id', $academicYear->id)
+            ->first(); // Retourne directement l'objet Classe
+    }
 }

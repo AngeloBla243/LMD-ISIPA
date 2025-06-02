@@ -19,7 +19,9 @@ class MarksRegisterModel extends Model
         'subject_id',
         'class_work',
         'exam',
+        'status',
         'full_marks',
+        'semester_id',
         'passing_mark',
         'ponde',
         'created_by'
