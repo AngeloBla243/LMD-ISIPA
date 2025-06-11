@@ -24,7 +24,8 @@
                                 <label for="academic_year_id" class="form-label fw-semibold">Année Académique <span
                                         class="text-danger">*</span></label>
                                 <select id="academic_year_id" name="academic_year_id"
-                                    class="form-select @error('academic_year_id') is-invalid @enderror" required>
+                                    class="form-select form-control @error('academic_year_id') is-invalid @enderror"
+                                    required>
                                     @foreach ($academicYears as $year)
                                         <option value="{{ $year->id }}"
                                             {{ $getRecord->academic_year_id == $year->id ? 'selected' : '' }}>
@@ -51,7 +52,7 @@
                             <div class="mb-4">
                                 <label for="opt" class="form-label fw-semibold">Option</label>
                                 <select id="opt" name="opt"
-                                    class="form-select @error('opt') is-invalid @enderror">
+                                    class="form-select form-control @error('opt') is-invalid @enderror">
                                     @php
                                         $options = [
                                             'Administration Réseau et Telecommunication',
@@ -93,7 +94,7 @@
                                 <label for="status" class="form-label fw-semibold">Statut <span
                                         class="text-danger">*</span></label>
                                 <select id="status" name="status"
-                                    class="form-select @error('status') is-invalid @enderror" required>
+                                    class="form-select form-control @error('status') is-invalid @enderror" required>
                                     <option value="0" {{ $getRecord->status == 0 ? 'selected' : '' }}>Actif</option>
                                     <option value="1" {{ $getRecord->status == 1 ? 'selected' : '' }}>Inactif</option>
                                 </select>

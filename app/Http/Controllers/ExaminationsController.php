@@ -569,6 +569,142 @@ class ExaminationsController extends Controller
 
 
 
+    public function submit_all_marks_register(Request $request)
+    {
+        DB::beginTransaction();
+
+        try {
+            $request->validate([
+                'exam_id'   => 'required|exists:exam,id',
+                'class_id'  => 'required|exists:class,id',
+                'marks'     => 'required|array'
+            ]);
+
+            $currentExam = ExamModel::with('semester')->findOrFail($request->exam_id);
+            $class = ClassModel::findOrFail($request->class_id);
+            $academicYearId = $class->academic_year_id;
+
+            if (!$currentExam->semester_id || !$currentExam->semester) {
+                throw new \Exception("Configuration invalide : semestre non défini");
+            }
+
+            $session2Exam = null;
+            if ($currentExam->session == 1) {
+                $session2Exam = ExamModel::firstOrCreate(
+                    [
+                        'semester_id' => $currentExam->semester_id,
+                        'session' => 2,
+                        'academic_year_id' => $currentExam->academic_year_id
+                    ],
+                    [
+                        'name' => $currentExam->name . ' - Rattrapage',
+                        'created_by' => Auth::id()
+                    ]
+                );
+            }
+
+            $validationErrors = [];
+
+            foreach ($request->marks as $studentId => $subjects) {
+                foreach ($subjects as $subjectId => $mark) {
+                    if (empty($mark['subject_id'])) {
+                        $validationErrors[] = "Subject ID manquant pour l'étudiant $studentId";
+                        continue;
+                    }
+
+                    $examSchedule = ExamScheduleModel::where([
+                        'exam_id' => $currentExam->id,
+                        'class_id' => $class->id,
+                        'subject_id' => $subjectId
+                    ])->first();
+
+                    if (!$examSchedule) {
+                        $validationErrors[] = "Aucun planning d'examen trouvé pour la matière {$subjectId}";
+                        continue;
+                    }
+
+                    $classWork = $mark['class_work'] ?? 0;
+                    $examScore = $mark['exam'] ?? 0;
+                    $totalScore = $classWork + $examScore;
+
+                    if ($totalScore > $examSchedule->full_marks) {
+                        $validationErrors[] = "Note totale ($totalScore) > max ({$examSchedule->full_marks}) pour étudiant $studentId";
+                        continue;
+                    }
+
+                    // Enregistrement Session 1
+                    MarksRegisterModel::updateOrCreate(
+                        [
+                            'student_id' => $studentId,
+                            'exam_id' => $currentExam->id,
+                            'subject_id' => $subjectId
+                        ],
+                        [
+                            'semester_id' => $currentExam->semester_id,
+                            'class_work' => $classWork,
+                            'exam' => $examScore,
+                            'full_marks' => $examSchedule->full_marks,
+                            'passing_mark' => $examSchedule->passing_mark,
+                            'ponde' => $examSchedule->ponde,
+                            'status' => 1,
+                            'class_id' => $class->id,
+                            'academic_year_id' => $academicYearId,
+                            'created_by' => Auth::id()
+                        ]
+                    );
+
+                    // Gestion Session 2
+                    if ($session2Exam) {
+                        MarksRegisterModel::updateOrCreate(
+                            [
+                                'student_id' => $studentId,
+                                'exam_id' => $session2Exam->id,
+                                'subject_id' => $subjectId
+                            ],
+                            [
+                                'semester_id' => $currentExam->semester_id,
+                                'class_work' => $classWork,
+                                'exam' => $examScore,
+                                'full_marks' => $examSchedule->full_marks,
+                                'passing_mark' => $examSchedule->passing_mark,
+                                'ponde' => $examSchedule->ponde,
+                                'status' => 0,
+                                'class_id' => $class->id,
+                                'academic_year_id' => $academicYearId,
+                                'created_by' => Auth::id()
+                            ]
+                        );
+                    }
+                }
+            }
+
+            if (!empty($validationErrors)) {
+                DB::rollBack();
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Erreurs de validation',
+                    'errors' => $validationErrors
+                ], 422);
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Toutes les notes ont été enregistrées avec succès'
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur : ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+
+
+
 
 
 
@@ -979,63 +1115,6 @@ class ExaminationsController extends Controller
 
 
 
-    // public function myExamResultPrint(Request $request)
-    // {
-    //     $exam_id = $request->exam_id;
-    //     $student_id = $request->student_id;
-
-    //     // Récupération des matières avec leurs UE et coefficients
-    //     $getExamSubject = MarksRegisterModel::select(
-    //         'marks_register.*',
-    //         'subject.name as subject_name',
-    //         'subject.code as subject_code',
-    //         'subject.ue_id',
-    //         'exam_schedule.ponde' // coefficient/credit EC
-    //     )
-    //         ->join('subject', 'subject.id', '=', 'marks_register.subject_id')
-    //         ->join('exam_schedule', function ($join) use ($exam_id) {
-    //             $join->on('exam_schedule.exam_id', '=', 'marks_register.exam_id')
-    //                 ->on('exam_schedule.class_id', '=', 'marks_register.class_id')
-    //                 ->on('exam_schedule.subject_id', '=', 'marks_register.subject_id')
-    //                 ->where('exam_schedule.exam_id', $exam_id);
-    //         })
-    //         ->where('marks_register.exam_id', $exam_id)
-    //         ->where('marks_register.student_id', $student_id)
-    //         ->get();
-
-    //     // Organisation des données
-    //     $dataSubject = [];
-    //     foreach ($getExamSubject as $exam) {
-    //         $total_score = $exam->class_work + $exam->exam;
-
-    //         $dataS = [
-    //             'subject_id'    => $exam->subject_id,
-    //             'subject_code'  => $exam->subject_code,
-    //             'subject_name'  => $exam->subject_name,
-    //             'class_work'    => $exam->class_work,
-    //             'exam'          => $exam->exam,
-    //             'total_score'   => $total_score,
-    //             'ponde'         => $exam->ponde ?? 1, // Valeur par défaut si null
-    //             'full_marks'    => $exam->full_marks,
-    //             'passing_mark'  => $exam->passing_mark,
-    //             'ue_id'         => $exam->ue_id
-    //         ];
-    //         $dataSubject[] = $dataS;
-    //     }
-
-    //     // Récupérer infos étudiant, année académique, settings
-    //     $getStudent = MarksRegisterModel::find($student_id);
-    //     // $academicYear = AcademicYearModel::where('is_active', 1)->first()?->name ?? '2024-2025';
-    //     $getSetting = SettingModel::first();
-
-    //     // Passer toutes les données nécessaires à la vue
-    //     return view('exam_result_print', [
-    //         'getExamMark'   => $dataSubject,
-    //         'getStudent'    => $getStudent,
-    //         // 'academicYear'  => $academicYear,
-    //         'getSetting'    => $getSetting,
-    //     ]);
-    // }
 
     public function myExamResultPrint(Request $request)
     {

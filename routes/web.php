@@ -26,6 +26,7 @@ use App\Http\Controllers\AdminThesisController;
 use App\Http\Controllers\AcademicYearController;
 use App\Http\Controllers\UeController;
 use App\Http\Controllers\SemesterController;
+use App\Http\Controllers\MeetingController;
 
 
 
@@ -172,6 +173,9 @@ Route::group(['middleware' => 'admin'], function () {
     Route::post('admin/student/edit/{id}', [StudentController::class, 'update']);
     Route::get('admin/student/delete/{id}', [StudentController::class, 'delete']);
     Route::post('admin/student/export_excel', [StudentController::class, 'export_excel']);
+    Route::get('admin/student/import', [StudentController::class, 'import'])->name('admin.student.import');
+    Route::post('admin/student/import', [StudentController::class, 'importSubmit'])->name('admin.student.import.submit');
+
 
 
     // parent
@@ -428,6 +432,9 @@ Route::group(['middleware' => 'teacher'], function () {
 
     Route::get('teacher/marks_register', [ExaminationsController::class, 'marks_register_teacher']);
     Route::post('teacher/submit_marks_register', [ExaminationsController::class, 'submit_marks_register']);
+
+    Route::post('teacher/submit_all_marks_register', [ExaminationsController::class, 'submit_all_marks_register'])
+        ->name('teacher.submit_all_marks_register');
     Route::post('teacher/single_submit_marks_register', [ExaminationsController::class, 'single_submit_marks_register']);
 
 
@@ -471,6 +478,18 @@ Route::group(['middleware' => 'teacher'], function () {
     // Pour le PDF
     Route::get('teacher/encadres/export', [TeacherController::class, 'exportEncadresPDF'])
         ->name('teacher.encadres.export');
+    // Pour les enseignants
+    Route::get('teacher/meetings', [MeetingController::class, 'list'])->name('teacher.meetings.list');
+    Route::get('teacher/meetings/create', [MeetingController::class, 'create'])->name('teacher.meetings.create');
+    Route::post('teacher/meetings', [MeetingController::class, 'store'])->name('teacher.meetings.store');
+
+    // Pour les étudiants
+    // Route::get('student/meetings', [MeetingController::class, 'studentMeetings'])->name('student.meetings');
+
+
+    // Pour les étudiants
+
+
 });
 
 
@@ -545,6 +564,9 @@ Route::group(['middleware' => 'student'], function () {
 
     Route::get('student/stripe/payment-error', [FeesCollectionController::class, 'PaymentError']);
     Route::get('student/stripe/payment-success', [FeesCollectionController::class, 'PaymentSuccessStripe']);
+
+    Route::get('/student/meetings', [MeetingController::class, 'getClassMeetings'])
+        ->middleware('auth:student');
 });
 
 

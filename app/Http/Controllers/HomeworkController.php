@@ -375,15 +375,6 @@ class HomeworkController extends Controller
     }
 
 
-    // public function editTeacher($id)
-    // {
-    // $getRecord = HomeworkModel::getSingle($id);
-    // $data['getRecord'] = $getRecord;
-    // $data['getSubject'] = ClassSubjectModel::MySubject($getRecord->class_id);
-    // $data['getClass'] = AssignClassTeacherModel::getMyClassSubjectGroup(Auth::user()->id);
-    // $data['header_title'] = 'Edit Homework';
-    // return view('teacher.homework.edit', $data);
-    // }
 
     public function editTeacher($id)
     {
@@ -531,12 +522,7 @@ class HomeworkController extends Controller
         return redirect('student/my_homework')->with('success', "Homework successfully submited");
     }
 
-    // public function HomeworkSubmittedStudent(Request $request)
-    // {
-    //     $data['getRecord'] = HomeworkSubmitModel::getRecordStudent(Auth::user()->id);
-    //     $data['header_title'] = 'My Submitted Homework';
-    //     return view('student.homework.submitted_list', $data);
-    // }
+
 
     public function HomeworkSubmittedStudent(Request $request)
     {

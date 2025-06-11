@@ -56,7 +56,7 @@ class ClassSubjectModel extends Model
         }
 
         $return = $return->orderBy('class_subject.id', 'asc')
-            ->paginate(100);
+            ->paginate(50);
 
         return $return;
     }

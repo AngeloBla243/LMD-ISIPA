@@ -26,7 +26,8 @@
                                         <label for="class_id" class="form-label fw-semibold">Classe <span
                                                 class="text-danger">*</span></label>
                                         <select id="class_id" name="class_id"
-                                            class="form-select @error('class_id') is-invalid @enderror" required>
+                                            class="form-select form-control @error('class_id') is-invalid @enderror"
+                                            required>
                                             <option value="">Sélectionner une classe</option>
                                             @foreach ($getClass as $class)
                                                 <option value="{{ $class->id }}"

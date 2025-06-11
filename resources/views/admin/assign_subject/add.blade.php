@@ -46,7 +46,7 @@
                             <label for="academicYear" class="form-label fw-semibold">Année Académique <span
                                     class="text-danger">*</span></label>
                             <select name="academic_year_id" id="academicYear"
-                                class="form-select @error('academic_year_id') is-invalid @enderror" required>
+                                class="form-select form-control @error('academic_year_id') is-invalid @enderror" required>
                                 <option value="">Sélectionner une année</option>
                                 @foreach ($academicYears as $year)
                                     <option value="{{ $year->id }}">{{ $year->name }}</option>
@@ -62,7 +62,7 @@
                             <label for="classSelect" class="form-label fw-semibold">Classe <span
                                     class="text-danger">*</span></label>
                             <select name="class_id" id="classSelect"
-                                class="form-select @error('class_id') is-invalid @enderror" required disabled>
+                                class="form-select form-control @error('class_id') is-invalid @enderror" required disabled>
                                 <option value="">Choisissez d'abord une année</option>
                             </select>
                             @error('class_id')
@@ -75,8 +75,8 @@
                             <label for="subjectSelect" class="form-label fw-semibold">Matières <span
                                     class="text-danger">*</span></label>
                             <select name="subject_id[]" id="subjectSelect"
-                                class="form-select select2 @error('subject_id') is-invalid @enderror" multiple required
-                                disabled>
+                                class="form-select select2 form-control @error('subject_id') is-invalid @enderror" multiple
+                                required disabled>
                                 <option value="">Choisissez d'abord une année</option>
                             </select>
                             @error('subject_id')

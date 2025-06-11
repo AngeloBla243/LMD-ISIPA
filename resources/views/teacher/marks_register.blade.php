@@ -144,7 +144,7 @@
                                     <table class="table table-hover table-bordered align-middle mb-0 styled-table">
                                         <thead class="table-primary text-center text-uppercase small">
                                             <tr>
-                                                <th style="min-width: 180px;">Student Name</th>
+                                                <th style="min-width: 180px;">Nom de l'étudiant</th>
                                                 @foreach ($getSubject as $subject)
                                                     <th style="min-width: 340px;">
                                                         {{ $subject->subject_name }} <br />
@@ -206,44 +206,49 @@
                                                                     }
                                                                     $totalStudentMark = $totalStudentMark + $totalMarks;
                                                                 @endphp
+
                                                                 <td>
-                                                                    <div class="mb-2">
-                                                                        <label class="form-label small">Class Work</label>
-                                                                        <input type="hidden"
-                                                                            name="mark[{{ $i }}][full_marks]"
-                                                                            value="{{ $subject->full_marks }}">
-                                                                        <input type="hidden"
-                                                                            name="mark[{{ $i }}][passing_mark]"
-                                                                            value="{{ $subject->passing_mark }}">
-                                                                        <input type="hidden"
-                                                                            name="mark[{{ $i }}][ponde]"
-                                                                            value="{{ $subject->ponde }}">
-                                                                        <input type="hidden"
-                                                                            name="mark[{{ $i }}][id]"
-                                                                            value="{{ $subject->id }}">
-                                                                        <input type="hidden"
-                                                                            name="mark[{{ $i }}][subject_id]"
-                                                                            value="{{ $subject->subject_id }}">
-                                                                        <input type="text"
-                                                                            name="mark[{{ $i }}][class_work]"
-                                                                            id="class_work_{{ $student->id }}{{ $subject->subject_id }}"
-                                                                            class="form-control mb-1" style="width: 220px;"
-                                                                            placeholder="Enter Marks"
-                                                                            value="{{ !empty($getMark->class_work) ? $getMark->class_work : '' }}">
-                                                                    </div>
-                                                                    <div class="mb-2">
-                                                                        <label class="form-label small">Exam</label>
-                                                                        <input type="text"
-                                                                            name="mark[{{ $i }}][exam]"
-                                                                            id="exam_{{ $student->id }}{{ $subject->subject_id }}"
-                                                                            class="form-control mb-1"
-                                                                            style="width: 220px;"
-                                                                            placeholder="Enter Marks"
-                                                                            value="{{ !empty($getMark->exam) ? $getMark->exam : '' }}">
-                                                                    </div>
-                                                                    <div class="mb-2">
+                                                                    <div class="d-flex align-items-center gap-2"
+                                                                        style="gap:10px;">
+                                                                        <div>
+                                                                            <label
+                                                                                class="form-label small mb-1">TP/TD</label>
+                                                                            <input type="hidden"
+                                                                                name="mark[{{ $i }}][full_marks]"
+                                                                                value="{{ $subject->full_marks }}">
+                                                                            <input type="hidden"
+                                                                                name="mark[{{ $i }}][passing_mark]"
+                                                                                value="{{ $subject->passing_mark }}">
+                                                                            <input type="hidden"
+                                                                                name="mark[{{ $i }}][ponde]"
+                                                                                value="{{ $subject->ponde }}">
+                                                                            <input type="hidden"
+                                                                                name="mark[{{ $i }}][id]"
+                                                                                value="{{ $subject->id }}">
+                                                                            <input type="hidden"
+                                                                                name="mark[{{ $i }}][subject_id]"
+                                                                                value="{{ $subject->subject_id }}">
+                                                                            <input type="number"
+                                                                                name="mark[{{ $i }}][class_work]"
+                                                                                id="class_work_{{ $student->id }}{{ $subject->subject_id }}"
+                                                                                class="form-control form-control-sm note-input"
+                                                                                style="width:70px; display:inline-block;"
+                                                                                placeholder="CW"
+                                                                                value="{{ !empty($getMark->class_work) ? $getMark->class_work : '' }}">
+                                                                        </div>
+                                                                        <div>
+                                                                            <label
+                                                                                class="form-label small mb-1">Exam</label>
+                                                                            <input type="number"
+                                                                                name="mark[{{ $i }}][exam]"
+                                                                                id="exam_{{ $student->id }}{{ $subject->subject_id }}"
+                                                                                class="form-control form-control-sm note-input"
+                                                                                style="width:70px; display:inline-block;"
+                                                                                placeholder="Exam"
+                                                                                value="{{ !empty($getMark->exam) ? $getMark->exam : '' }}">
+                                                                        </div>
                                                                         <button type="button"
-                                                                            class="btn btn-primary SaveSingleSubject"
+                                                                            class="btn btn-primary btn-sm SaveSingleSubject note-btn"
                                                                             data-student-id="{{ $student->id }}"
                                                                             data-subject-id="{{ $subject->subject_id }}"
                                                                             data-exam-id="{{ Request::get('exam_id') }}"
@@ -252,21 +257,8 @@
                                                                             Save
                                                                         </button>
                                                                     </div>
-                                                                    @if (!empty($getMark))
-                                                                        <div>
-                                                                            <b>Crédit Du Cours : </b>
-                                                                            {{ $subject->ponde }}<br />
-                                                                            @if ($totalMarks >= $totalPass)
-                                                                                <b>Résultat :</b> <span
-                                                                                    class="text-success fw-bold">VAL</span>
-                                                                            @else
-                                                                                <b>Décision :</b> <span
-                                                                                    class="text-danger fw-bold">NVL</span>
-                                                                                @php $pass_fail_vali = 1; @endphp
-                                                                            @endif
-                                                                        </div>
-                                                                    @endif
                                                                 </td>
+
                                                                 @php $i++; @endphp
                                                             @endforeach
                                                             <td>
@@ -283,7 +275,10 @@
                                                                     @endif
                                                                 @endif
                                                             </td>
+
                                                         </tr>
+
+
                                                     </form>
                                                 @endforeach
                                             @else
@@ -296,6 +291,12 @@
                                                 </tr>
                                             @endif
                                         </tbody>
+
+                                        <div class="mb-3 text-end">
+                                            <button type="button" id="saveAllBtn" class="btn btn-success">
+                                                <i class="fa fa-save me-1"></i> Save All
+                                            </button>
+                                        </div>
                                     </table>
                                 </div>
                             </div>
@@ -460,6 +461,39 @@
                     });
                 }
             });
+        });
+    </script>
+
+    <script>
+        document.getElementById('saveAllBtn').addEventListener('click', function() {
+            const formData = new FormData(document.getElementById('marksForm'));
+
+            fetch("{{ route('teacher.submit_all_marks_register') }}", {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json'
+                    },
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire('Succès!', data.message, 'success');
+                        document.querySelectorAll('.note-input').forEach(el => el.disabled = true);
+                    } else {
+                        let errorMsg = data.message;
+                        if (data.errors) {
+                            errorMsg += '<ul>';
+                            data.errors.forEach(err => errorMsg += `<li>${err}</li>`);
+                            errorMsg += '</ul>';
+                        }
+                        Swal.fire('Erreur', errorMsg, 'error');
+                    }
+                })
+                .catch(error => {
+                    Swal.fire('Erreur', 'Une erreur réseau est survenue', 'error');
+                });
         });
     </script>
 @endsection
