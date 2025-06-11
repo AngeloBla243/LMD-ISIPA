@@ -223,7 +223,7 @@
 @section('script')
     .
 
-    <script type="text/javascript">
+    {{-- <script type="text/javascript">
         $('.SaveAttendance').change(function(e) {
 
             var student_id = $(this).attr('id');
@@ -253,6 +253,48 @@
                 }
             });
 
+        });
+    </script> --}}
+
+    <script type="text/javascript">
+        $('.SaveAttendance').change(function(e) {
+            // L'id est de la forme 'present_42', 'absent_42', etc.
+            // On récupère uniquement la partie numérique (l'ID étudiant)
+            var fullId = $(this).attr('id'); // ex: "present_42"
+            var student_id = fullId.split('_').pop(); // "42"
+
+            var attendance_type = $(this).val();
+            var class_id = $('#getClass').val();
+            var attendance_date = $('#getAttendanceDate').val();
+
+            $.ajax({
+                type: "POST",
+                url: "{{ url('teacher/attendance/student/save') }}",
+                data: {
+                    "_token": "{{ csrf_token() }}",
+                    student_id: student_id,
+                    attendance_type: attendance_type,
+                    class_id: class_id,
+                    attendance_date: attendance_date,
+                },
+                dataType: "json",
+                success: function(data) {
+                    Swal.fire({
+                        title: 'Success!',
+                        text: data.message,
+                        icon: 'success',
+                        confirmButtonText: 'OK'
+                    });
+                },
+                error: function(xhr) {
+                    Swal.fire({
+                        title: 'Erreur',
+                        text: 'Une erreur est survenue lors de l\'enregistrement.',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            });
         });
     </script>
 @endsection

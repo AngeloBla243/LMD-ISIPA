@@ -601,6 +601,17 @@
                         </a>
                     </li>
 
+                    <li class="nav-item">
+                        <a href="{{ route('teacher.meetings.create') }}"
+                            class="nav-link @if (Request::is('teacher/meetings/create*')) active @endif">
+                            <i class="nav-icon fas fa-user-graduate"></i>
+                            <p>Me</p>
+                        </a>
+                    </li>
+
+
+
+
 
 
 

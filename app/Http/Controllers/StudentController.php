@@ -12,6 +12,8 @@ use Illuminate\Support\Str;
 use App\Models\StudentAttendanceModel;
 use App\Models\AcademicYear;
 
+use App\Imports\StudentsImport;
+
 use App\Models\AssignClassTeacherModel;
 
 use Maatwebsite\Excel\Facades\Excel;
@@ -24,24 +26,24 @@ class StudentController extends Controller
         return Excel::download(new ExportStudent, 'Student_' . date('d-m-Y') . '.xls');
     }
 
-    // public function list()
-    // {
-    //     $data['getRecord'] = User::getStudent();
-    //     $data['header_title'] = "Student List";
-    //     return view('admin.student.list', $data);
-    // }
 
-    // public function list()
-    // {
-    //     $data['getRecord'] = \App\Models\User::where('user_type', 3)
-    //         ->where('is_delete', 0)
-    //         ->with([
-    //             'studentClasses.academicYear',
-    //         ])
-    //         ->paginate(40);
-    //     $data['header_title'] = "Liste des étudiants";
-    //     return view('admin.student.list', $data);
-    // }
+    public function import()
+    {
+        $data['header_title'] = "Importer des étudiants";
+        return view('admin.student.import', $data);
+    }
+
+    public function importSubmit(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls,csv'
+        ]);
+
+        Excel::import(new StudentsImport, $request->file('file'));
+
+        return redirect('admin/student/list')->with('success', 'Étudiants importés avec succès');
+    }
+
 
     public function list()
     {
