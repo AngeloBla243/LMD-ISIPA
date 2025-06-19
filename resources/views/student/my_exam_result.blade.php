@@ -139,14 +139,14 @@
                                 href="{{ url('student/my_exam_result/print?exam_id=' . $value['exam_id'] . '&student_id=' . Auth::user()->id) }}"><i
                                     class="fas fa-file-pdf"></i> Print</a>
                         </div>
-                        <div class="card-body p-0 table-responsive"">
+                        <div class="card-body p-0 table-responsive">
                             @if (!empty($value['subject']))
                                 <table class="table styled-table table-bordered table-striped m-0">
                                     <thead>
                                         <tr>
-                                            <th>Ec</th>
-                                            <th>Crédit Ec</th>
-                                            <th>Note / 20</th>
+                                            <th>Ecs</th>
+                                            <th style="min-width: 180px;">Crédit Ec</th>
+                                            <th style="min-width: 180px;">Note / 20</th>
                                             <th>Décision</th>
                                         </tr>
                                     </thead>

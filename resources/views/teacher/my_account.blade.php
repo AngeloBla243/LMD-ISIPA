@@ -54,7 +54,8 @@
                                             <label for="gender" class="form-label fw-semibold">Genre <span
                                                     class="text-danger">*</span></label>
                                             <select id="gender" name="gender"
-                                                class="form-select @error('gender') is-invalid @enderror" required>
+                                                class="form-select form-control @error('gender') is-invalid @enderror"
+                                                required>
                                                 <option value="">Sélectionner</option>
                                                 <option value="Male"
                                                     {{ old('gender', $getRecord->gender) == 'Male' ? 'selected' : '' }}>

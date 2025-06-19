@@ -160,6 +160,26 @@
             margin-bottom: 20px;
         }
 
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .summary-table {
+            width: 100%;
+            border: 1px solid #ddd;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .summary-table th,
+        .summary-table td {
+            padding: 8px;
+            text-align: center;
+            background-color: var(--header-bg-color);
+            min-width: 100px;
+        }
+
         @keyframes fadeIn {
             to {
                 opacity: 1;
@@ -350,49 +370,69 @@ $mentionSemestre = getMention($semester['moyenne_semestre']);
             <h3 class="semester-name">
                 {{ $semesterName }}
             </h3>
-
-            <table>
-                <thead>
-                    <tr>
-                        <th rowspan="2" style="background:#fff;">Code UE</th>
-                        <th rowspan="2" style="background:#fff;">Intitulé UE/EC</th>
-                        <th colspan="2" style="background:#fff;">Crédit</th>
-                        <th colspan="2" style="background:#fff;">Note / 20</th>
-                        <th rowspan="2" style="background:#fff;">Décision</th>
-                    </tr>
-                    <tr>
-                        <th>EC</th>
-                        <th>UE</th>
-                        <th>EC</th>
-                        <th>UE</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($semester['ues'] as $ue)
-                        <tr class="ue-row">
-                            <td><strong>{{ $ue['ue']->code }}</strong></td>
-                            <td>
-                                <strong>{{ $ue['ue']->name }}</strong>
-                                @if (count($ue['ecs']) > 1)
-                                    <div class="ue-composee" style="color:#e74c3c; font-weight:bold;">UE composée</div>
-                                @endif
-                            </td>
-                            <td></td>
-                            <td rowspan="{{ count($ue['ecs']) + 1 }}"><strong>{{ $ue['ue']->credits }}</strong></td>
-                            <td></td>
-                            <td rowspan="{{ count($ue['ecs']) + 1 }}">
-                                <strong>{{ number_format($ue['moyenne'], 0, PHP_ROUND_HALF_UP) }}</strong>
-                            </td>
-                            <td rowspan="{{ count($ue['ecs']) + 1 }}"
-                                class="{{ $ue['moyenne'] >= 10 ? 'note-val' : 'note-nvl' }}">
-                                {{ $ue['moyenne'] >= 10 ? 'VAL' : 'NVL' }}
-                            </td>
+            <div class="table-container">
+                <table class="summary-table">
+                    <thead>
+                        <tr>
+                            <th rowspan="2" style="background:#fff;">Code UE</th>
+                            <th rowspan="2" style="background:#fff;">Intitulé UE/EC</th>
+                            <th colspan="2" style="background:#fff;">Crédit</th>
+                            <th colspan="2" style="background:#fff;">Note / 20</th>
+                            <th rowspan="2" style="background:#fff;">Décision</th>
                         </tr>
-                        @foreach ($ue['ecs'] as $ec)
-                            <tr class="ec-row">
+                        <tr>
+                            <th>EC</th>
+                            <th>UE</th>
+                            <th>EC</th>
+                            <th>UE</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($semester['ues'] as $ue)
+                            <tr class="ue-row">
+                                <td><strong>{{ $ue['ue']->code }}</strong></td>
+                                <td>
+                                    <strong>{{ $ue['ue']->name }}</strong>
+                                    @if (count($ue['ecs']) > 1)
+                                        <div class="ue-composee" style="color:#e74c3c; font-weight:bold;">UE composée
+                                        </div>
+                                    @endif
+                                </td>
                                 <td></td>
-                                <td class="ec-indent" style="text-align:left; padding-left: 25px;">→
-                                    {{ $ec['subject']->name }}</td>
+                                <td rowspan="{{ count($ue['ecs']) + 1 }}"><strong>{{ $ue['ue']->credits }}</strong>
+                                </td>
+                                <td></td>
+                                <td rowspan="{{ count($ue['ecs']) + 1 }}">
+                                    <strong>{{ number_format($ue['moyenne'], 0, PHP_ROUND_HALF_UP) }}</strong>
+                                </td>
+                                <td rowspan="{{ count($ue['ecs']) + 1 }}"
+                                    class="{{ $ue['moyenne'] >= 10 ? 'note-val' : 'note-nvl' }}">
+                                    {{ $ue['moyenne'] >= 10 ? 'VAL' : 'NVL' }}
+                                </td>
+                            </tr>
+                            @foreach ($ue['ecs'] as $ec)
+                                <tr class="ec-row">
+                                    <td></td>
+                                    <td class="ec-indent" style="text-align:left; padding-left: 25px;">→
+                                        {{ $ec['subject']->name }}</td>
+                                    <td>{{ $ec['ponde'] }}</td>
+                                    <td class="{{ $ec['score'] >= 10 ? 'note-val' : 'note-nvl' }}">
+                                        {{ $ec['score'] }}
+                                        @if ($ec['is_session2'])
+                                            <span class="session2"
+                                                style="font-size:0.85em; color:#f39c12; font-style:italic;">(2e
+                                                session)</span>
+                                        @endif
+                                    </td>
+                                </tr>
+                            @endforeach
+                        @endforeach
+
+                        @foreach ($semester['ecsAutonomes'] as $ec)
+                            <tr class="ue-row">
+                                <td>{{ $ec['subject']->code }}</td>
+                                <td><strong>{{ $ec['subject']->name }} (EC autonome)</strong></td>
+                                <td>{{ $ec['ponde'] }}</td>
                                 <td>{{ $ec['ponde'] }}</td>
                                 <td class="{{ $ec['score'] >= 10 ? 'note-val' : 'note-nvl' }}">
                                     {{ $ec['score'] }}
@@ -402,35 +442,17 @@ $mentionSemestre = getMention($semester['moyenne_semestre']);
                                             session)</span>
                                     @endif
                                 </td>
+                                <td>{{ $ec['score'] }}</td>
+                                <td class="{{ $ec['score'] >= 10 ? 'note-val' : 'note-nvl' }}">
+                                    {{ $ec['score'] >= 10 ? 'VAL' : 'NVL' }}
+                                </td>
                             </tr>
                         @endforeach
-                    @endforeach
-
-                    @foreach ($semester['ecsAutonomes'] as $ec)
-                        <tr class="ue-row">
-                            <td>{{ $ec['subject']->code }}</td>
-                            <td><strong>{{ $ec['subject']->name }} (EC autonome)</strong></td>
-                            <td>{{ $ec['ponde'] }}</td>
-                            <td>{{ $ec['ponde'] }}</td>
-                            <td class="{{ $ec['score'] >= 10 ? 'note-val' : 'note-nvl' }}">
-                                {{ $ec['score'] }}
-                                @if ($ec['is_session2'])
-                                    <span class="session2"
-                                        style="font-size:0.85em; color:#f39c12; font-style:italic;">(2e
-                                        session)</span>
-                                @endif
-                            </td>
-                            <td>{{ $ec['score'] }}</td>
-                            <td class="{{ $ec['score'] >= 10 ? 'note-val' : 'note-nvl' }}">
-                                {{ $ec['score'] >= 10 ? 'VAL' : 'NVL' }}
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-
-            <div class="decision-box" style="margin-bottom:30px;">
-                <table style="width: 100%; border-collapse: collapse;">
+                    </tbody>
+                </table>
+            </div>
+            <div class="decision-box table-container" style="margin-bottom:30px;">
+                <table class="summary-table" style="width: 100%; border-collapse: collapse;">
                     <tr>
                         <th style="background: #f0f0f0;">Crédits obtenus / {{ $semester['credits_possibles'] }}</th>
                         <th style="background: #f0f0f0;">Moyenne / 20</th>
@@ -452,9 +474,9 @@ $mentionSemestre = getMention($semester['moyenne_semestre']);
             </div>
         @endforeach
 
-        <div class="annual-summary" style="margin-top: 40px;">
+        <div class="annual-summary table-container" style="margin-top: 40px;">
             <h3 class="semester-name">SYNTHÈSE ANNUELLE</h3>
-            <table>
+            <table class="summary-table">
                 <tr>
                     <th>Crédits capitalisés / {{ $totalCreditsPossibles }}</th>
                     <th>Moyenne générale / 20</th>

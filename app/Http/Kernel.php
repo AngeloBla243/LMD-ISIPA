@@ -38,6 +38,7 @@ class Kernel extends HttpKernel
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
             \App\Http\Middleware\OnlineUer::class,
             \App\Http\Middleware\SetAcademicYear::class,
+            \App\Http\Middleware\UpgradeToHttpsUnderNgrok::class,
 
         ],
 

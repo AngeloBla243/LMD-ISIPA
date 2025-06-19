@@ -436,88 +436,90 @@ if ($moyenneGenerale >= 18) {
             style="background:{{ $backgroundColor }};color:#fff;padding:12px 0;border-radius:6px;margin:15px 0 20px 0;text-align:center;font-weight:bold;transition:background 0.4s;">
             <span style="font-size:1.2em;margin-right:7px;">{!! $icon !!}</span> {!! $message !!}
         </div>
-        <table>
-            <thead>
-                <tr>
-                    <th rowspan="2" style="background:#fff;">Code UE</th>
-                    <th rowspan="2" style="background:#fff;">Intitulé UE/EC</th>
-                    <th colspan="2" style="background:#fff;">Crédit</th>
-                    <th colspan="2" style="background:#fff;">Note / 20</th>
-                    <th rowspan="2" style="background:#fff;">Décision</th>
-                </tr>
-                <tr>
-                    {{-- <th style="background:#fff;"></th>
-                    <th style="background:#fff;"></th> --}}
-                    <th>EC</th>
-                    <th>UE</th>
-                    <th>EC</th>
-                    <th>UE</th>
-                    {{-- <th style="background:#fff;"></th> --}}
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($uesData as $ueId => $ueData)
-                    <tr class="ue-row">
-                        <td><strong>{{ $ueData['ue']->code }}</strong></td>
-                        <td>
-                            <strong>{{ $ueData['ue']->name }}</strong>
-                            @if (count($ueData['subjects']) > 1)
-                                <div class="ue-composee"></div>
-                            @endif
-                        </td>
-                        <td></td>
-                        <td rowspan="{{ count($ueData['subjects']) + 1 }}">
-                            <strong>{{ $ueData['ue']->credits }}</strong>
-                        </td>
-                        <td></td>
-                        <td rowspan="{{ count($ueData['subjects']) + 1 }}">
-                            {{-- <strong>{{ $ueData['moyenne'] }}</strong> --}}
-                            <strong>{{ round($ueData['moyenne'], 0, PHP_ROUND_HALF_UP) }}</strong>
-                        </td>
-                        <td rowspan="{{ count($ueData['subjects']) + 1 }}" style="background:#fff;">
-                            @if ($ueData['is_compensated'])
-                                <span class="badge
-                            badge-comp">Compensée</span>
-                            @else
-                                <span class="badge {{ $ueData['moyenne'] >= 10 ? 'badge-adm' : 'badge-def' }}">
-                                    {{ $ueData['moyenne'] >= 10 ? 'VAL' : 'NVL' }}
-                                </span>
-                            @endif
-                        </td>
+        <div class="table-container">
+            <table class="summary-table">
+                <thead>
+                    <tr>
+                        <th rowspan="2" style="background:#fff;">Code UE</th>
+                        <th rowspan="2" style="background:#fff;">Intitulé UE/EC</th>
+                        <th colspan="2" style="background:#fff;">Crédit</th>
+                        <th colspan="2" style="background:#fff;">Note / 20</th>
+                        <th rowspan="2" style="background:#fff;">Décision</th>
                     </tr>
-                    @foreach ($ueData['subjects'] as $subject)
-                        <tr class="ec-row">
-                            <td></td>
-                            <td class="ec-indent">→ {{ $subject['subject_name'] }}</td>
-                            <td>{{ $subject['ponde'] }}</td>
-                            {{-- <td></td> --}}
-                            <td class="{{ $subject['note_finale'] < 10 ? 'note-rouge' : 'note-verte' }}">
-                                {{ $subject['note_finale'] }}
+                    <tr>
+                        {{-- <th style="background:#fff;"></th>
+                    <th style="background:#fff;"></th> --}}
+                        <th>EC</th>
+                        <th>UE</th>
+                        <th>EC</th>
+                        <th>UE</th>
+                        {{-- <th style="background:#fff;"></th> --}}
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($uesData as $ueId => $ueData)
+                        <tr class="ue-row">
+                            <td><strong>{{ $ueData['ue']->code }}</strong></td>
+                            <td>
+                                <strong>{{ $ueData['ue']->name }}</strong>
+                                @if (count($ueData['subjects']) > 1)
+                                    <div class="ue-composee"></div>
+                                @endif
                             </td>
+                            <td></td>
+                            <td rowspan="{{ count($ueData['subjects']) + 1 }}">
+                                <strong>{{ $ueData['ue']->credits }}</strong>
+                            </td>
+                            <td></td>
+                            <td rowspan="{{ count($ueData['subjects']) + 1 }}">
+                                {{-- <strong>{{ $ueData['moyenne'] }}</strong> --}}
+                                <strong>{{ round($ueData['moyenne'], 0, PHP_ROUND_HALF_UP) }}</strong>
+                            </td>
+                            <td rowspan="{{ count($ueData['subjects']) + 1 }}" style="background:#fff;">
+                                @if ($ueData['is_compensated'])
+                                    <span class="badge
+                            badge-comp">Compensée</span>
+                                @else
+                                    <span class="badge {{ $ueData['moyenne'] >= 10 ? 'badge-adm' : 'badge-def' }}">
+                                        {{ $ueData['moyenne'] >= 10 ? 'VAL' : 'NVL' }}
+                                    </span>
+                                @endif
+                            </td>
+                        </tr>
+                        @foreach ($ueData['subjects'] as $subject)
+                            <tr class="ec-row">
+                                <td></td>
+                                <td class="ec-indent">→ {{ $subject['subject_name'] }}</td>
+                                <td>{{ $subject['ponde'] }}</td>
+                                {{-- <td></td> --}}
+                                <td class="{{ $subject['note_finale'] < 10 ? 'note-rouge' : 'note-verte' }}">
+                                    {{ $subject['note_finale'] }}
+                                </td>
 
+                            </tr>
+                        @endforeach
+                    @endforeach
+                    @foreach ($subjectsWithoutUe as $subject)
+                        <tr class="ue-row">
+                            <td>{{ $subject['subject_code'] ?? 'AUTO' }}</td>
+                            <td><strong>{{ $subject['subject_name'] }} (UE Autonome)</strong></td>
+                            <td style="background:#fff;"></td>
+                            <td>{{ $subject['ponde'] }}</td>
+                            <td class="{{ $subject['note_finale'] < 10 ? 'note-rouge' : 'note-verte' }}"
+                                style="background:#fff;">
+                                {{-- {{ $subject['note_finale'] }} --}}
+                            </td>
+                            <td>{{ $subject['note_finale'] }}</td>
+                            <td style="background:#fff;">
+                                <span class="badge {{ $subject['note_finale'] >= 10 ? 'badge-adm' : 'badge-def' }}">
+                                    {{ $subject['note_finale'] >= 10 ? 'VAL' : 'NVL' }}
+                                </span>
+                            </td>
                         </tr>
                     @endforeach
-                @endforeach
-                @foreach ($subjectsWithoutUe as $subject)
-                    <tr class="ue-row">
-                        <td>{{ $subject['subject_code'] ?? 'AUTO' }}</td>
-                        <td><strong>{{ $subject['subject_name'] }} (UE Autonome)</strong></td>
-                        <td style="background:#fff;"></td>
-                        <td>{{ $subject['ponde'] }}</td>
-                        <td class="{{ $subject['note_finale'] < 10 ? 'note-rouge' : 'note-verte' }}"
-                            style="background:#fff;">
-                            {{-- {{ $subject['note_finale'] }} --}}
-                        </td>
-                        <td>{{ $subject['note_finale'] }}</td>
-                        <td style="background:#fff;">
-                            <span class="badge {{ $subject['note_finale'] >= 10 ? 'badge-adm' : 'badge-def' }}">
-                                {{ $subject['note_finale'] >= 10 ? 'VAL' : 'NVL' }}
-                            </span>
-                        </td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
+                </tbody>
+            </table>
+        </div>
         <div class="table-container">
             <table class="summary-table">
                 <tr>

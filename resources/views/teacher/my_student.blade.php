@@ -79,12 +79,12 @@
                                             <th style="min-width: 130px;">N° Rôle</th>
                                             <th style="min-width: 120px;">Classe</th>
                                             <th>Genre</th>
-                                            <th style="min-width: 140px;">Date de Naissance</th>
+                                            <th style="min-width: 200px;">Date de Naissance</th>
                                             <th>Caste</th>
                                             <th>Religion</th>
                                             <th style="min-width: 150px;">Téléphone</th>
                                             <th style="min-width: 140px;">Date Admission</th>
-                                            <th style="min-width: 120px;">Groupe Sanguin</th>
+                                            <th style="min-width: 200px;">Groupe Sanguin</th>
                                             <th>Taille</th>
                                             <th>Poids</th>
                                             <th style="min-width: 160px;">Créé le</th>
@@ -107,7 +107,8 @@
                                                 <td>{{ $value->email }}</td>
                                                 <td>{{ $value->admission_number }}</td>
                                                 <td>{{ $value->roll_number }}</td>
-                                                <td>{{ $value->class_name }} {{ $value->class_opt }}</td>
+                                                <td style="min-width: 200px;">{{ $value->class_name }}
+                                                    {{ $value->class_opt }}</td>
                                                 <td>{{ $value->gender }}</td>
                                                 <td>
                                                     @if (!empty($value->date_of_birth))

@@ -76,14 +76,12 @@
                                     <div class="row g-3">
                                         <div class="col-md-3">
                                             <label class="form-label fw-semibold">Exam</label>
-                                            <select class="form-select form-control getClass" name="exam_id" required>
-                                                <option value="">Select</option>
+                                            <select name="exam_id" id="exam_id" class="form-select form-control">
                                                 @foreach ($getExam as $exam)
-                                                    <option
-                                                        {{ Request::get('exam_id') == $exam->exam_id ? 'selected' : '' }}
-                                                        value="{{ $exam->exam_id }}">{{ $exam->exam_name }}</option>
+                                                    <option value="{{ $exam->id }}">{{ $exam->name }}</option>
                                                 @endforeach
                                             </select>
+
                                         </div>
                                         <div class="col-md-3">
                                             <label class="form-label fw-semibold">Class</label>
@@ -91,11 +89,12 @@
                                                 <option value="">Select</option>
                                                 @foreach ($getClass as $class)
                                                     <option
-                                                        {{ Request::get('class_id') == $class->class_id ? 'selected' : '' }}
-                                                        value="{{ $class->class_id }}">{{ $class->class_name }}
-                                                        {{ $class->class_opt }}</option>
+                                                        {{ Request::get('class_id') == $class['class_id'] ? 'selected' : '' }}
+                                                        value="{{ $class['class_id'] }}">{{ $class['class_name'] }}
+                                                        {{ $class['class_opt'] }}</option>
                                                 @endforeach
                                             </select>
+
                                         </div>
                                         <div class="col-md-3 d-flex align-items-end gap-2">
                                             <button class="btn btn-primary w-100" type="submit">
