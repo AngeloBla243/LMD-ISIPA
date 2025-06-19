@@ -346,26 +346,38 @@ class ExaminationsController extends Controller
     }
 
 
-
-
     public function marks_register_teacher(Request $request)
     {
-        $data['getClass'] = AssignClassTeacherModel::getMyClassSubjectGroup(Auth::user()->id);
-        // dd($data['getClass']);
-        $data['getExam'] = ExamScheduleModel::getExamTeacher(Auth::user()->id);
-        // dd($data['getExam']);
+        $teacherId = Auth::user()->id;
+        // Récupérer l'année académique sélectionnée ou active
+        $allAcademicYears = \App\Models\AcademicYear::orderBy('start_date', 'desc')->get();
+        $currentYearId = session('academic_year_id', $allAcademicYears->where('is_active', 1)->first()?->id);
+
+        // $data['getClass'] = AssignClassTeacherModel::getMyClassSubjectGroup($teacherId, $currentYearId);
+        $data['getClass'] = \App\Models\AssignClassTeacherModel::where('teacher_id', $teacherId)
+            ->where('academic_year_id', $currentYearId)
+            ->with('class')
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'class_id' => $item->class_id,
+                    'class_name' => $item->class->name,
+                    'class_opt' => $item->class->opt,
+                ];
+            });
+
+        // Filtrer les examens par année académique
+        $data['getExam'] = \App\Models\ExamModel::where('academic_year_id', $currentYearId)->get();
 
         if (!empty($request->get('exam_id')) && !empty($request->get('class_id'))) {
-            $data['getSubject'] = ExamScheduleModel::getSubject_teacher($request->get('exam_id'), $request->get('class_id'), Auth::user()->id);
-            // dd($data['getSubject']);
-
-
-            $data['getStudent'] = User::getStudentClass($request->get('class_id'));
+            $data['getSubject'] = ExamScheduleModel::getSubject_teacher($request->get('exam_id'), $request->get('class_id'), $teacherId);
+            $data['getStudent'] = User::getStudentClass($request->get('class_id'), $currentYearId);
         }
 
         $data['header_title'] = "Marks Register";
         return view('teacher.marks_register', $data);
     }
+
 
 
     // public function submit_marks_register(Request $request)

@@ -110,13 +110,13 @@
                                 <table class="table table-hover table-bordered align-middle mb-0 styled-table">
                                     <thead class="table-primary text-center text-uppercase small">
                                         <tr>
-                                            <th>Student ID</th>
-                                            <th>Student Name</th>
-                                            <th>Class Name</th>
-                                            <th>Attendance Type</th>
-                                            <th>Attendance Date</th>
-                                            <th>Created By</th>
-                                            <th>Created Date</th>
+                                            <th style="min-width: 180px;">Student ID</th>
+                                            <th style="min-width: 200px;">Student Name</th>
+                                            <th style="min-width: 200px;">Class Name</th>
+                                            <th style="min-width: 200px;">Attendance Type</th>
+                                            <th style="min-width: 200px;">Attendance Date</th>
+                                            <th style="min-width: 200px;">Created By</th>
+                                            <th style="min-width: 200px;">Created Date</th>
                                         </tr>
                                     </thead>
                                     <tbody>

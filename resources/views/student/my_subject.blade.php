@@ -143,7 +143,7 @@
                                     <thead class="table-primary text-center text-uppercase small">
                                         <tr>
                                             <th>Nom du cours</th>
-                                            <th>Type de cours</th>
+                                            <th style="min-width: 180px;">Type de cours</th>
                                             {{-- <th style="min-width: 180px;">Recours</th> --}}
                                         </tr>
                                     </thead>

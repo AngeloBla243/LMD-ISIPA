@@ -71,9 +71,9 @@
                                 <table class="table table-bordered table-striped mb-0 styled-table">
                                     <thead class="table-primary text-center text-uppercase small">
                                         <tr>
-                                            <th style="min-width: 160px;">Nom de la Classe</th>
-                                            <th style="min-width: 280px;">Nom de la Matière</th>
-                                            <th style="min-width: 140px;">Type de Matière</th>
+                                            <th style="min-width: 200px;">Nom de la Classe</th>
+                                            <th style="min-width: 200px;">Nom de la Matière</th>
+                                            <th style="min-width: 200px;">Type de Matière</th>
                                             <th style="min-width: 220px;">Mon Emploi du Temps</th>
                                             <th style="min-width: 160px;">Date de Création</th>
                                             <th style="min-width: 240px;">Action</th>
@@ -82,7 +82,8 @@
                                     <tbody>
                                         @forelse($getRecord as $value)
                                             <tr>
-                                                <td class="text-center">{{ $value->class_name }} {{ $value->class_opt }}
+                                                <td class="text-center" style="min-width: 220px;">{{ $value->class_name }}
+                                                    {{ $value->class_opt }}
                                                 </td>
                                                 <td>{{ $value->subject_name }}</td>
                                                 <td class="text-center">{{ $value->subject_type }}</td>

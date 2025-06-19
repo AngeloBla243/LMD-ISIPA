@@ -125,13 +125,13 @@
                                                 <th>Classe</th>
                                                 <th>Type</th>
                                                 <th>Date</th>
-                                                <th>Créé le</th>
+                                                <th style="min-width: 180px;">Créé le</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             @foreach ($getRecord as $value)
                                                 <tr>
-                                                    <td class="fw-semibold text-center">
+                                                    <td class="fw-semibold text-center" style="min-width: 180px;">
                                                         {{ $value->class_name }} {{ $value->class_opt }}
                                                     </td>
                                                     <td class="text-center">
@@ -156,10 +156,10 @@
                                                                 <span class="badge bg-secondary">Inconnu</span>
                                                         @endswitch
                                                     </td>
-                                                    <td class="text-center">
+                                                    <td class="text-center" style="min-width: 180px;">
                                                         {{ \Carbon\Carbon::parse($value->attendance_date)->format('d-m-Y') }}
                                                     </td>
-                                                    <td class="text-center">
+                                                    <td class="text-center" style="min-width: 180px;">
                                                         {{ \Carbon\Carbon::parse($value->created_at)->format('d-m-Y H:i') }}
                                                     </td>
                                                 </tr>

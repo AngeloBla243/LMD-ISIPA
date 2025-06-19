@@ -11,16 +11,16 @@
                 </div>
             @else
                 <div class="card shadow-sm">
-                    <div class="card-body p-0">
+                    <div class="card-body p-0 table-responsive">
                         <table class="table table-hover mb-0">
                             <thead class="bg-light">
                                 <tr>
                                     <th>Type</th>
                                     <th>Titre</th>
                                     <th>Encadrant</th>
-                                    <th>Taux de plagiat</th>
-                                    <th>Statut plagiat</th>
-                                    <th>Statut de validation</th>
+                                    <th style="min-width: 200px;">Taux de plagiat</th>
+                                    <th style="min-width: 200px;">Statut plagiat</th>
+                                    <th style="min-width: 200px;">Statut de validation</th>
                                     <th>Date</th>
                                 </tr>
                             </thead>

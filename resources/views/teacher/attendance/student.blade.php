@@ -113,8 +113,9 @@
                                                     @endphp
                                                     <tr>
                                                         <td class="text-center">{{ $value->id }}</td>
-                                                        <td>{{ $value->name }} {{ $value->last_name }}</td>
-                                                        <td>
+                                                        <td style="min-width: 200px;">{{ $value->name }}
+                                                            {{ $value->last_name }}</td>
+                                                        <td style="min-width: 250px;">
                                                             <div class="d-flex flex-wrap gap-3">
                                                                 <div class="form-check form-check-inline">
                                                                     <input value="1" type="radio"
