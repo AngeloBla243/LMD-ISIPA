@@ -16,36 +16,6 @@ use Illuminate\Support\Facades\Auth;
 
 class CalendarController extends Controller
 {
-    // public function MyCalendar()
-    // {
-    //     // Récupère l'ID de l'année académique dans l'ordre de priorité :
-    //     // 1. Session > 2. Requête GET > 3. Année active par défaut
-    //     $academicYearId = session(
-    //         'academic_year_id',
-    //         request()->get(
-    //             'academic_year_id',
-    //             AcademicYear::where('is_active', 1)->value('id')
-    //         )
-    //     );
-
-    //     // Passe academicYearId aux méthodes
-    //     $data['getMyTimetable'] = $this->getTimetable(
-    //         Auth::user()->class_id,
-    //         $academicYearId
-    //     );
-
-    //     $data['getExamTimetable'] = $this->getExamTimetable(
-    //         Auth::user()->class_id,
-    //         $academicYearId
-    //     );
-
-    //     // Pour le filtre dans la vue
-    //     $data['academicYears'] = AcademicYear::orderBy('start_date', 'desc')->get();
-    //     $data['selectedAcademicYear'] = AcademicYear::find($academicYearId);
-
-    //     return view('student.my_calendar', $data);
-    // }
-
     public function MyCalendar()
     {
         // 1. Récupérer l'année académique

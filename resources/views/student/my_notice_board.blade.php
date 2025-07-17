@@ -64,19 +64,23 @@
                             <div class="card card-primary card-outline">
                                 <div class="card-body p-0">
                                     <div class="mailbox-read-info">
-                                        <h5>{{ $value->title }}</h5>
+                                        <h5>
+                                            <!-- LIEN CLIQUABLE vers le détail -->
+                                            <a href="{{ route('student.notice.detail', $value->id) }}">
+                                                {{ $value->title }}
+                                            </a>
+                                        </h5>
                                         <h6 style="margin-top: 10px;"> {{ date('d-m-Y', strtotime($value->notice_date)) }}
                                         </h6>
                                     </div>
                                     <div class="mailbox-read-message">
-                                        {!! $value->message !!}
+                                        {!! Str::limit(strip_tags($value->message), 150) !!}
                                     </div>
-
                                 </div>
-
                             </div>
                         </div>
                     @endforeach
+
 
                     <div class="col-md-12">
                         <div style="padding: 10px; float: right;">

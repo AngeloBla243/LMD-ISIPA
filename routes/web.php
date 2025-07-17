@@ -27,6 +27,10 @@ use App\Http\Controllers\AcademicYearController;
 use App\Http\Controllers\UeController;
 use App\Http\Controllers\SemesterController;
 use App\Http\Controllers\MeetingController;
+use App\Http\Controllers\TeacherExamController;
+use App\Http\Controllers\QuestionController;
+use App\Http\Controllers\StudentExamController;
+
 
 
 
@@ -486,10 +490,27 @@ Route::group(['middleware' => 'teacher'], function () {
     // Pour les étudiants
     // Route::get('student/meetings', [MeetingController::class, 'studentMeetings'])->name('student.meetings');
 
+    // Routes pour les enseignants
+    Route::get('teacher/exams', [TeacherExamController::class, 'index'])->name('teacher.exams.index');
+    Route::get('teacher/exams/create', [TeacherExamController::class, 'create'])->name('teacher.exams.create');
+    // Route AJAX pour récupérer les matières du prof pour une classe donnée
+    Route::get('teacher/exams/get-subjects/{class_id}', [TeacherExamController::class, 'getSubjectsByClass']);
 
-    // Pour les étudiants
 
 
+    Route::post('teacher/exams/store', [TeacherExamController::class, 'store'])->name('teacher.exams.store');
+    Route::get('teacher/exams/{exam}/questions/create', [QuestionController::class, 'create'])->name('teacher.exams.questions.create');
+    Route::post('teacher/exams/{exam}/questions/store', [QuestionController::class, 'store'])->name('teacher.exams.questions.store');
+
+    // Édition d'un examen
+    Route::get('teacher/exams/{exam}/edit', [TeacherExamController::class, 'edit'])->name('teacher.exams.edit');
+    Route::put('teacher/exams/{exam}', [TeacherExamController::class, 'update'])->name('teacher.exams.update');
+
+    // Suppression d'un examen
+    Route::delete('teacher/exams/{exam}', [TeacherExamController::class, 'destroy'])->name('teacher.exams.destroy');
+
+    // Résultats d'un examen
+    Route::get('teacher/exams/{exam}/results', [TeacherExamController::class, 'results'])->name('teacher.exams.results');
 });
 
 
@@ -545,6 +566,9 @@ Route::group(['middleware' => 'student'], function () {
 
     Route::get('student/my_notice_board', [CommunicateController::class, 'MyNoticeBoardStudent']);
 
+    Route::get('student/notice/{id}', [CommunicateController::class, 'NoticeBoardDetail'])->name('student.notice.detail');
+
+
 
     Route::get('student/my_homework', [HomeworkController::class, 'HomeworkStudent']);
     Route::get('student/my_homework/submit_homework/{id}', [HomeworkController::class, 'SubmitHomework']);
@@ -567,6 +591,13 @@ Route::group(['middleware' => 'student'], function () {
 
     Route::get('/student/meetings', [MeetingController::class, 'getClassMeetings'])
         ->middleware('auth:student');
+
+    // Routes pour les étudiants
+    Route::get('student/exams', [StudentExamController::class, 'index'])->name('student.exams.index');
+    Route::get('student/exams/{exam}', [StudentExamController::class, 'show'])->name('student.exams.show');
+    // Dans le groupe/middleware 'student' si existant :
+    Route::post('student/exams/{exam}/submit', [StudentExamController::class, 'submit'])->name('student.exams.submit');
+    Route::get('student/exams/{exam}/result', [StudentExamController::class, 'result'])->name('student.exams.result');
 });
 
 

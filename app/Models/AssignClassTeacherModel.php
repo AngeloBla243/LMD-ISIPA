@@ -229,4 +229,9 @@ class AssignClassTeacherModel extends Model
     {
         return $this->belongsTo(SubjectModel::class);
     }
+
+    public function subjects()
+    {
+        return $this->belongsTo(SubjectModel::class, 'subject_id');
+    }
 }
