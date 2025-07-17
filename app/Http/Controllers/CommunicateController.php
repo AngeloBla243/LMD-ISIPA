@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\NoticeReadModel;
+
 use App\Models\NoticeBoardModel;
 use App\Models\NoticeBoardMessageModel;
 use App\Mail\SendEmailUserMail;
@@ -187,5 +189,39 @@ class CommunicateController extends Controller
         $data['getRecord'] = NoticeBoardModel::getRecordUser(3);
         $data['header_title'] = 'My Notice Board';
         return view('parent.my_student_notice_board', $data);
+    }
+
+
+
+    // public function NoticeBoardDetail($id)
+    // {
+    //     $notice = NoticeBoardModel::findOrFail($id);
+    //     $userId = Auth::id();
+
+    //     // Marquer comme lu
+    //     NoticeReadModel::firstOrCreate([
+    //         'notice_board_id' => $id,
+    //         'user_id' => $userId,
+    //     ], [
+    //         'read_at' => now()
+    //     ]);
+
+
+
+    //     return view('student.notice_detail', compact('notice'));
+    // }
+
+    public function NoticeBoardDetail($id)
+    {
+        $notice = NoticeBoardModel::findOrFail($id);
+        $userId = Auth::id();
+
+        $res = NoticeReadModel::firstOrCreate([
+            'notice_board_id' => $id,
+            'user_id' => $userId,
+        ], [
+            'read_at' => now()
+        ]);
+        return view('student.notice_detail', compact('notice'));
     }
 }

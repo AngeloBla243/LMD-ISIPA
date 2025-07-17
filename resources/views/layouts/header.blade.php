@@ -148,7 +148,7 @@
                             class="nav-link @if (Request::segment(2) == 'dashboard') active @endif">
                             <i class="nav-icon fas fa-tachometer-alt"></i>
                             <p>
-                                Dashboard
+                                Tableau de bord
                             </p>
                         </a>
                     </li>
@@ -170,7 +170,7 @@
                             class="nav-link @if (Request::segment(2) == 'teacher') active @endif">
                             <i class="nav-icon fa fa-list-alt"></i>
                             <p>
-                                Teacher
+                                Professeurs
                             </p>
                         </a>
                     </li>
@@ -180,7 +180,7 @@
                             class="nav-link @if (Request::segment(2) == 'student') active @endif">
                             <i class="nav-icon fa fa-list-alt"></i>
                             <p>
-                                Student
+                                Étudiants
                             </p>
                         </a>
                     </li>
@@ -202,7 +202,7 @@
                             class="nav-link @if (Request::segment(2) == 'parent') active @endif">
                             <i class="nav-icon fa fa-list-alt"></i>
                             <p>
-                                Parent
+                                Parents
                             </p>
                         </a>
                     </li>
@@ -225,7 +225,7 @@
                                 Request::segment(2) == 'class_timetable') active @endif">
                             <i class="nav-icon fa-solid fa-calendar-days"></i>
                             <p>
-                                Academics
+                                Gestion académique
                                 <i class="fas fa-angle-left right"></i>
                             </p>
                         </a>
@@ -243,7 +243,7 @@
                                 <a href="{{ url('admin/class/list') }}"
                                     class="nav-link @if (Request::segment(2) == 'class') active @endif">
                                     <i class="far fa-circle nav-icon"></i>
-                                    <p>Class</p>
+                                    <p>Classe</p>
                                 </a>
                             </li>
 
@@ -261,7 +261,7 @@
                                 <a href="{{ url('admin/subject/list') }}"
                                     class="nav-link @if (Request::segment(2) == 'subject') active @endif">
                                     <i class="far fa-circle nav-icon"></i>
-                                    <p>Subject</p>
+                                    <p>Cours</p>
                                 </a>
                             </li>
 
@@ -278,7 +278,7 @@
                                 <a href="{{ url('admin/assign_subject/list') }}"
                                     class="nav-link @if (Request::segment(2) == 'assign_subject') active @endif">
                                     <i class="far fa-circle nav-icon"></i>
-                                    <p>Assign Subject</p>
+                                    <p>Attribuer un Cours</p>
                                 </a>
                             </li>
 
@@ -286,7 +286,7 @@
                                 <a href="{{ url('admin/class_timetable/list') }}"
                                     class="nav-link @if (Request::segment(2) == 'class_timetable') active @endif">
                                     <i class="far fa-circle nav-icon"></i>
-                                    <p>Class Timetable</p>
+                                    <p>Horaire des cours</p>
                                 </a>
                             </li>
 
@@ -294,7 +294,7 @@
                                 <a href="{{ url('admin/assign_class_teacher/list') }}"
                                     class="nav-link @if (Request::segment(2) == 'assign_class_teacher') active @endif">
                                     <i class="far fa-circle nav-icon"></i>
-                                    <p>Assign Class Teacher</p>
+                                    <p>Attribuer un enseignant à la classe</p>
                                 </a>
                             </li>
                         </ul>
@@ -307,7 +307,7 @@
                         <a href="#" class="nav-link  @if (Request::segment(2) == 'fees_collection') active @endif">
                             <i class="nav-icon fa-solid fa-wallet"></i>
                             <p>
-                                Fees Collection
+                                Collecte des frais
                                 <i class="fas fa-angle-left right"></i>
                             </p>
                         </a>
@@ -316,7 +316,7 @@
                                 <a href="{{ url('admin/fees_collection/collect_fees') }}"
                                     class="nav-link @if (Request::segment(3) == 'collect_fees') active @endif">
                                     <i class="far fa-circle nav-icon"></i>
-                                    <p>Collect Fees</p>
+                                    <p>Percevoir les frais</p>
                                 </a>
                             </li>
 
@@ -324,7 +324,7 @@
                                 <a href="{{ url('admin/fees_collection/collect_fees_report') }}"
                                     class="nav-link @if (Request::segment(3) == 'collect_fees_report') active @endif">
                                     <i class="far fa-circle nav-icon"></i>
-                                    <p>Collect Fees Report</p>
+                                    <p>Rapport de collecte des frais</p>
                                 </a>
                             </li>
                         </ul>
@@ -335,7 +335,7 @@
                         <a href="#" class="nav-link  @if (Request::segment(2) == 'examinations') active @endif">
                             <i class="nav-icon  fa-solid fa-user-pen"></i>
                             <p>
-                                Examinations
+                                Gestion de Session
                                 <i class="fas fa-angle-left right"></i>
                             </p>
                         </a>
@@ -345,7 +345,7 @@
                                 <a href="{{ route('admin.semester.list') }}"
                                     class="nav-link @if (Request::segment(3) == 'semestre') active @endif">
                                     <i class="far fa-circle nav-icon"></i>
-                                    <p>Nouveau Semestre</p>
+                                    <p>Semestre</p>
                                 </a>
                             </li>
 
@@ -353,7 +353,7 @@
                                 <a href="{{ url('admin/examinations/exam/list') }}"
                                     class="nav-link @if (Request::segment(3) == 'exam') active @endif">
                                     <i class="far fa-circle nav-icon"></i>
-                                    <p>Exam</p>
+                                    <p>Session</p>
                                 </a>
                             </li>
 
@@ -362,7 +362,7 @@
                                 <a href="{{ url('admin/examinations/exam_schedule') }}"
                                     class="nav-link @if (Request::segment(3) == 'exam_schedule') active @endif">
                                     <i class="far fa-circle nav-icon"></i>
-                                    <p>Exam Schedule</p>
+                                    <p>Calendrier des sessions</p>
                                 </a>
                             </li>
 
@@ -371,22 +371,9 @@
                                 <a href="{{ url('admin/examinations/marks_register') }}"
                                     class="nav-link @if (Request::segment(3) == 'marks_register') active @endif">
                                     <i class="far fa-circle nav-icon"></i>
-                                    <p>Marks Register</p>
+                                    <p>Fiche de Cotation</p>
                                 </a>
                             </li>
-
-
-
-
-
-                            <li class="nav-item">
-                                <a href="{{ url('admin/examinations/marks_grade') }}"
-                                    class="nav-link @if (Request::segment(3) == 'marks_grade') active @endif">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>Marks Grade</p>
-                                </a>
-                            </li>
-
 
 
                         </ul>
@@ -397,7 +384,7 @@
                         <a href="#" class="nav-link  @if (Request::segment(2) == 'attendance') active @endif">
                             <i class="nav-icon fa-solid fa-rectangle-list"></i>
                             <p>
-                                Attendance
+                                Gestion de Présence
                                 <i class="fas fa-angle-left right"></i>
                             </p>
                         </a>
@@ -407,7 +394,7 @@
                                 <a href="{{ url('admin/attendance/student') }}"
                                     class="nav-link @if (Request::segment(3) == 'student') active @endif">
                                     <i class="far fa-circle nav-icon"></i>
-                                    <p>Student Attendance</p>
+                                    <p>Présence des étudiants</p>
                                 </a>
                             </li>
 
@@ -415,7 +402,7 @@
                                 <a href="{{ url('admin/attendance/report') }}"
                                     class="nav-link @if (Request::segment(3) == 'report') active @endif">
                                     <i class="far fa-circle nav-icon"></i>
-                                    <p>Attendance Report</p>
+                                    <p>Rapport de présence</p>
                                 </a>
                             </li>
 
@@ -427,7 +414,7 @@
                         <a href="#" class="nav-link  @if (Request::segment(2) == 'communicate') active @endif">
                             <i class="nav-icon fa-solid fa-envelope"></i>
                             <p>
-                                Communicate
+                                Communiquer
                                 <i class="fas fa-angle-left right"></i>
                             </p>
                         </a>
@@ -437,7 +424,7 @@
                                 <a href="{{ url('admin/communicate/notice_board') }}"
                                     class="nav-link @if (Request::segment(3) == 'notice_board') active @endif">
                                     <i class="far fa-circle nav-icon"></i>
-                                    <p>Notice Board</p>
+                                    <p>Tableau d'affichage</p>
                                 </a>
                             </li>
 
@@ -446,7 +433,7 @@
                                 <a href="{{ url('admin/communicate/send_email') }}"
                                     class="nav-link @if (Request::segment(3) == 'send_email') active @endif">
                                     <i class="far fa-circle nav-icon"></i>
-                                    <p>Send Email</p>
+                                    <p>Envoyer un e-mail</p>
                                 </a>
                             </li>
 
@@ -459,7 +446,7 @@
                         <a href="#" class="nav-link  @if (Request::segment(2) == 'homework') active @endif">
                             <i class="nav-icon fa-solid fa-house"></i>
                             <p>
-                                Homework
+                                Devoirs
                                 <i class="fas fa-angle-left right"></i>
                             </p>
                         </a>
@@ -469,7 +456,7 @@
                                 <a href="{{ url('admin/homework/homework') }}"
                                     class="nav-link @if (Request::segment(3) == 'homework') active @endif">
                                     <i class="far fa-circle nav-icon"></i>
-                                    <p>Homework</p>
+                                    <p>Devoirs</p>
                                 </a>
                             </li>
 
@@ -477,7 +464,7 @@
                                 <a href="{{ url('admin/homework/homework_report') }}"
                                     class="nav-link @if (Request::segment(3) == 'homework_report') active @endif">
                                     <i class="far fa-circle nav-icon"></i>
-                                    <p>Homework Report</p>
+                                    <p>Rapport de devoirs</p>
                                 </a>
                             </li>
 
@@ -511,7 +498,7 @@
                             class="nav-link @if (Request::segment(2) == 'setting') active @endif">
                             <i class="nav-icon fa-solid fa-gear"></i>
                             <p>
-                                Setting
+                                Paramètre
                             </p>
                         </a>
                     </li>
@@ -522,7 +509,7 @@
                             class="nav-link @if (Request::segment(2) == 'change_password') active @endif">
                             <i class="nav-icon fa-solid fa-id-card-clip"></i>
                             <p>
-                                Change Password
+                                Changer le mot de passe
                             </p>
                         </a>
                     </li>
@@ -532,7 +519,7 @@
                             class="nav-link @if (Request::segment(2) == 'dashboard') active @endif">
                             <i class="nav-icon fas fa-tachometer-alt"></i>
                             <p>
-                                Dashboard
+                                Tableau de bord
                             </p>
                         </a>
                     </li>
@@ -543,7 +530,7 @@
                             class="nav-link @if (Request::segment(2) == 'my_student') active @endif">
                             <i class="nav-icon fa fa-list-alt"></i>
                             <p>
-                                My Student
+                                Mes Etudiants
                             </p>
                         </a>
                     </li>
@@ -554,7 +541,7 @@
                             class="nav-link @if (Request::segment(2) == 'my_class_subject') active @endif">
                             <i class="nav-icon fa-solid fa-book"></i>
                             <p>
-                                My Class & Subject
+                                Mes classes et mes Cours
                             </p>
                         </a>
                     </li>
@@ -565,10 +552,21 @@
                             class="nav-link @if (Request::segment(2) == 'my_exam_timetable') active @endif">
                             <i class="nav-icon fa-solid fa-calendar-days"></i>
                             <p>
-                                My Exam Timetable
+                                Mon emploi du temps
                             </p>
                         </a>
                     </li>
+
+                    <li class="nav-item">
+                        <a href="{{ url('teacher/exams') }}"
+                            class="nav-link @if (Request::segment(2) == 'exams' && Request::segment(1) == 'teacher') active @endif">
+                            <i class="nav-icon fa fa-question-circle"></i>
+                            <p>
+                                Mes Questionnaires
+                            </p>
+                        </a>
+                    </li>
+
 
 
 
@@ -577,7 +575,7 @@
                             class="nav-link @if (Request::segment(2) == 'my_calendar') active @endif">
                             <i class="nav-icon fa-solid fa-calendar"></i>
                             <p>
-                                My Calendar
+                                Mon calendrier
                             </p>
                         </a>
                     </li>
@@ -587,7 +585,7 @@
                             class="nav-link @if (Request::segment(2) == 'marks_register') active @endif">
                             <i class="nav-icon fa-solid fa-pen-to-square"></i>
                             <p>
-                                Marks Register
+                                Fiche de Cotation
                             </p>
                         </a>
                     </li>
@@ -605,7 +603,7 @@
                         <a href="{{ route('teacher.meetings.create') }}"
                             class="nav-link @if (Request::is('teacher/meetings/create*')) active @endif">
                             <i class="nav-icon fas fa-user-graduate"></i>
-                            <p>Me</p>
+                            <p>visioconférence</p>
                         </a>
                     </li>
 
@@ -619,7 +617,7 @@
                         <a href="#" class="nav-link  @if (Request::segment(2) == 'attendance') active @endif">
                             <i class="nav-icon fa-solid fa-rectangle-list"></i>
                             <p>
-                                Attendance
+                                Gestion de Présence
                                 <i class="fas fa-angle-left right"></i>
                             </p>
                         </a>
@@ -629,7 +627,7 @@
                                 <a href="{{ url('teacher/attendance/student') }}"
                                     class="nav-link @if (Request::segment(3) == 'student') active @endif">
                                     <i class="far fa-circle nav-icon"></i>
-                                    <p>Student Attendance</p>
+                                    <p>Présence des étudiants</p>
                                 </a>
                             </li>
 
@@ -637,7 +635,7 @@
                                 <a href="{{ url('teacher/attendance/report') }}"
                                     class="nav-link @if (Request::segment(3) == 'report') active @endif">
                                     <i class="far fa-circle nav-icon"></i>
-                                    <p>Attendance Report</p>
+                                    <p>Rapport de présence</p>
                                 </a>
                             </li>
 
@@ -649,7 +647,7 @@
                         <a href="#" class="nav-link  @if (Request::segment(2) == 'homework') active @endif">
                             <i class="nav-icon fa-solid fa-house"></i>
                             <p>
-                                Homework
+                                Devoirs
                                 <i class="fas fa-angle-left right"></i>
                             </p>
                         </a>
@@ -659,7 +657,7 @@
                                 <a href="{{ url('teacher/homework/homework') }}"
                                     class="nav-link @if (Request::segment(3) == 'homework') active @endif">
                                     <i class="far fa-circle nav-icon"></i>
-                                    <p>Homework</p>
+                                    <p>Devoirs</p>
                                 </a>
                             </li>
 
@@ -672,7 +670,7 @@
                             class="nav-link @if (Request::segment(2) == 'my_notice_board') active @endif">
                             <i class="nav-icon fa-solid fa-bell"></i>
                             <p>
-                                My Notice Board
+                                Valves
                             </p>
                         </a>
                     </li>
@@ -683,7 +681,7 @@
                             class="nav-link @if (Request::segment(2) == 'account') active @endif">
                             <i class="nav-icon fa-solid fa-gear"></i>
                             <p>
-                                My Account
+                                Mon compte
                             </p>
                         </a>
                     </li>
@@ -704,7 +702,7 @@
                             class="nav-link @if (Request::segment(2) == 'change_password') active @endif">
                             <i class="nav-icon fa-solid fa-id-card-clip"></i>
                             <p>
-                                Change Password
+                                Changer le mot de passe
                             </p>
                         </a>
                     </li>
@@ -714,7 +712,7 @@
                             class="nav-link @if (Request::segment(2) == 'dashboard') active @endif">
                             <i class="nav-icon fas fa-tachometer-alt"></i>
                             <p>
-                                Dashboard
+                                Tableau de bord
                             </p>
                         </a>
                     </li>
@@ -724,12 +722,23 @@
                             class="nav-link @if (Request::segment(2) == 'fees_collection') active @endif">
                             <i class="nav-icon fa-solid fa-wallet"></i>
                             <p>
-                                Fees Collection
+                                Collecte des frais
                             </p>
                         </a>
                     </li>
 
                     <li class="nav-item">
+                        <a href="{{ url('student/exams') }}"
+                            class="nav-link @if (Request::segment(2) == 'exams' && Request::segment(1) == 'student') active @endif">
+                            <i class="nav-icon fa fa-file-alt"></i>
+                            <p>
+                                Examens en Ligne
+                            </p>
+                        </a>
+                    </li>
+
+
+                    {{-- <li class="nav-item">
                         <a href="{{ route('student.submissions') }}"
                             class="nav-link @if (Request::segment(2) == 'submissions') active @endif">
                             <i class="nav-icon fa-solid fa-file-lines"></i>
@@ -737,7 +746,21 @@
                                 Mes Soumissions
                             </p>
                         </a>
+                    </li> --}}
+
+                    <li class="nav-item">
+                        <a href="{{ route('student.submissions') }}"
+                            class="nav-link {{ Request::is('student/submissions*') ? 'active' : '' }}">
+                            <i class="nav-icon fa-solid fa-file-lines"></i>
+                            <p>
+                                Mes Soumissions
+                                @if (isset($newSubmissionCount) && $newSubmissionCount > 0)
+                                    <span class="badge bg-danger ms-2">{{ $newSubmissionCount }}</span>
+                                @endif
+                            </p>
+                        </a>
                     </li>
+
 
 
 
@@ -746,7 +769,7 @@
                             class="nav-link @if (Request::segment(2) == 'my_calendar') active @endif">
                             <i class="nav-icon fa-solid fa-calendar-days"></i>
                             <p>
-                                My Calendar
+                                Mon calendrier
                             </p>
                         </a>
                     </li>
@@ -758,7 +781,7 @@
                             class="nav-link @if (Request::segment(2) == 'my_subject') active @endif">
                             <i class="nav-icon fa-solid fa-book"></i>
                             <p>
-                                My Subject
+                                Mes Cours
                             </p>
                         </a>
                     </li>
@@ -769,7 +792,7 @@
                             class="nav-link @if (Request::segment(2) == 'my_timetable') active @endif">
                             <i class="nav-icon fa-regular fa-clock"></i>
                             <p>
-                                My Timetable
+                                Mon emploi du temps
                             </p>
                         </a>
                     </li>
@@ -781,7 +804,7 @@
                             class="nav-link @if (Request::segment(2) == 'my_exam_timetable') active @endif">
                             <i class="nav-icon fa-solid fa-calendar-plus"></i>
                             <p>
-                                My Exam Timetable
+                                Mon emploi du temps d'examen
                             </p>
                         </a>
                     </li>
@@ -792,7 +815,7 @@
                             class="nav-link @if (Request::segment(2) == 'my_exam_result') active @endif">
                             <i class="nav-icon fa-solid fa-pen-to-square"></i>
                             <p>
-                                My Exam Result
+                                Mes Resultats
                             </p>
                         </a>
                     </li>
@@ -803,27 +826,42 @@
                             class="nav-link @if (Request::segment(2) == 'my_attendance') active @endif">
                             <i class="nav-icon fa-solid fa-rectangle-list"></i>
                             <p>
-                                My Attendance
+                                Ma présence
                             </p>
                         </a>
                     </li>
 
-                    <li class="nav-item">
+                    {{-- <li class="nav-item">
                         <a href="{{ url('student/my_notice_board') }}"
                             class="nav-link @if (Request::segment(2) == 'my_notice_board') active @endif">
                             <i class="nav-icon fa-solid fa-bell"></i>
                             <p>
-                                My Notice Board
+                                Valves
+                            </p>
+                        </a>
+                    </li> --}}
+
+                    <li class="nav-item">
+                        <a href="{{ url('student/my_notice_board') }}"
+                            class="nav-link {{ Request::is('student/my_notice_board*') ? 'active' : '' }}">
+                            <i class="nav-icon fa-solid fa-bell"></i>
+                            <p>
+                                Valves
+                                @if (!empty($unread_notices) && $unread_notices > 0)
+                                    <span class="badge bg-danger ms-2">{{ $unread_notices }}</span>
+                                @endif
                             </p>
                         </a>
                     </li>
+
+
 
                     <li class="nav-item">
                         <a href="{{ url('student/my_homework') }}"
                             class="nav-link @if (Request::segment(2) == 'my_homework') active @endif">
                             <i class="nav-icon fa-solid fa-house"></i>
                             <p>
-                                My Homework
+                                Mes devoirs
                             </p>
                         </a>
                     </li>
@@ -833,7 +871,7 @@
                             class="nav-link @if (Request::segment(2) == 'my_submitted_homework') active @endif">
                             <i class="nav-icon fas fa-download"></i>
                             <p>
-                                Submitted Homework
+                                Devoirs soumis
                             </p>
                         </a>
                     </li>
@@ -855,7 +893,7 @@
                             class="nav-link @if (Request::segment(2) == 'account') active @endif">
                             <i class="nav-icon fa-solid fa-gear"></i>
                             <p>
-                                My Account
+                                Mon compte
                             </p>
                         </a>
                     </li>
@@ -866,7 +904,7 @@
                             class="nav-link @if (Request::segment(2) == 'change_password') active @endif">
                             <i class="nav-icon fa-solid fa-id-card-clip"></i>
                             <p>
-                                Change Password
+                                Changer le mot de passe
                             </p>
                         </a>
                     </li>
@@ -876,7 +914,7 @@
                             class="nav-link @if (Request::segment(2) == 'dashboard') active @endif">
                             <i class="nav-icon fas fa-tachometer-alt"></i>
                             <p>
-                                Dashboard
+                                Tableau de bord
                             </p>
                         </a>
                     </li>
@@ -887,7 +925,7 @@
                             class="nav-link @if (Request::segment(2) == 'my_student') active @endif">
                             <i class="nav-icon  fa-solid fa-user-pen"></i>
                             <p>
-                                My Student
+                                Mes Etudiants
                             </p>
                         </a>
                     </li>
@@ -898,7 +936,7 @@
                             class="nav-link @if (Request::segment(2) == 'my_student_notice_board') active @endif">
                             <i class="nav-icon fa-solid fa-street-view"></i>
                             <p>
-                                My Student Notice Board
+                                tableau d'affichage des étudiants
                             </p>
                         </a>
                     </li>
@@ -909,7 +947,7 @@
                             class="nav-link @if (Request::segment(2) == 'my_notice_board') active @endif">
                             <i class="nav-icon fa-solid fa-bell"></i>
                             <p>
-                                My Notice Board
+                                Mon tableau d'affichage
                             </p>
                         </a>
                     </li>
@@ -919,7 +957,7 @@
                             class="nav-link @if (Request::segment(2) == 'account') active @endif">
                             <i class="nav-icon fa-solid fa-gear"></i>
                             <p>
-                                My Account
+                                Mon compte
                             </p>
                         </a>
                     </li>
@@ -929,22 +967,12 @@
                             class="nav-link @if (Request::segment(2) == 'change_password') active @endif">
                             <i class="nav-icon fa-solid fa-id-card-clip"></i>
                             <p>
-                                Change Password
+                                Changer le mot de passe
                             </p>
                         </a>
                     </li>
                 @endif
 
-
-
-                {{-- <li class="nav-item">
-                    <a href="{{ url('logout') }}" class="nav-link">
-                        <i class="nav-icon fa fa-sign-out"></i>
-                        <p>
-                            Logout
-                        </p>
-                    </a>
-                </li> --}}
 
 
 

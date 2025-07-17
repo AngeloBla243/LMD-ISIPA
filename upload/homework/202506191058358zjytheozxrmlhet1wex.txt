@@ -1,0 +1,35 @@
+RAPPORT D'ANALYSE DE PLAGIAT
+===========================
+
+Document : Mémoire L2.docx
+Date d'analyse : 07/03/2025 00:23:31
+Similarité globale : 15%
+
+RÉSULTATS DÉTAILLÉS
+------------------
+
+Correspondance 1:
+Type : Copie exacte
+Page : 12
+Contexte : Section 2.3 : Écosystèmes marins
+Texte : L'impact du changement climatique sur la biodiversité marine en Méditerranée...
+Source : Thèse de Doctorat, Université de Marseille (2023)
+Similarité : 85%
+
+
+Correspondance 2:
+Type : Paraphrase
+Page : 24
+Contexte : Chapitre 3 : Impacts environnementaux
+Texte : Les effets de l'acidification des océans sur les récifs coralliens...
+Source : Revue Scientifique d'Océanographie (2022)
+Similarité : 72%
+
+
+Correspondance 3:
+Type : Citation potentielle
+Page : 45
+Contexte : Introduction
+Texte : La pollution plastique dans les océans représente une menace majeure...
+Source : Journal de l'Environnement Marin (2023)
+Similarité : 65%

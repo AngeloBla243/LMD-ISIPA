@@ -78,13 +78,6 @@ class HomeworkController extends Controller
 
     public function insert(Request $request)
     {
-        // $request->validate([
-        //     'academic_year_id' => 'required|exists:academic_years,id',
-        //     'class_id' => 'required|exists:class,id',
-        //     'subject_id' => 'required|exists:subject,id',
-        //     // ... autres règles
-        // ]);
-
         $homework = new HomeworkModel;
         $homework->academic_year_id = $request->academic_year_id;
         $homework->class_id = $request->class_id;
@@ -248,29 +241,6 @@ class HomeworkController extends Controller
 
 
 
-    // public function addTeacher()
-    // {
-    //     // Récupérer les classes assignées à l'enseignant connecté
-    //     $assignedClasses = AssignClassTeacherModel::getMyClassSubjectGroup(Auth::user()->id);
-
-    //     // Récupérer les IDs de classes assignées
-    //     $class_ids = $assignedClasses->pluck('class_id')->toArray();
-
-    //     // Récupérer les matières assignées aux classes de cet enseignant
-    //     $assignedSubjects = SubjectModel::whereIn('id', function ($query) use ($class_ids) {
-    //         $query->select('subject_id')
-    //             ->from('assign_class_teacher')
-    //             ->whereIn('class_id', $class_ids)
-    //             ->where('is_delete', 0); // Optionnel : vérifie si l'assignation n'est pas supprimée
-    //     })->get();
-
-    //     // Passer les données à la vue
-    //     $data['getClass'] = $assignedClasses; // Garder les classes assignées si besoin
-    //     $data['getSubjects'] = $assignedSubjects; // Passer les matières assignées
-    //     $data['header_title'] = 'Add New Homework';
-
-    //     return view('teacher.homework.add', $data);
-    // }
     public function addTeacher()
     {
         // Récupérer l'année académique active ou sélectionnée
@@ -352,6 +322,7 @@ class HomeworkController extends Controller
     public function insertTeacher(Request $request)
     {
         $homwork = new HomeworkModel;
+        $homwork->academic_year_id = session('academic_year_id');
         $homwork->class_id = trim($request->class_id);
         $homwork->subject_id = trim($request->subject_id);
         $homwork->homework_date = trim($request->homework_date);

@@ -25,10 +25,10 @@
         <!-- /.login-logo -->
         <div class="card card-outline card-primary">
             <div class="card-header text-center">
-                <a href="" class="h1"><b>Login</b></a>
+                <a href="" class="h1"><b>Se connecter</b></a>
             </div>
             <div class="card-body">
-                <p class="login-box-msg">Sign in to start your session</p>
+                <p class="login-box-msg">Connectez-vous pour démarrer votre session</p>
 
                 @include('_message')
 
@@ -55,7 +55,7 @@
                             <div class="icheck-primary">
                                 <input type="checkbox" id="remember" name="remember">
                                 <label for="remember">
-                                    Remember Me
+                                    Souviens-toi de moi
                                 </label>
                             </div>
                         </div>
@@ -71,7 +71,7 @@
                 <!-- /.social-auth-links -->
 
                 <p class="mb-1">
-                    <a href="{{ url('forgot-password') }}">I forgot my password</a>
+                    <a href="{{ url('forgot-password') }}">J'ai oublié mon mot de passe</a>
                 </p>
 
             </div>

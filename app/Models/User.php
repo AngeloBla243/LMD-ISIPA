@@ -226,21 +226,6 @@ class User extends Authenticatable
             ->where('users.user_type', '=', 3)
             ->where('users.is_delete', '=', 0);
 
-        // $return = self::select(
-        //     'users.*',
-        //     'class.name as class_name',
-        //     'class.opt as class_opt',
-        //     'parent.name as parent_name',
-        //     'parent.last_name as parent_last_name'
-        // )
-        //     ->with('studentClasses') // Chargement des relations
-        //     ->leftJoin('student_class', 'student_class.student_id', '=', 'users.id')
-        //     ->leftJoin('class', 'class.id', '=', 'student_class.class_id')
-        //     // ->join('users as parent', 'parent.id', '=', 'users.parent_id', 'left')
-        //     ->leftJoin('users as parent', 'parent.id', '=', 'users.parent_id')
-        //     ->where('users.user_type', '=', 3)
-        //     ->where('users.is_delete', '=', 0)
-        //     ->groupBy('users.id');
 
         if (!empty(Request::get('name'))) {
             $return = $return->where('users.name', 'like', '%' . Request::get('name') . '%');
@@ -703,6 +688,7 @@ class User extends Authenticatable
             ->wherePivot('academic_year_id', $academicYearId)
             ->first(); // Retourne la première classe de l'année active
     }
+
 
     public function studentClass()
     {
