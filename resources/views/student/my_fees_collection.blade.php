@@ -161,15 +161,15 @@
                                 <table class="table styled-table table-bordered mb-0">
                                     <thead>
                                         <tr>
-                                            <th>Classe</th>
-                                            <th>Nom du frais</th>
-                                            <th>Montant total</th>
-                                            <th>Montant payé</th>
-                                            <th>Reste à payer</th>
-                                            <th>Type paiement</th>
-                                            <th>Remarque</th>
-                                            <th>Enregistré par</th>
-                                            <th>Date d'ajout</th>
+                                            <th style="min-width: 200px;">Classe</th>
+                                            <th style="min-width: 250px;">Nom du frais</th>
+                                            <th style="min-width: 250px;">Montant total</th>
+                                            <th style="min-width: 250px;">Montant payé</th>
+                                            <th style="min-width: 250px;">Reste à payer</th>
+                                            <th style="min-width: 250px;">Type paiement</th>
+                                            <th style="min-width: 250px;">Remarque</th>
+                                            <th style="min-width: 250px;">Enregistré par</th>
+                                            <th style="min-width: 250px;">Date d'ajout</th>
                                         </tr>
                                     </thead>
                                     <tbody>
