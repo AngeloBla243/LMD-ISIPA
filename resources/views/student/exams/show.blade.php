@@ -82,7 +82,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- Face API -->
     <script defer src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.min.js"></script>
-    <script>
+    {{-- <script>
         document.addEventListener('DOMContentLoaded', async function() {
 
             // === TIMER ===
@@ -348,6 +348,290 @@
                 }
             });
 
+        });
+    </script> --}}
+    <script>
+        document.addEventListener('DOMContentLoaded', async function() {
+            // === VARIABLES DOM ===
+            const video = document.getElementById('student-camera');
+            const cameraStatus = document.getElementById('camera-status');
+            const timerElement = document.getElementById('exam-timer');
+            const timerAlert = document.getElementById('timer-alert');
+            const examForm = document.getElementById('exam-form');
+            const submitBtn = document.getElementById('submit-btn');
+
+            const questions = document.querySelectorAll('.exam-question');
+            const indicators = document.querySelectorAll('.question-indicator');
+            let current = 0;
+
+            let absenceSeconds = 0;
+            const absenceLimit = 10; // secondes sans visage tolérées
+
+            let timerInterval = null;
+            let faceDetectionInterval = null;
+
+            let timeLeft = parseInt(timerElement.dataset.timeLeft);
+            const totalTime = timeLeft;
+
+            // === FUNCTIONS ===
+
+            // Formatage temps mm:ss ou hh:mm:ss
+            function formatTime(sec) {
+                if (sec >= 3600) {
+                    const h = Math.floor(sec / 3600);
+                    const m = Math.floor((sec % 3600) / 60);
+                    const s = sec % 60;
+                    return `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+                } else {
+                    const m = Math.floor(sec / 60);
+                    const s = sec % 60;
+                    return `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+                }
+            }
+
+            // Mise à jour affichage timer
+            function updateTimerDisplay() {
+                timerElement.textContent = formatTime(timeLeft);
+                if (timeLeft <= totalTime * 0.2) {
+                    timerElement.classList.add('text-danger');
+                    timerAlert.style.display = '';
+                    timerAlert.textContent = "⏰ Attention : il reste peu de temps !";
+                } else {
+                    timerElement.classList.remove('text-danger');
+                    timerAlert.style.display = 'none';
+                }
+            }
+
+            // Démarre le timer examen
+            function startExamTimer() {
+                updateTimerDisplay();
+                timerInterval = setInterval(() => {
+                    timeLeft--;
+                    updateTimerDisplay();
+                    if (timeLeft <= 0) {
+                        clearInterval(timerInterval);
+                        clearInterval(faceDetectionInterval);
+                        showTimeExpiredAndSubmit();
+                    }
+                }, 1000);
+            }
+
+            // Montre une question selon l'index
+            function showQuestion(idx) {
+                questions.forEach((q, i) => q.style.display = (i === idx ? 'block' : 'none'));
+                indicators.forEach((ind, i) => {
+                    ind.classList.remove('bg-primary', 'text-white', 'bg-success', 'bg-light',
+                        'text-dark');
+                    if (i === idx) ind.classList.add('bg-primary', 'text-white');
+                    const inputs = questions[i].querySelectorAll('input[type=radio]');
+                    if ([...inputs].some(input => input.checked)) {
+                        ind.classList.add('bg-success', 'text-white');
+                    } else {
+                        ind.classList.add('bg-light', 'text-dark');
+                    }
+                });
+                document.getElementById('prev-btn').style.display = idx === 0 ? 'none' : '';
+                document.getElementById('next-btn').style.display = idx === questions.length - 1 ? 'none' : '';
+            }
+
+            // Soumission du formulaire d’examen (ajax fetch)
+            async function submitExamForm() {
+                if (timerInterval) clearInterval(timerInterval);
+                if (faceDetectionInterval) clearInterval(faceDetectionInterval);
+
+                const formData = new FormData(examForm);
+
+                @foreach ($exam->questions as $question)
+                    if (!formData.has('answers[{{ $question->id }}]')) {
+                        formData.append('answers[{{ $question->id }}]', '');
+                    }
+                @endforeach
+
+                try {
+                    const response = await fetch(examForm.action, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json'
+                        },
+                        body: formData
+                    });
+                    if (!response.ok) {
+                        let message = 'Erreur lors de la soumission.';
+                        if (response.status === 422) {
+                            const data = await response.json();
+                            message = Object.values(data.errors).flat().join('\n') || message;
+                        }
+                        Swal.fire('Erreur', message, 'error');
+                        throw new Error(message);
+                    }
+                    const data = await response.json();
+                    if (data.success) {
+                        await Swal.fire({
+                            icon: 'success',
+                            title: 'Examen terminé !',
+                            text: `Votre score total : ${data.score}`,
+                            confirmButtonText: 'OK'
+                        });
+                        window.location.href = data.redirect;
+                    }
+                } catch (error) {
+                    console.error(error);
+                }
+            }
+
+            // Affiche alerte temps écoulé et soumet automatiquement
+            function showTimeExpiredAndSubmit() {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Temps écoulé !',
+                    text: 'Votre examen sera soumis automatiquement.',
+                    showConfirmButton: false,
+                    timer: 2000,
+                    willClose: () => submitExamForm()
+                });
+            }
+
+            // Boucle de détection du visage
+            async function startFaceDetectionLoop() {
+                const options = new faceapi.TinyFaceDetectorOptions({
+                    inputSize: 160,
+                    scoreThreshold: 0.5
+                });
+
+                faceDetectionInterval = setInterval(async () => {
+                    try {
+                        const detection = await faceapi.detectSingleFace(video, options);
+
+                        if (detection) {
+                            absenceSeconds = 0;
+                            cameraStatus.textContent = "🎥 Visage détecté";
+                            cameraStatus.classList.remove('text-danger');
+                            cameraStatus.classList.add('text-success');
+                        } else {
+                            absenceSeconds++;
+                            cameraStatus.textContent =
+                                `🚨 Visage non détecté depuis ${absenceSeconds} seconde(s)`;
+                            cameraStatus.classList.remove('text-success');
+                            cameraStatus.classList.add('text-danger');
+
+                            if (absenceSeconds >= absenceLimit) {
+                                clearInterval(timerInterval);
+                                clearInterval(faceDetectionInterval);
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Examen annulé',
+                                    text: 'Votre visage est absent depuis trop longtemps.',
+                                    allowOutsideClick: false,
+                                    allowEscapeKey: false
+                                }).then(() => {
+                                    submitExamForm();
+                                });
+                            }
+                        }
+                    } catch (err) {
+                        console.error('Face detection error:', err);
+                    }
+                }, 1000);
+            }
+
+            // Initialisation caméra et modèles face-api
+            async function initCameraAndModels() {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({
+                        video: true,
+                        audio: false
+                    });
+                    video.srcObject = stream;
+                    cameraStatus.textContent = "🎥 Caméra activée, détection visage en cours...";
+
+                    await faceapi.nets.tinyFaceDetector.loadFromUri(
+                        'https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/');
+
+                    startFaceDetectionLoop();
+                    startExamTimer();
+
+                } catch (err) {
+                    console.error('Camera error: ', err);
+                    cameraStatus.textContent = "⚠️ Caméra indisponible : " + err.message;
+                    await Swal.fire({
+                        icon: 'error',
+                        title: 'Erreur',
+                        text: 'La caméra est nécessaire pour cet examen.'
+                    });
+                    window.location.href = "{{ route('student.exams.index') }}";
+                }
+            }
+
+
+            // === ÉVÉNEMENTS ===
+
+            // Navigation questions
+            showQuestion(current);
+
+            document.getElementById('prev-btn').onclick = function() {
+                if (current > 0) {
+                    current--;
+                    showQuestion(current);
+                }
+            };
+
+            document.getElementById('next-btn').onclick = function() {
+                if (current < questions.length - 1) {
+                    current++;
+                    showQuestion(current);
+                }
+            };
+
+            indicators.forEach(ind => {
+                ind.onclick = function() {
+                    const idx = parseInt(this.dataset.index);
+                    current = idx;
+                    showQuestion(current);
+                };
+            });
+
+            // Actualisation des indicateurs lors changement de réponse
+            questions.forEach((q, i) => {
+                q.querySelectorAll('input[type=radio]').forEach(input => {
+                    input.addEventListener('change', () => showQuestion(current));
+                });
+            });
+
+            // Soumettre formulaire au clic sur bouton
+            submitBtn.addEventListener('click', function() {
+                if (timerInterval) clearInterval(timerInterval);
+                if (faceDetectionInterval) clearInterval(faceDetectionInterval);
+                submitExamForm();
+            });
+
+            // Prévenir sortie de page / fermeture onglet
+            window.addEventListener('beforeunload', function(e) {
+                e.preventDefault();
+                e.returnValue = '';
+                return 'Quitter cette page annulera votre examen !';
+            });
+
+            // Détecter changement d'onglet / perte visibilité
+            document.addEventListener('visibilitychange', function() {
+                if (document.hidden) {
+                    if (timerInterval) clearInterval(timerInterval);
+                    if (faceDetectionInterval) clearInterval(faceDetectionInterval);
+
+                    Swal.fire({
+                        title: 'Attention !',
+                        text: 'Vous avez quitté l\'onglet, votre examen va être soumis.',
+                        icon: 'warning',
+                        showConfirmButton: false,
+                        timer: 2000
+                    });
+                    setTimeout(() => submitExamForm(), 2000);
+                }
+            });
+
+            // ==== INITIALISATION ====
+            initCameraAndModels();
         });
     </script>
     <style>
