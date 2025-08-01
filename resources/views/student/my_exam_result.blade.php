@@ -1,370 +1,571 @@
 @extends('layouts.app')
+
 @section('style')
-    <style type="text/css">
-        .styled-table thead tr {
-            background-color: #009879;
-            color: #ffffff;
-            text-align: left;
+    <style>
+        /* Conteneur général */
+        .content-wrapper {
+            padding: 2.5rem 0;
+            min-height: 100vh;
+            background: #f8fbff;
+            font-family: 'Montserrat', sans-serif;
+            color: #222;
         }
 
-        /* Effet survol (hover) */
+        h2 {
+            text-align: center;
+            color: #2176bd;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            font-size: 2rem;
+        }
+
+        /* Cards */
+        .card {
+            border-radius: 18px;
+            box-shadow: 0 8px 24px rgba(14, 74, 107, 0.07);
+            border: none;
+            margin-bottom: 2rem;
+            background: #fff;
+        }
+
+        .card-header {
+            background: #2176bd;
+            color: white;
+            font-weight: 700;
+            font-size: 1.1rem;
+            border-radius: 18px 18px 0 0 !important;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.5rem;
+        }
+
+        /* Badge styles */
+        .badge {
+            font-weight: 600;
+            font-size: 0.85rem;
+            padding: 0.4em 0.75em;
+            border-radius: 1rem;
+            min-width: 80px;
+            text-align: center;
+            display: inline-block;
+            box-shadow: 0 1px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .bg-info {
+            background-color: #3a99d8 !important;
+            color: white !important;
+            box-shadow: 0 2px 8px rgba(58, 153, 216, 0.5);
+        }
+
+        .bg-success {
+            background-color: #27c381 !important;
+            color: white !important;
+            box-shadow: 0 2px 8px rgba(39, 195, 129, 0.5);
+        }
+
+        .bg-warning {
+            background-color: #f0b619 !important;
+            color: #222 !important;
+            box-shadow: 0 2px 8px rgba(240, 182, 25, 0.5);
+        }
+
+        .bg-danger {
+            background-color: #d9534f !important;
+            color: white !important;
+            box-shadow: 0 2px 8px rgba(217, 83, 79, 0.5);
+        }
+
+        .bg-secondary {
+            background-color: #6c757d !important;
+            color: white !important;
+            box-shadow: 0 2px 6px rgba(108, 117, 125, 0.4);
+        }
+
+        /* Boutons */
+        .btn {
+            border-radius: 18px !important;
+            font-weight: 600;
+            font-size: 0.9rem;
+            padding: 0.38em 0.8em;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35em;
+            white-space: nowrap;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn i {
+            font-size: 1.1em;
+        }
+
+        .btn-primary {
+            background-color: #2176bd;
+            border-color: #2176bd;
+            color: white;
+        }
+
+        .btn-primary:hover,
+        .btn-primary:focus {
+            background-color: #145a8d;
+            border-color: #145a8d;
+            color: white;
+        }
+
+        .btn-success {
+            background-color: #27c381;
+            border-color: #27c381;
+            color: white;
+        }
+
+        .btn-success:hover,
+        .btn-success:focus {
+            background-color: #1db16a;
+            border-color: #1db16a;
+            color: white;
+        }
+
+        .btn-warning {
+            background-color: #f0b619;
+            border-color: #f0b619;
+            color: #222;
+        }
+
+        .btn-warning:hover,
+        .btn-warning:focus {
+            background-color: #d4a30d;
+            border-color: #d4a30d;
+            color: #222;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            border-color: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover,
+        .btn-secondary:focus {
+            background-color: #5a6268;
+            border-color: #5a6268;
+            color: white;
+        }
+
+        /* Table */
+        .table {
+            margin-bottom: 0;
+        }
+
+        .styled-table {
+            width: 100%;
+            border-spacing: 0;
+            border-collapse: separate;
+            min-width: 720px;
+            /* minimum width to allow horizontal scrolling */
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
+            border-radius: 14px 14px 0 0;
+            font-size: 0.95rem;
+            color: #222;
+        }
+
+        .styled-table thead tr {
+            background-color: #2176bd;
+            color: white;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.07em;
+        }
+
+        .styled-table thead th,
+        .styled-table tbody td {
+            padding: 14px 18px;
+            border-bottom: 1px solid #e3e9f1;
+            border-right: 1px solid #e3e9f1;
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+
+        .styled-table thead th:last-child,
+        .styled-table tbody td:last-child {
+            border-right: none;
+        }
+
+        .styled-table tbody tr:nth-child(even) {
+            background-color: #f5faff;
+        }
+
         .styled-table tbody tr:hover {
-            background-color: #f1f1f1;
+            background-color: #e9f2ff;
             cursor: pointer;
         }
-    </style>
 
-    <style type="text/css">
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            border: 1px solid #000;
+        /* Responsive container for horizontal scroll */
+        .table-responsive {
+            overflow-x: auto !important;
+            -webkit-overflow-scrolling: touch;
+            border-radius: 14px;
+            box-shadow: inset 0 0 8px #c8dafb;
+            padding-bottom: 0.7rem;
         }
 
-        .header {
-            text-align: center;
-        }
-
-
-        .section-title {
-            margin-top: 10px;
-            font-weight: bold;
-            text-decoration: underline;
-        }
-
+        /* Form */
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 1rem;
         }
 
-        .form-group label {
-            display: block;
-            font-weight: bold;
+        label {
+            font-weight: 600;
+            color: #2176bd;
         }
 
-        .checkbox-group {
-            margin-left: 20px;
+        input[type="checkbox"].single-checkbox {
+            margin-right: 8px;
+            transform: scale(1.1);
         }
 
-        .checkbox-group input {
-            margin-right: 10px;
-        }
-
+        /* Sections */
+        .header,
+        .signature,
         .signature-section {
-            margin-top: 30px;
-            text-align: right;
+            text-align: center;
+            margin-bottom: 1rem;
+            font-weight: 700;
+            color: #2176bd;
         }
 
-        .note-section {
-            margin-top: 20px;
-            font-size: 0.9em;
+        .signature-section,
+        .signature {
+            margin-top: 3rem;
         }
 
         .signature {
-            margin-top: 50px;
-            text-align: right;
+            margin-top: 4rem;
         }
 
+        .note-section {
+            font-size: 0.9rem;
+            margin-top: 1.5rem;
+            color: #555;
+        }
+
+        ul {
+            padding-left: 1.25rem;
+        }
+
+        ul li {
+            margin-bottom: 0.4rem;
+        }
+
+        /* Disabled link */
         a.disabled {
             pointer-events: none;
-            cursor: not-allowed;
-            opacity: 0.6;
+            cursor: default;
+            opacity: 0.5;
         }
 
-        .table-primary th {
-            background-color: #cfe2ff;
-            color: #084298;
+        /* Modal adjustments */
+        .modal-content {
+            border-radius: 15px;
+            box-shadow: 0 6px 22px rgba(0, 0, 0, 0.1);
         }
 
-        .btn-outline-primary:hover {
-            background-color: #084298;
+        .modal-header {
+            border-bottom: 1px solid #dee2e6;
+            padding: 1rem 1.25rem;
+            background-color: #2176bd;
             color: #fff;
-            border-color: #084298;
+            border-top-left-radius: 15px;
+            border-top-right-radius: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        .fw-semibold {
-            font-weight: 600;
+        .modal-header .btn-close {
+            filter: invert(1);
+        }
+
+        /* Responsive tweaks */
+        @media (max-width: 768px) {
+            h2 {
+                font-size: 1.6rem;
+            }
+
+            .styled-table {
+                min-width: 600px;
+            }
+
+            .styled-table thead th,
+            .styled-table tbody td {
+                padding: 10px 12px;
+                font-size: 0.85rem;
+            }
+
+            .btn {
+                font-size: 0.85rem;
+                padding: 0.3em 0.7em;
+            }
+
+            .badge {
+                font-size: 0.75rem;
+                min-width: 55px;
+                padding: 0.3em 0.5em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .styled-table {
+                min-width: 480px;
+            }
         }
     </style>
 @endsection
 
-
 @section('content')
     <div class="content-wrapper">
-        <section class="content-header">
-            <div class="row mb-3">
-                <div class="col-md-12">
-                    <form method="GET" action="">
-                        <div class="input-group mb-2">
-
-                            @if ($selectedAcademicYear && !$selectedAcademicYear->is_active)
-                                <span class="ms-3 align-items-center" style="color: #ffc107;">
-                                    <i class="fas fa-exclamation-triangle"></i> Vous n'êtes pas dans l'année active !
-                                </span>
-                            @endif
-                        </div>
-                    </form>
-
-
-
-                    <div class="card mb-4">
-                        <div class="text-black d-flex justify-content-between align-items-center">
-                            <span> Année Academique : {{ $selectedAcademicYear->name ?? 'Année académique' }}</span>
-
-                            <!-- Bouton d'impression -->
-                            <a class="btn btn-primary btn-sm" style="float: right;"
-                                href="{{ route('student.year_result.print', [
-                                    'academic_year_id' => $selectedAcademicYear->id,
-                                    'student_id' => Auth::id(),
-                                ]) }}"
-                                class="btn btn-light btn-sm" target="_blank">
-                                <i class="fas fa-file-pdf"></i> Relever Annuel
-                            </a>
-                        </div>
-
+        <section class="content-header mb-4">
+            <div class="container">
+                <form method="GET" action="" class="mb-3">
+                    <div class="input-group">
+                        @if ($selectedAcademicYear && !$selectedAcademicYear->is_active)
+                            <span class="text-warning d-flex align-items-center">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                Vous n'êtes pas dans l'année active !
+                            </span>
+                        @endif
                     </div>
+                </form>
 
-
-                </div>
-
-            </div>
-
-            @if (!empty($getRecord))
-                @foreach ($getRecord as $value)
-                    <div class="card mb-4 shadow-sm">
-                        <div class="card-header bg-secondary text-white">
-                            <strong>{{ $value['exam_name'] }}</strong>
-
-                            <a class="btn btn-primary btn-sm" style="float: right;" target="_blank"
-                                href="{{ url('student/my_exam_result/print?exam_id=' . $value['exam_id'] . '&student_id=' . Auth::user()->id) }}"><i
-                                    class="fas fa-file-pdf"></i> Print</a>
-                        </div>
-                        <div class="card-body p-0 table-responsive">
-                            @if (!empty($value['subject']))
-                                <table class="table styled-table table-bordered table-striped m-0">
-                                    <thead>
-                                        <tr>
-                                            <th>Ecs</th>
-                                            <th style="min-width: 180px;">Crédit Ec</th>
-                                            <th style="min-width: 180px;">Note / 20</th>
-                                            <th>Décision</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @php
-                                            $Grandtotals_score = 0;
-                                            $credits_obtenus = 0;
-                                            $full_marks = 0;
-                                            $fail_count = 0;
-                                        @endphp
-                                        @foreach ($value['subject'] as $exam)
-                                            @php
-                                                $Grandtotals_score += $exam['totals_score'] ?? 0;
-                                                $total_score = $exam['total_score'] ?? 0;
-                                                $passing_mark = $exam['passing_mark'] ?? 0;
-                                                $full_marks += $exam['ponde'] ?? 0;
-                                                if ($total_score >= 10) {
-                                                    $credits_obtenus += $exam['ponde'] ?? 0;
-                                                }
-                                            @endphp
-                                            <tr>
-                                                <td
-                                                    style="width: 200px; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
-                                                    <span>{{ $exam['subject_name'] ?? 'N/A' }}</span>
-
-                                                    <button class="btn btn-sm btn-outline-primary btn-recours"
-                                                        data-exam-id="{{ $value['exam_id'] }}"
-                                                        data-session="{{ $exam['session'] ?? 1 }}"
-                                                        data-subject-id="{{ $exam['subject_id'] }}"
-                                                        style="display: flex; align-items: center; gap: 4px;">
-                                                        <i class="fas fa-edit me-1"></i>
-                                                    </button>
-                                                </td>
-
-                                                <td>{{ $exam['ponde'] ?? 0 }}</td>
-                                                <td>
-                                                    @if (($exam['total_score'] ?? 0) == 0)
-                                                        <span style="color: gray; font-weight: bold;">ND</span>
-                                                    @else
-                                                        @if ($exam['total_score'] >= $exam['passing_mark'])
-                                                            <span
-                                                                style="color: green; font-weight: bold;"><b>{{ $exam['total_score'] }}</b></span>
-                                                        @else
-                                                            <span
-                                                                style="color: red; font-weight: bold;"><b>{{ $exam['total_score'] }}</b></span>
-                                                            @php $fail_count++; @endphp
-                                                        @endif
-                                                    @endif
-                                                </td>
-                                                <td>
-                                                    @if (($exam['total_score'] ?? 0) >= 10)
-                                                        <span style="color: green; font-weight: bold;"><b>VAL</b></span>
-                                                    @else
-                                                        <span style="color: red; font-weight: bold;"><b>NVL</b></span>
-                                                        @php $fail_count++; @endphp
-                                                    @endif
-                                                </td>
-
-                                                {{-- <td>
-                                                    <button class="btn btn-warning btn-sm btn-recours"
-                                                        data-exam-id="{{ $value['exam_id'] }}"
-                                                        data-session="{{ $exam['session'] ?? 1 }}"
-                                                        data-subject-id="{{ $exam['subject_id'] }}">
-                                                        <i class="fa fa-exclamation-triangle"></i> Recours
-                                                    </button>
-                                                </td> --}}
-                                            </tr>
-                                        @endforeach
-
-                                    </tbody>
-                                </table>
-                            @else
-                                <div class="alert alert-info m-3">
-                                    <i class="fas fa-info-circle"></i> Aucun résultat d'examen enregistré pour cette
-                                    session.
-                                </div>
-                            @endif
-                        </div>
-                    </div>
-                @endforeach
-            @else
-                <div class="alert alert-warning mt-4">
-                    <i class="fas fa-info-circle"></i> Aucun résultat d'examen disponible pour le moment.
-                </div>
-            @endif
-        </section>
-    </div>
-
-    <div class="modal fade" id="recoursModal" tabindex="-1" role="dialog" aria-labelledby="recoursModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog" role="document">
-
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addFeesModalLabel">Recours</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <form id="recoursForm" action="{{ route('student.my_subject') }}" method="POST">
-                    {{ csrf_field() }}
-
-                    <!-- Récupère l'année depuis l'URL -->
-
-                    <input type="hidden" name="exam_id" id="modal_exam_id">
-                    <input type="hidden" name="session" id="modal_session">
-                    <input type="hidden" name="subject_id" id="modal_subject_id">
-                    <input type="hidden" name="academic_year_id" id="modal_academic_year_id">
-
-                    <div class="container">
+                <div class="card mb-4">
+                    <div class="card-body d-flex justify-content-between align-items-center">
                         <div class="header">
-                            <h2>I.S.I.P.A</h2>
-                            <h3>Secrétariat Général Académique <br> Bureau du Jury</h3>
+                            Année Académique : {{ $selectedAcademicYear->name ?? 'N/A' }}
+                        </div>
+                        <a href="{{ route('student.year_result.print', ['academic_year_id' => $selectedAcademicYear->id, 'student_id' => Auth::id()]) }}"
+                            target="_blank" class="btn btn-primary btn-sm">
+                            <i class="fas fa-file-pdf me-1"></i> Relevé Annuel
+                        </a>
+                    </div>
+                </div>
+
+                @if (!empty($getRecord) && count($getRecord) > 0)
+                    @foreach ($getRecord as $record)
+                        <div class="card mb-4 shadow-sm">
+                            <div
+                                class="card-header d-flex justify-content-between align-items-center bg-secondary text-white">
+                                <strong>{{ $record['exam_name'] }}</strong>
+
+                                <a href="{{ url('student/my_exam_result/print?exam_id=' . $record['exam_id'] . '&student_id=' . Auth::user()->id) }}"
+                                    target="_blank" class="btn btn-sm btn-light text-primary" title="Imprimer Relevé">
+                                    <i class="fas fa-file-pdf"></i> Print
+                                </a>
+                            </div>
+
+                            <div class="card-body p-0">
+                                @if (!empty($record['subject']) && count($record['subject']) > 0)
+                                    <div class="table-responsive rounded-3">
+                                        <table class="table styled-table table-bordered table-striped mb-0">
+                                            <thead>
+                                                <tr>
+                                                    <th style="min-width: 200px;">Ecs</th>
+                                                    <th>Crédit Ec</th>
+                                                    <th>Note / 20</th>
+                                                    <th>Décision</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @php
+                                                    $Grandtotals = 0;
+                                                    $creditsObtained = 0;
+                                                    $totalWeight = 0;
+                                                    $failCount = 0;
+                                                @endphp
+                                                @foreach ($record['subject'] as $subject)
+                                                    @php
+                                                        $Grandtotals += $subject['totals_score'] ?? 0;
+                                                        $score = $subject['total_score'] ?? 0;
+                                                        $passingMark = $subject['passing_mark'] ?? 0;
+                                                        $weight = $subject['ponde'] ?? 0;
+                                                        $totalWeight += $weight;
+                                                        if ($score >= $passingMark) {
+                                                            $creditsObtained += $weight;
+                                                        } else {
+                                                            $failCount++;
+                                                        }
+                                                    @endphp
+                                                    <tr>
+                                                        <td class="d-flex justify-content-between align-items-center"
+                                                            style="width: 400px;">
+                                                            <span>{{ $subject['subject_name'] ?? 'N/A' }}</span>
+                                                            <button type="button"
+                                                                class="btn btn-sm btn-outline-primary btn-recours"
+                                                                data-exam-id="{{ $record['exam_id'] }}"
+                                                                data-session="{{ $subject['session'] ?? 1 }}"
+                                                                data-subject-id="{{ $subject['subject_id'] }}"
+                                                                title="Faire un recours">
+                                                                <i class="fas fa-edit"></i>
+                                                            </button>
+                                                        </td>
+                                                        <td class="text-center">{{ $weight }}</td>
+                                                        <td class="text-center">
+                                                            @if ($score == 0)
+                                                                <span class="text-muted" style="font-weight:700;">ND</span>
+                                                            @else
+                                                                @if ($score >= $passingMark)
+                                                                    <span class="text-success"
+                                                                        style="font-weight:700;">{{ $score }}</span>
+                                                                @else
+                                                                    <span class="text-danger"
+                                                                        style="font-weight:700;">{{ $score }}</span>
+                                                                @endif
+                                                            @endif
+                                                        </td>
+                                                        <td class="text-center">
+                                                            @if ($score >= $passingMark)
+                                                                <span class="text-success"
+                                                                    style="font-weight:700;">VAL</span>
+                                                            @else
+                                                                <span class="text-danger"
+                                                                    style="font-weight:700;">NVL</span>
+                                                            @endif
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                @else
+                                    <div class="alert alert-info m-3">
+                                        Aucun résultat enregistré pour cette session.
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                    @endforeach
+                @else
+                    <div class="alert alert-warning text-center mt-4">
+                        Aucun résultat disponible pour le moment.
+                    </div>
+                @endif
+            </div>
+        </section>
+
+        {{-- Modal Recours --}}
+        <div class="modal fade" id="recoursModal" tabindex="-1" aria-labelledby="recoursModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content rounded-4 shadow-lg">
+                    <div
+                        class="modal-header bg-primary text-white rounded-top-4 d-flex justify-content-between align-items-center">
+                        <h5 class="modal-title" id="recoursModalLabel">Recours</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+
+                    <form id="recoursForm" action="{{ route('student.my_subject') }}" method="POST" class="p-4">
+                        @csrf
+
+                        <input type="hidden" name="exam_id" id="modal_exam_id" />
+                        <input type="hidden" name="session" id="modal_session" />
+                        <input type="hidden" name="subject_id" id="modal_subject_id" />
+                        <input type="hidden" name="academic_year_id" id="modal_academic_year_id" />
+
+                        <div class="text-center mb-4">
+                            <h3 class="mb-0">I.S.I.P.A</h3>
+                            <small class="text-primary fw-bold">Secrétariat Général - Bureau du Jury</small>
                         </div>
 
-                        <div class="form-group">
-                            @php
-                                $currentClass = Auth::user()->getCurrentClass();
-                            @endphp
-
+                        <div class="mb-3">
+                            @php $currentClass = Auth::user()->getCurrentClass(); @endphp
                             @if ($currentClass)
-                                <label>Section / Département : {{ $currentClass->opt }} /
+                                <label><strong>Section / Département :</strong> {{ $currentClass->opt }} /
                                     {{ Auth::user()->departement ?? 'N/A' }}</label>
+                                <label><strong>Promotion :</strong> {{ $currentClass->name }}
+                                    {{ $currentClass->opt }}</label>
                             @else
-                                <label class="text-danger">Aucune classe assignée pour cette année académique.</label>
+                                <p class="text-danger fw-bold">Vous n'êtes affecté à aucune classe pour l'année académique
+                                    en cours.</p>
                             @endif
+                            <label><strong>Nom & Post-nom :</strong> {{ Auth::user()->name }}
+                                {{ Auth::user()->last_name }}</label>
                         </div>
 
-                        <div class="form-group">
-                            <label>Promotion : <b>{{ $currentClass->name ?? 'N/A' }}
-                                    {{ $currentClass->opt ?? 'N/A' }}</b></label>
+                        <h5 class="mb-3 text-decoration-underline">I. Objet (cochez la raison du recours)</h5>
+                        <div class="mb-4">
+                            <div class="form-check">
+                                <input class="form-check-input single-checkbox" type="checkbox" name="objet[]"
+                                    value="Omission des cotes sur la grille de délibération" id="obj1" />
+                                <label class="form-check-label" for="obj1">Omission des cotes sur la grille de
+                                    délibération</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input single-checkbox" type="checkbox" name="objet[]"
+                                    value="Omission du nom sur la grille de délibération" id="obj2" />
+                                <label class="form-check-label" for="obj2">Omission du nom sur la grille de
+                                    délibération</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input single-checkbox" type="checkbox" name="objet[]"
+                                    value="Calcul erroné des cotes" id="obj3" />
+                                <label class="form-check-label" for="obj3">Calcul erroné des cotes</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input single-checkbox" type="checkbox" name="objet[]"
+                                    value="Non transmission des cotes au Jury" id="obj4" />
+                                <label class="form-check-label" for="obj4">Non transmission des cotes au Jury</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input single-checkbox" type="checkbox" name="objet[]"
+                                    value="Transcription erronée par l'enseignant ou secrétaire" id="obj5" />
+                                <label class="form-check-label" for="obj5">Transcription erronée par l'enseignant ou
+                                    secrétaire</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input single-checkbox" type="checkbox" name="objet[]"
+                                    value="Omission de la correction des copies" id="obj6" />
+                                <label class="form-check-label" for="obj6">Omission de la correction des
+                                    copies</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input single-checkbox" type="checkbox" name="objet[]"
+                                    value="Identification confuse des copies" id="obj7" />
+                                <label class="form-check-label" for="obj7">Identification confuse des copies</label>
+                            </div>
                         </div>
 
-                        <div class="form-group">
-                            <label>Nom et Post-nom : <b>{{ Auth::user()->name }} {{ Auth::user()->last_name }}</b></label>
-                        </div>
-
-                        <h4 class="section-title">I. Objet (Prière de cocher la case concernée)</h4>
-                        <div class="checkbox-group">
-                            <!-- Les cases à cocher ici -->
-                            <div>
-                                <input type="checkbox" name="objet[]"
-                                    value="Omission des cotes sur la grille de délibération" class="single-checkbox">
-                                Omission des cotes sur la grille de délibération
-                            </div>
-                            <div>
-                                <input type="checkbox" name="objet[]"
-                                    value="Omission
-                                du nom sur la grille de délibération"
-                                    class="single-checkbox"> Omission
-                                du nom sur la grille de délibération
-                            </div>
-                            <div>
-                                <input type="checkbox" name="objet[]" value="Calcul erroné des cotes"
-                                    class="single-checkbox"> Calcul
-                                erroné des cotes
-                            </div>
-                            <div>
-                                <input type="checkbox" name="objet[]" value="Non transmission des cotes au Jury"
-                                    class="single-checkbox"> Non
-                                transmission des cotes au Jury
-                            </div>
-                            <div>
-                                <input type="checkbox" name="objet[]"
-                                    value="Transcription erronée des cotes par l'enseignant (titulaire) ou le secrétaire du jury"class="single-checkbox">
-                                Transcription erronée des cotes par l'enseignant (titulaire) ou le secrétaire du jury
-                            </div>
-                            <div>
-                                <input type="checkbox" name="objet[]" value="Omission de la correction des copies"
-                                    class="single-checkbox">
-                                Omission de la correction des copies
-                            </div>
-                            <div>
-                                <input type="checkbox" name="objet[]" value="Identification confuse des copies"
-                                    class="single-checkbox">
-                                Identification confuse des copies
-                            </div>
-
-                        </div>
-
-                        <div class="note-section">
-                            <p>NB :</p>
+                        <div class="note-section fst-italic">
+                            <p><strong>NB :</strong></p>
                             <ul>
-                                <li>Le recours retourne au bureau du Jury 48 heures après le retrait</li>
-                                <li>Le recours dont l'objet ne sera pas coché est d'office annulé</li>
-                                <li>Le recours se fait par cours</li>
-                                <li>Le recours ne garantit pas la réussite</li>
+                                <li>Le recours est retourné au bureau du Jury sous 48h après retrait.</li>
+                                <li>Tout recours sans motif cochée sera annulé automatiquement.</li>
+                                <li>Recours possible par cours seulement.</li>
+                                <li>Le recours ne garantit pas la validation.</li>
                             </ul>
                         </div>
 
-                        <button type="submit" class="btn btn-primary">Soumettre</button>
-                    </div>
-                </form>
+                        <div class="text-end mt-4">
+                            <button type="submit" class="btn btn-primary px-4">Soumettre</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
-    </div>
 
-    <div id="customModal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <p id="modalMessage"></p>
-        </div>
     </div>
 @endsection
 
-
 @section('script')
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Gestion de l'ouverture du modal
+        document.addEventListener('DOMContentLoaded', () => {
+            // Ouvre modal et pré-remplit les inputs
             document.querySelectorAll('.btn-recours').forEach(button => {
-                button.addEventListener('click', function() {
-                    const examId = this.dataset.examId;
-                    const session = this.dataset.session;
-                    const subjectId = this.dataset.subjectId;
+                button.addEventListener('click', () => {
+                    const examId = button.dataset.examId;
+                    const session = button.dataset.session;
+                    const subjectId = button.dataset.subjectId;
                     const academicYearId = "{{ session('academic_year_id') }}";
 
                     document.getElementById('modal_exam_id').value = examId;
@@ -372,70 +573,67 @@
                     document.getElementById('modal_subject_id').value = subjectId;
                     document.getElementById('modal_academic_year_id').value = academicYearId;
 
-                    // Affichage du modal (Bootstrap 5)
                     new bootstrap.Modal(document.getElementById('recoursModal')).show();
                 });
             });
 
-            // Validation des cases à cocher (une seule case)
+            // Limite à une seule checkbox cochée
             document.querySelectorAll('.single-checkbox').forEach(checkbox => {
-                checkbox.addEventListener('change', function() {
-                    if (this.checked) {
+                checkbox.addEventListener('change', () => {
+                    if (checkbox.checked) {
                         document.querySelectorAll('.single-checkbox').forEach(cb => {
-                            if (cb !== this) cb.checked = false;
+                            if (cb !== checkbox) cb.checked = false;
                         });
                     }
                 });
             });
 
-            // Soumission AJAX du formulaire
+            // Gestion de la soumission en Ajax avec SweetAlert pour retours utilisateur
             document.getElementById('recoursForm').addEventListener('submit', function(e) {
                 e.preventDefault();
 
-                // Vérifier si au moins une case est cochée
                 const checkboxes = Array.from(this.querySelectorAll('input[name="objet[]"]'));
-                const isChecked = checkboxes.some(cb => cb.checked);
-
-                if (!isChecked) {
+                if (!checkboxes.some(cb => cb.checked)) {
                     Swal.fire({
-                        title: 'Erreur !',
-                        text: 'Veuillez cocher au moins un motif.',
                         icon: 'error',
+                        title: 'Erreur',
+                        text: 'Veuillez cocher au moins un motif pour le recours.',
                         confirmButtonText: 'OK'
                     });
                     return;
                 }
 
-                // Soumettre le formulaire
                 fetch(this.action, {
-                        method: 'POST',
-                        headers: {
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                            'Accept': 'application/json'
-                        },
-                        body: new FormData(this)
-                    })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Erreur réseau');
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        if (data.success) {
-                            Swal.fire({
-                                title: 'Recours envoyé !',
-                                html: `N° ${data.nextNumero}<br>Session ${data.session_year}`,
-                                icon: 'success'
-                            }).then(() => window.location.reload());
-                        } else {
-                            Swal.fire('Erreur !', data.message, 'error');
-                        }
-                    })
-                    .catch(error => {
-                        Swal.fire('Erreur !', error.message ||
-                            'Une erreur est survenue lors de la soumission du recours.', 'error');
+                    method: 'POST',
+                    headers: {
+                        "X-CSRF-TOKEN": document.querySelector('meta[name=csrf-token]').content,
+                        "Accept": "application/json"
+                    },
+                    body: new FormData(this)
+                }).then(response => {
+                    if (!response.ok) throw new Error("Erreur réseau");
+                    return response.json();
+                }).then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Recours envoyé',
+                            html: `Numéro: <b>${data.nextNumero}</b><br/>Session: <b>${data.session}</b>`
+                        }).then(() => window.location.reload());
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Erreur',
+                            text: data.message || "Une erreur est survenue."
+                        });
+                    }
+                }).catch(() => {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Erreur',
+                        text: "Une erreur est survenue, veuillez réessayer plus tard."
                     });
+                });
             });
         });
     </script>
