@@ -111,4 +111,23 @@ class StudentAddFeesModel extends Model
             ->whereIn('student_add_fees.student_id', $student_ids)
             ->sum('student_add_fees.paid_amount');
     }
+
+    public static function getPaidAmountForFee($student_id, $class_id, $fee_type_id)
+    {
+        return self::where('student_id', $student_id)
+            ->where('class_id', $class_id)
+            ->where('fee_type_id', $fee_type_id)
+            ->where('is_payment', 1)
+            ->sum('paid_amount');
+    }
+
+    public function fee_type()
+    {
+        return $this->belongsTo(\App\Models\FeeType::class, 'fee_type_id');
+    }
+
+    public function creator()
+    {
+        return $this->belongsTo(\App\Models\User::class, 'created_by');
+    }
 }

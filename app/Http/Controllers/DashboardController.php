@@ -16,6 +16,7 @@ use App\Models\HomeworkModel;
 use App\Models\HomeworkSubmitModel;
 use App\Models\StudentAttendanceModel;
 use App\Models\AcademicYear;
+use App\Models\FeeType;
 use Illuminate\Support\Facades\DB;
 
 
@@ -100,28 +101,73 @@ class DashboardController extends Controller
 
     // Dans le DashboardController
 
+    // public function dash(Request $request)
+    // {
+    //     $academicYearId = session('academic_year_id') ?? AcademicYear::where('is_active', 1)->value('id');
+
+    //     // Récupère la classe de l'étudiant pour cette année (via la table student_class)
+    //     $studentClass = DB::table('student_class')
+    //         ->where('student_id', Auth::id())
+    //         ->where('academic_year_id', $academicYearId)
+    //         ->value('class_id');
+
+    //     // S'il n'est pas inscrit pour cette année, sortie propre
+    //     if (!$studentClass) {
+    //         $data['TotalSubject'] = 0;
+    //         $data['getRecord'] = collect();
+    //         $data['message'] = "Vous n'êtes pas inscrit dans une classe pour l'année académique sélectionnée.";
+    //         return view('student.dashboard', $data);
+    //     }
+
+    //     $data['TotalSubject'] = ClassSubjectModel::MySubjectTotal($studentClass, $academicYearId);
+    //     $data['getRecord'] = ClassSubjectModel::MySubject($studentClass, $academicYearId);
+
+    //     // ... autres indicateurs dashboard
+
+    //     return view('student.dashboard', $data);
+    // }
+
     public function dash(Request $request)
     {
         $academicYearId = session('academic_year_id') ?? AcademicYear::where('is_active', 1)->value('id');
 
-        // Récupère la classe de l'étudiant pour cette année (via la table student_class)
+        // 1. La classe actuelle de l'étudiant pour l'année académique
         $studentClass = DB::table('student_class')
             ->where('student_id', Auth::id())
             ->where('academic_year_id', $academicYearId)
             ->value('class_id');
 
-        // S'il n'est pas inscrit pour cette année, sortie propre
         if (!$studentClass) {
             $data['TotalSubject'] = 0;
             $data['getRecord'] = collect();
             $data['message'] = "Vous n'êtes pas inscrit dans une classe pour l'année académique sélectionnée.";
+
+            // Aucun frais à montrer si pas de classe
+            $data['fees'] = [];
             return view('student.dashboard', $data);
         }
 
         $data['TotalSubject'] = ClassSubjectModel::MySubjectTotal($studentClass, $academicYearId);
         $data['getRecord'] = ClassSubjectModel::MySubject($studentClass, $academicYearId);
 
-        // ... autres indicateurs dashboard
+        // 2. Récupération de tous les frais assignés à cette classe
+        $feeTypes = FeeType::whereHas('classes', function ($query) use ($studentClass) {
+            $query->where('class_id', $studentClass);
+        })->get();
+
+        // 3. Pour chaque frais, récupération du paiement de l'étudiant
+        $fees = [];
+        foreach ($feeTypes as $feeType) {
+            $payment = StudentAddFeesModel::where('student_id', Auth::id())
+                ->where('class_id', $studentClass)
+                ->where('fee_type_id', $feeType->id)
+                ->first();
+            $fees[] = [
+                'fee_type' => $feeType,
+                'payment' => $payment
+            ];
+        }
+        $data['fees'] = $fees;
 
         return view('student.dashboard', $data);
     }

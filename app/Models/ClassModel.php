@@ -124,4 +124,9 @@ class ClassModel extends Model
             'student_id' // Clé étrangère de ThesisSubmissio vers User
         );
     }
+
+    public function feeTypes()
+    {
+        return $this->belongsToMany(FeeType::class, 'class_fee_type', 'class_id', 'fee_type_id');
+    }
 }

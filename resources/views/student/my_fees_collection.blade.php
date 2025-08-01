@@ -162,6 +162,7 @@
                                     <thead>
                                         <tr>
                                             <th>Classe</th>
+                                            <th>Nom du frais</th>
                                             <th>Montant total</th>
                                             <th>Montant payé</th>
                                             <th>Reste à payer</th>
@@ -172,25 +173,28 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @forelse($getFees as $value)
+                                        @forelse($payments as $value)
                                             <tr>
                                                 <td>{{ $value->class_name }}</td>
+                                                <td>{{ $value->fee_name }}</td>
                                                 <td class="text-success fw-bold">
                                                     ${{ number_format($value->total_amount, 2) }}</td>
                                                 <td class="text-info">${{ number_format($value->paid_amount, 2) }}</td>
                                                 <td class="text-danger fw-semibold">
-                                                    ${{ number_format($value->remaning_amount, 2) }}</td>
+                                                    ${{ number_format($value->remaining_amount, 2) }}</td>
                                                 <td>
-                                                    <span class="badge bg-primary">{{ $value->payment_type }}</span>
+                                                    <span
+                                                        class="badge bg-primary">{{ $value->payment_type ?? 'Non payé' }}</span>
                                                 </td>
-                                                <td>{{ $value->remark }}</td>
+                                                <td>{{ $value->remark ?? '' }}</td>
                                                 <td>
                                                     <span
                                                         class="badge rounded-pill bg-light text-dark border border-primary">
-                                                        {{ $value->created_name }}
+                                                        {{ $value->created_name ?? '' }}
                                                     </span>
                                                 </td>
-                                                <td>{{ date('d-m-Y', strtotime($value->created_at)) }}</td>
+                                                <td>{{ !empty($value->created_at) ? date('d-m-Y', strtotime($value->created_at)) : '' }}
+                                                </td>
                                             </tr>
                                         @empty
                                             <tr>
@@ -199,6 +203,7 @@
                                                 </td>
                                             </tr>
                                         @endforelse
+
                                     </tbody>
                                 </table>
                             </div>
@@ -213,57 +218,74 @@
     <!-- Modal -->
     <div class="modal fade" id="AddFeesModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
         <div class="modal-dialog">
-            <div class="modal-content shadow">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="modalLabel"><i class="fas fa-money-check-alt me-2"></i>Ajouter des frais
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
-                </div>
-                <form action="" method="post">
-                    {{ csrf_field() }}
+            <form action="" method="post" id="addFeesForm">
+                {{ csrf_field() }}
+                <div class="modal-content shadow">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalLabel"><i class="fas fa-money-check-alt me-2"></i>Ajouter un
+                            paiement</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                    </div>
                     <div class="modal-body">
+
                         <div class="mb-2">
-                            <label class="form-label">Classe :</label>
-                            <div class="form-control bg-light border-0">{{ $getStudent->name }}</div>
+                            <label class="form-label">Frais <span class="text-danger">*</span></label>
+                            <select class="form-select form-control" name="fee_type_id" id="fee_type_select" required>
+                                <option value="">Sélectionnez le frais à payer...</option>
+                                @foreach ($feeTypes as $f)
+                                    <option value="{{ $f->id }}" data-amount="{{ $f->amount }}">
+                                        {{ $f->name }} (${{ number_format($f->amount, 2) }}) - Limite
+                                        {{ date('d/m/Y', strtotime($f->end_date)) }}
+                                    </option>
+                                @endforeach
+                            </select>
+
                         </div>
+
+
                         <div class="mb-2">
                             <label class="form-label">Montant total :</label>
-                            <div class="form-control bg-light border-0">${{ number_format($getStudent->amount, 2) }}</div>
+                            <input type="number" class="form-control" id="amount_total" readonly>
                         </div>
+
                         <div class="mb-2">
-                            <label class="form-label">Montant payé :</label>
-                            <div class="form-control bg-light border-0">${{ number_format($paid_amount, 2) }}</div>
-                        </div>
-                        <div class="mb-2">
-                            @php $RemaningAmount = $getStudent->amount - $paid_amount; @endphp
                             <label class="form-label">Reste à payer :</label>
-                            <div class="form-control bg-light border-0 text-danger">
-                                ${{ number_format($RemaningAmount, 2) }}</div>
+                            <input type="number" class="form-control" id="remaining_amount" readonly>
                         </div>
+
+
+
                         <div class="mb-3">
                             <label class="form-label">Montant <span class="text-danger">*</span></label>
                             <input type="number" class="form-control" name="amount" min="0.01" step="0.01"
                                 required>
                         </div>
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <label class="form-label">Type de paiement <span class="text-danger">*</span></label>
                             <select class="form-select form-control" name="payment_type" required>
                                 <option value="">Sélectionner...</option>
-                                <option value="Paypal">Paypal</option>
+                                <option value="Cash">Espèces</option>
+                                <option value="Cheque">Chèque</option>
+                                <option value="Paypal">PayPal</option>
                                 <option value="Stripe">Stripe</option>
+                                <option value="OrangeMoney">Orange Money</option>
+                                <option value="AirtelMoney">Airtel Money</option>
+                                <option value="MPESA">M-Pesa</option>
                             </select>
                         </div>
+
                         <div class="mb-2">
                             <label class="form-label">Remarque</label>
                             <textarea class="form-control" name="remark" rows="2"></textarea>
                         </div>
+
                     </div>
                     <div class="modal-footer bg-light rounded-bottom-3">
                         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Fermer</button>
                         <button type="submit" class="btn btn-primary">Valider</button>
                     </div>
-                </form>
-            </div>
+                </div>
+            </form>
         </div>
     </div>
 @endsection
@@ -274,6 +296,65 @@
         document.getElementById('AddFees').addEventListener('click', function() {
             var modal = new bootstrap.Modal(document.getElementById('AddFeesModal'));
             modal.show();
+        });
+    </script>
+
+    <script>
+        document.querySelectorAll('.payFeesBtn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                let feeTypeId = this.getAttribute('data-feetype');
+                let amount = this.getAttribute('data-amount');
+                document.getElementById('fee_type_id_modal').value = feeTypeId;
+                document.getElementById('amount_modal').value = amount;
+                document.getElementById('amount_display').innerText = amount + " FCFA";
+                var modal = new bootstrap.Modal(document.getElementById('AddFeesModal'));
+                modal.show();
+            })
+        });
+    </script>
+
+    {{-- <script>
+        document.getElementById('AddFees').addEventListener('click', function() {
+            var modal = new bootstrap.Modal(document.getElementById('AddFeesModal'));
+            modal.show();
+        });
+        document.getElementById('fee_type_select').addEventListener('change', function() {
+            var selected = this.options[this.selectedIndex];
+            var amount = selected.getAttribute('data-amount');
+            document.getElementById('amount_input').value = amount ?? '';
+        });
+    </script> --}}
+
+    <script>
+        let paidAmountsByFee = @json($paidAmountsByFee);
+
+        const feeTypeSelect = document.getElementById('fee_type_select');
+        const amountTotalInput = document.getElementById('amount_total');
+        const remainingAmountInput = document.getElementById('remaining_amount');
+        const amountInput = document.getElementById('amount_input');
+
+        feeTypeSelect.addEventListener('change', function() {
+            let selectedOption = this.options[this.selectedIndex];
+            let feeId = selectedOption.value;
+            let totalAmount = parseFloat(selectedOption.getAttribute('data-amount')) || 0;
+
+            let paidAmount = paidAmountsByFee[feeId] ?? 0;
+            let remainingAmount = totalAmount - paidAmount;
+            if (remainingAmount < 0) remainingAmount = 0;
+
+            amountTotalInput.value = totalAmount.toFixed(2);
+            remainingAmountInput.value = remainingAmount.toFixed(2);
+
+            // Mets par défaut le montant à payer au reste à payer maximum
+            amountInput.value = remainingAmount.toFixed(2);
+            amountInput.max = remainingAmount.toFixed(2);
+        });
+
+        amountInput.addEventListener('input', function() {
+            let max = parseFloat(this.max);
+            if (parseFloat(this.value) > max) {
+                this.value = max;
+            }
         });
     </script>
 @endsection

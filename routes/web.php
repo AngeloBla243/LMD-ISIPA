@@ -30,6 +30,7 @@ use App\Http\Controllers\MeetingController;
 use App\Http\Controllers\TeacherExamController;
 use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\StudentExamController;
+use App\Http\Controllers\FeeTypeController;
 
 
 
@@ -371,7 +372,20 @@ Route::group(['middleware' => 'admin'], function () {
 
     Route::post('admin/fees_collection/collect_fees/add_fees/{student_id}', [FeesCollectionController::class, 'collect_fees_insert']);
 
+    Route::resource('fee-types', FeeTypeController::class)->names([
+        'index' => 'admin.fee_types.index',
+        'create' => 'admin.fee_types.create',
+        'store' => 'admin.fee_types.store',
+        'edit' => 'admin.fee_types.edit',
+        'update' => 'admin.fee_types.update',
+        'destroy' => 'admin.fee_types.destroy',
+        'show' => 'admin.fee_types.show',
+    ]);
+
+
+
     Route::get('admin/recours/list', [RecoursController::class, 'list']);
+
     Route::post('admin/recours/toggle-status/{id}', [RecoursController::class, 'toggleStatus'])
         ->name('admin.recours.toggle_status');
 
@@ -581,6 +595,9 @@ Route::group(['middleware' => 'student'], function () {
     Route::get('student/fees_collection', [FeesCollectionController::class, 'CollectFeesStudent']);
 
     Route::post('student/fees_collection', [FeesCollectionController::class, 'CollectFeesStudentPayment']);
+
+    Route::post('student/pay-fees', [FeesCollectionController::class, 'CollectFeesStudentPayment'])->name('student.fees.pay');
+
 
 
     Route::get('student/paypal/payment-error', [FeesCollectionController::class, 'PaymentError']);
