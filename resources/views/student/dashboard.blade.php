@@ -223,6 +223,98 @@
                         </div>
                     </div>
 
+                    <!-- Frais à payer (section à placer où tu veux dans le dashboard) -->
+
+
+                    {{-- Carte Frais à Payer --}}
+                    <div class="col-md-8">
+                        <div class="card shadow-sm rounded-4 border-0 p-4">
+                            <h5 class="fw-bold mb-3 text-danger">
+                                <i class="fa-solid fa-money-bill-wave me-2"></i> Mes frais à payer
+                            </h5>
+
+                            @forelse ($fees as $item)
+                                @php
+                                    $now = \Carbon\Carbon::now();
+                                    $limit = \Carbon\Carbon::parse($item['fee_type']->end_date);
+                                    $totalAmount = $item['fee_type']->amount;
+
+                                    // Calcule le montant déjà payé pour ce frais (si paiement existe)
+                                    $paidAmount = 0;
+                                    if ($item['payment']) {
+                                        // Somme des paiements validés pour ce fee_type_id
+                                        $paidAmount = \App\Models\StudentAddFeesModel::where('student_id', auth()->id())
+                                            ->where('fee_type_id', $item['fee_type']->id)
+                                            ->where('is_payment', 1)
+                                            ->sum('paid_amount');
+                                    }
+
+                                    // Détermine le badge et statut selon le montant payé et la date limite
+                                    if ($paidAmount >= $totalAmount) {
+                                        $badge = 'success';
+                                        $statut = 'Payé';
+                                    } elseif ($paidAmount > 0 && $paidAmount < $totalAmount) {
+                                        $badge = 'warning';
+                                        $statut = 'Pas encore soldé';
+                                    } else {
+                                        if ($now->gt($limit)) {
+                                            $badge = 'danger';
+                                            $statut = 'En retard';
+                                        } else {
+                                            $badge = 'secondary';
+                                            $statut = 'Non payé';
+                                        }
+                                    }
+                                @endphp
+
+
+                                <div class="card shadow-sm mb-4 border-start border-{{ $badge }} border-4 rounded-4">
+                                    <div class="card-body">
+                                        <h6 class="fw-bold mb-3 text-danger">{{ $item['fee_type']->name }}</h6>
+                                        <ul class="list-group list-group1">
+                                            <li class="list-group-item1">
+                                                <i class="fa-solid fa-coins course-icon"></i>
+                                                <strong>Montant : </strong>
+                                                <span class="ms-2 text-primary">{{ number_format($totalAmount, 0) }}
+                                                    $</span>
+                                            </li>
+                                            <li class="list-group-item1">
+                                                <i class="fa-regular fa-calendar-days course-icon"></i>
+                                                <strong>Date limite : </strong>
+                                                <span class="ms-2">{{ $limit->format('d/m/Y') }}</span>
+                                            </li>
+                                            <li class="list-group-item1 d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <i class="fa-solid fa-hourglass-half course-icon"></i>
+                                                    <strong>Statut : </strong>
+                                                    <span
+                                                        class="badge bg-{{ $badge }} ms-2 px-3 py-2 rounded-pill">{{ $statut }}</span>
+                                                </div>
+                                                <div>
+                                                    @if ($paidAmount > 0)
+                                                        <small class="text-success">Dernier paiement le
+                                                            {{ $item['payment']->created_at ? $item['payment']->created_at->format('d/m/Y') : '' }}</small>
+                                                    @endif
+                                                    @if ($statut == 'En retard')
+                                                        <i class="fa-solid fa-exclamation-triangle ms-3 text-danger"
+                                                            title="Frais en retard"></i>
+                                                    @endif
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            @empty
+                                <div class="alert alert-info text-center">
+                                    <i class="fa-solid fa-circle-info me-1"></i>
+                                    Aucun frais assigné à votre classe.
+                                </div>
+                            @endforelse
+
+                        </div>
+                    </div>
+
+
                     <!-- Carte Cours -->
                     <div class="col-md-8">
                         <div class="card shadow-sm rounded-4 border-0 p-4">

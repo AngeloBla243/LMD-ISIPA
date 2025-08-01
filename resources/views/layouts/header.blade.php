@@ -327,6 +327,20 @@
                                     <p>Rapport de collecte des frais</p>
                                 </a>
                             </li>
+
+
+                            <li class="nav-item">
+                                <a href="{{ route('admin.fee_types.index') }}"
+                                    class="nav-link {{ Request::is('admin/fee-types*') ? 'active' : '' }}">
+                                    <i class="nav-icon fas fa-money-check-alt"></i>
+                                    <p>
+                                        Types de frais & périodes
+                                    </p>
+                                </a>
+                            </li>
+
+
+
                         </ul>
                     </li>
 
