@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use App\Models\StudentAttendanceModel;
 use App\Models\AcademicYear;
+use App\Models\Department;
 
 use App\Imports\StudentsImport;
 
@@ -23,34 +24,93 @@ class StudentController extends Controller
 {
     public function export_excel(Request $request)
     {
-        return Excel::download(new ExportStudent, 'Student_' . date('d-m-Y') . '.xls');
+        $filters = $request->only(['name', 'last_name', 'email', 'departement', 'class', 'academic_year']);
+
+        return Excel::download(new ExportStudent($filters), 'Etudiants_' . date('d-m-Y') . '.xlsx');
     }
+
 
 
     public function import()
     {
         $data['header_title'] = "Importer des étudiants";
+        $data['departments'] = Department::all(); // Toutes les départements
+        $data['academicYears'] = AcademicYear::orderBy('start_date', 'desc')->get(); // Toutes les années académiques
+        $data['classes'] = ClassModel::all(); // Toutes les classes (ajustez selon vos filtres si besoin)
+
         return view('admin.student.import', $data);
     }
+
 
     public function importSubmit(Request $request)
     {
         $request->validate([
-            'file' => 'required|mimes:xlsx,xls,csv'
+            'file' => 'required|file|mimes:xlsx,xls,csv',
         ]);
 
-        Excel::import(new StudentsImport, $request->file('file'));
-
-        return redirect('admin/student/list')->with('success', 'Étudiants importés avec succès');
+        try {
+            Excel::import(new StudentsImport, $request->file('file'));
+            return redirect()->back()->with('success', 'Importation réussie des étudiants.');
+        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+            $failures = $e->failures();
+            $errors = [];
+            foreach ($failures as $failure) {
+                $errors[] = 'Ligne ' . $failure->row() . ' : ' . implode(', ', $failure->errors());
+            }
+            return redirect()->back()->withErrors($errors);
+        } catch (\Exception $e) {
+            return redirect()->back()->withErrors(['Erreur lors de l’importation : ' . $e->getMessage()]);
+        }
     }
 
 
-    public function list()
+    public function list(Request $request)
     {
-        $data['getRecord'] = User::getStudent();
-        $data['header_title'] = "Student List";
+        // Récupération des filtres (exemple)
+        $query = User::query()->where('user_type', 3)->where('is_delete', 0);
+
+        // Ajout d'une jointure pour récupérer le nom du département
+        $query->leftJoin('departments', 'users.department_id', '=', 'departments.id');
+
+        // Sélection des colonnes souhaitées, y compris le nom du département
+        $query->select(
+            'users.*',
+            'departments.name as departement' // alias correspondant à l’attribut utilisé en vue
+        );
+
+        // Appliquer les filtres éventuels sur les champs
+        if ($request->filled('name')) {
+            $query->where('users.name', 'like', '%' . $request->name . '%');
+        }
+        if ($request->filled('last_name')) {
+            $query->where('users.last_name', 'like', '%' . $request->last_name . '%');
+        }
+        if ($request->filled('email')) {
+            $query->where('users.email', 'like', '%' . $request->email . '%');
+        }
+        if ($request->filled('admission_number')) {
+            $query->where('users.admission_number', 'like', '%' . $request->admission_number . '%');
+        }
+        if ($request->filled('roll_number')) {
+            $query->where('users.roll_number', 'like', '%' . $request->roll_number . '%');
+        }
+        if ($request->filled('gender')) {
+            $query->where('users.gender', $request->gender);
+        }
+        if ($request->filled('departement')) {
+            $query->where('departments.name', $request->departement);
+        }
+
+        // Optionnel : joindre la table class et récupérer son nom, si utile pour la liste
+
+        // Pagination classique
+        $data['getRecord'] = $query->paginate(20);
+
+        $data['header_title'] = "Liste des étudiants";
+
         return view('admin.student.list', $data);
     }
+
 
 
 
@@ -61,6 +121,7 @@ class StudentController extends Controller
     public function add()
     {
         $data['getClass'] = ClassModel::getClass();
+        $data['departments'] = Department::all(); // Ajout
         $data['header_title'] = "Add New Student";
         return view('admin.student.add', $data);
     }
@@ -116,6 +177,8 @@ class StudentController extends Controller
         $student->weight = trim($request->weight);
         $student->status = trim($request->status);
         $student->email = trim($request->email);
+        $student->department_id = $request->department_id;
+
         $student->password = Hash::make($request->password);
         $student->user_type = 3;
         $student->save();
@@ -136,6 +199,7 @@ class StudentController extends Controller
                 ->where('status', 0)
                 ->get(),
             'academicYears' => AcademicYear::orderBy('start_date', 'desc')->get(),
+            'departments' => Department::all(), // Ajout
             'header_title' => "Modifier l'étudiant"
         ];
 
@@ -148,6 +212,7 @@ class StudentController extends Controller
         request()->validate([
             'email' => 'required|email|unique:users,email,' . $id,
             'weight' => 'max:10',
+            'department_id' => 'required|exists:departments,id',
             'blood_group' => 'max:10',
             'mobile_number' => 'max:15|min:8',
             'admission_number' => 'max:50',
@@ -161,6 +226,7 @@ class StudentController extends Controller
 
         $student = User::getSingle($id);;
         $student->name = trim($request->name);
+        $student->department_id = $request->department_id; // ici
         $student->last_name = trim($request->last_name);
         $student->departement = trim($request->departement);
         $student->admission_number = trim($request->admission_number);

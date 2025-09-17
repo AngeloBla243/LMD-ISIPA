@@ -51,11 +51,6 @@
                             Liste des étudiants <small class="text-muted">(Total : {{ $getRecord->total() }})</small>
                         </h1>
                     </div>
-                    {{-- <div class="col-sm-6 text-end">
-                        <a href="{{ url('admin/student/add') }}" class="btn btn-info shadow-sm rounded-3">
-                            <i class="fa-solid fa-file-circle-plus me-2"></i> Ajouter un étudiant
-                        </a>
-                    </div> --}}
 
                     <div class="col-sm-6 text-end">
                         <a href="{{ url('admin/student/add') }}" class="btn btn-info shadow-sm rounded-3">

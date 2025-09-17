@@ -31,6 +31,12 @@ use App\Http\Controllers\TeacherExamController;
 use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\StudentExamController;
 use App\Http\Controllers\FeeTypeController;
+use App\Http\Controllers\ApparitoratController;
+use App\Http\Controllers\DepartementController;
+use App\Http\Controllers\JuryController;
+use App\Http\Controllers\DepartementNameController;
+use App\Http\Controllers\DepartementStudentController;
+use App\Http\Controllers\DepartementAssignSubjectController;
 
 
 
@@ -63,6 +69,7 @@ use App\Http\Controllers\FeeTypeController;
 
 
 Route::get('/', [AuthController::class, 'login']);
+Route::post('login', [AuthController::class, 'AuthLogin'])->name('login');
 Route::post('login', [AuthController::class, 'AuthLogin']);
 Route::get('logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('forgot-password', [AuthController::class, 'forgotpassword']);
@@ -94,8 +101,11 @@ Route::get('/set-academic-year-teacher', function (\Illuminate\Http\Request $req
 
 
 
-
-
+// Routes AJAX pour charger les classes
+Route::prefix('admin')->group(function () {
+    Route::get('get-classes-by-department/{departmentId}', [ClassController::class, 'getClassesByDepartment']);
+    Route::get('get-classes-by-department-year/{departmentId}/{yearId}', [ClassController::class, 'getClassesByDepartmentAndYear']);
+});
 
 Route::group(['middleware' => 'common'], function () {
 
@@ -178,8 +188,34 @@ Route::group(['middleware' => 'admin'], function () {
     Route::post('admin/student/edit/{id}', [StudentController::class, 'update']);
     Route::get('admin/student/delete/{id}', [StudentController::class, 'delete']);
     Route::post('admin/student/export_excel', [StudentController::class, 'export_excel']);
+
     Route::get('admin/student/import', [StudentController::class, 'import'])->name('admin.student.import');
     Route::post('admin/student/import', [StudentController::class, 'importSubmit'])->name('admin.student.import.submit');
+
+    // Departement
+    Route::get('admin/departement/list', [DepartementController::class, 'list'])->name('admin.departement.list');
+    Route::get('admin/departement/add', [DepartementController::class, 'add'])->name('admin.departement.add');
+    Route::post('admin/departement/add', [DepartementController::class, 'insert'])->name('admin.departement.insert');
+    Route::get('admin/departement/edit/{id}', [DepartementController::class, 'edit'])->name('admin.departement.edit');
+    Route::post('admin/departement/edit/{id}', [DepartementController::class, 'update'])->name('admin.departement.update');
+    Route::get('admin/departement/delete/{id}', [DepartementController::class, 'delete'])->name('admin.departement.delete');
+
+    // jury
+    Route::get('admin/jury/list', [JuryController::class, 'list'])->name('admin.jury.list');
+    Route::get('admin/jury/add', [JuryController::class, 'add'])->name('admin.jury.add');
+    Route::post('admin/jury/add', [JuryController::class, 'insert'])->name('admin.jury.insert');
+    Route::get('admin/jury/edit/{id}', [JuryController::class, 'edit'])->name('admin.jury.edit');
+    Route::post('admin/jury/edit/{id}', [JuryController::class, 'update'])->name('admin.jury.update');
+    Route::get('admin/jury/delete/{id}', [JuryController::class, 'delete'])->name('admin.jury.delete');
+
+    //
+    Route::get('admin/apparitorat/list', [ApparitoratController::class, 'list'])->name('admin.apparitorat.list');
+    Route::get('admin/apparitorat/add', [ApparitoratController::class, 'add'])->name('admin.apparitorat.add');
+    Route::post('admin/apparitorat/add', [ApparitoratController::class, 'insert'])->name('admin.apparitorat.insert');
+    Route::get('admin/apparitorat/edit/{id}', [ApparitoratController::class, 'edit'])->name('admin.apparitorat.edit');
+    Route::post('admin/apparitorat/edit/{id}', [ApparitoratController::class, 'update'])->name('admin.apparitorat.update');
+    Route::get('admin/apparitorat/delete/{id}', [ApparitoratController::class, 'delete'])->name('admin.apparitorat.delete');
+
 
 
 
@@ -220,6 +256,15 @@ Route::group(['middleware' => 'admin'], function () {
     Route::post('admin/subject/edit/{id}', [SubjectController::class, 'update']);
     Route::get('admin/subject/delete/{id}', [SubjectController::class, 'delete']);
 
+    // departement
+    Route::get('admin/departementName/list', [DepartementNameController::class, 'list'])->name('admin.departementName.list');
+    Route::get('admin/departementName/add', [DepartementNameController::class, 'add'])->name('admin.departementName.add');
+    Route::post('admin/departementName/add', [DepartementNameController::class, 'insert'])->name('admin.departementName.insert');
+    Route::get('admin/departementName/edit/{id}', [DepartementNameController::class, 'edit'])->name('admin.departementName.edit');
+    Route::post('admin/departementName/edit/{id}', [DepartementNameController::class, 'update'])->name('admin.departementName.update');
+    Route::get('admin/departementName/delete/{id}', [DepartementNameController::class, 'delete'])->name('admin.departementName.delete');
+
+
 
     // assign_subject
 
@@ -244,15 +289,7 @@ Route::group(['middleware' => 'admin'], function () {
     Route::post('admin/class_timetable/add', [ClassTimetableController::class, 'insert_update']);
 
 
-
     Route::get('/admin/class-timetable/get-classes/{yearId}', [ClassTimetableController::class, 'getClassesByYear']);
-
-
-
-
-
-
-
 
 
     Route::get('admin/account', [UserController::class, 'MyAccount']);
@@ -664,4 +701,32 @@ Route::group(['middleware' => 'parent'], function () {
     Route::get('parent/stripe/payment-error/{student_id}', [FeesCollectionController::class, 'PaymentErrorParent']);
 
     Route::get('parent/stripe/payment-success/{student_id}', [FeesCollectionController::class, 'PaymentSuccessStripeParent']);
+});
+
+
+// Routes Departement
+Route::group(['middleware' => ['auth', 'departement']], function () {
+    Route::get('departement/dashboard', [DashboardController::class, 'departementDashboard']);
+    Route::get('departement/student/list', [DepartementStudentController::class, 'list'])->name('departement.student.list');
+    Route::get('departement/student/edit/{id}', [DepartementStudentController::class, 'edit'])->name('departement.student.edit');
+    Route::post('departement/student/edit/{id}', [DepartementStudentController::class, 'update'])->name('departement.student.update');
+    Route::get('departement/get-classes-by-department-year/{department}/{year}', [ClassController::class, 'getClassesByDepartmentAndYear']);
+
+    Route::get('departement/assign_subject/list', [DepartementAssignSubjectController::class, 'list'])->name('departement.assign_subject.list');
+    Route::get('departement/assign_subject/add', [DepartementAssignSubjectController::class, 'add'])->name('departement.assign_subject.add');
+    Route::post('departement/assign_subject/insert', [DepartementAssignSubjectController::class, 'insert'])->name('departement.assign_subject.insert');
+    Route::get('departement/assign_subject/edit/{id}', [DepartementAssignSubjectController::class, 'edit'])->name('departement.assign_subject.edit');
+    Route::post('departement/assign_subject/update_single/{id}', [DepartementAssignSubjectController::class, 'update_single'])->name('departement.assign_subject.update_single');
+    Route::post('departement/assign_subject/update', [DepartementAssignSubjectController::class, 'update'])->name('departement.assign_subject.update');
+    Route::get('departement/assign_subject/delete/{id}', [DepartementAssignSubjectController::class, 'delete'])->name('departement.assign_subject.delete');
+
+    // Route::get('departement/get-classes-by-department-year/{department}/{year}', [ClassController::class, 'getClassesByDepartmentAndYear']);
+    Route::get('departement/get-subjects-by-year/{year}', [SubjectController::class, 'getSubjectsByYear']);
+});
+Route::group(['middleware' => ['auth', 'jury']], function () {
+    Route::get('jury/dashboard', [DashboardController::class, 'juryDashboard']);
+});
+
+Route::group(['middleware' => ['auth', 'apparitorat']], function () {
+    Route::get('apparitorat/dashboard', [DashboardController::class, 'apparitoratDashboard']);
 });

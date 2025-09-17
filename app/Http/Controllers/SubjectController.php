@@ -178,7 +178,16 @@ class SubjectController extends Controller
         }
     }
 
+    public function getSubjectsByYear($yearId)
+    {
+        $subjects = SubjectModel::where('academic_year_id', $yearId)
+            ->where('status', 0) // optionnel: si vous avez un champ de statut actif
+            ->where('is_delete', 0) // optionnel
+            ->orderBy('name')
+            ->get(['id', 'name', 'code']);
 
+        return response()->json($subjects);
+    }
 
     // parent side
 

@@ -97,6 +97,25 @@
                                             @enderror
                                         </div>
                                         <div class="col-md-6">
+                                            <label class="form-label fw-semibold">Département <span
+                                                    class="text-danger">*</span></label>
+                                            <select name="department_id"
+                                                class="form-select form-control @error('department_id') is-invalid @enderror"
+                                                required>
+                                                <option value="">Sélectionner</option>
+                                                @foreach ($departments as $department)
+                                                    <option value="{{ $department->id }}"
+                                                        {{ old('department_id', $getRecord->department_id ?? '') == $department->id ? 'selected' : '' }}>
+                                                        {{ $department->name }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                            @error('department_id')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+
+                                        <div class="col-md-6">
                                             <label class="form-label fw-semibold">Genre <span
                                                     class="text-danger">*</span></label>
                                             <select class="form-select form-control @error('gender') is-invalid @enderror"
@@ -253,14 +272,14 @@
                                         </div>
                                     </div>
 
-                                    {{-- Gestion multi-classes & année académique --}}
                                     <div class="card p-3 my-4 bg-light border-0 shadow-sm">
                                         <label class="fw-bold mb-2">Affectation Classe(s) et Année(s) académique(s)</label>
                                         <div id="classYearContainer">
                                             @foreach ($getRecord->studentClasses as $enrollment)
                                                 <div class="row align-items-end mb-2 class-academic-row g-2">
                                                     <div class="col-md-5">
-                                                        <select name="class_ids[]" class="form-select" required>
+                                                        <select name="class_ids[]" class="form-select class-select"
+                                                            required>
                                                             <option value="">Sélectionnez une classe</option>
                                                             @foreach ($getClass as $class)
                                                                 <option value="{{ $class->id }}"
@@ -272,7 +291,7 @@
                                                     </div>
                                                     <div class="col-md-5">
                                                         <select name="academic_year_ids[]"
-                                                            class="form-select form-control" required>
+                                                            class="form-select academic-year-select" required>
                                                             <option value="">Sélectionnez une année académique
                                                             </option>
                                                             @foreach ($academicYears as $year)
@@ -297,12 +316,12 @@
                                             <i class="fas fa-plus"></i> Ajouter une classe/année
                                         </button>
                                     </div>
-                                </div>
-                                <div class="card-footer d-flex justify-content-end bg-white border-0">
-                                    <button type="submit" class="btn btn-primary px-4 py-2 fw-semibold shadow-sm">
-                                        Mettre à jour
-                                    </button>
-                                </div>
+
+                                    <div class="card-footer d-flex justify-content-end bg-white border-0">
+                                        <button type="submit" class="btn btn-primary px-4 py-2 fw-semibold shadow-sm">
+                                            Mettre à jour
+                                        </button>
+                                    </div>
                             </form>
                         </div>
                     </div>
@@ -352,66 +371,125 @@
     </style>
 
     <script>
-        // Ajout dynamique de lignes classe/année
         document.addEventListener('DOMContentLoaded', function() {
+            const departmentSelect = document.querySelector('select[name="department_id"]');
+            const classYearContainer = document.getElementById('classYearContainer');
+
+            // Fonction pour charger les classes via API
+            function loadClasses(departmentId, yearId, classSelect, selectedClassId = null) {
+                if (!departmentId) {
+                    classSelect.innerHTML = '<option value="">Sélectionnez un département d\'abord</option>';
+                    return;
+                }
+
+                // Construction dynamique de l'URL
+                let url = `{{ url('admin/get-classes-by-department') }}/${departmentId}`;
+                if (yearId) {
+                    url = `{{ url('admin/get-classes-by-department-year') }}/${departmentId}/${yearId}`;
+                }
+
+                fetch(url)
+                    .then(res => {
+                        if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+                        return res.json();
+                    })
+                    .then(classes => {
+                        classSelect.innerHTML = '<option value="">Sélectionnez une classe</option>';
+                        classes.forEach(c => {
+                            const option = document.createElement('option');
+                            option.value = c.id;
+                            option.textContent = c.name + (c.opt ? ' - ' + c.opt : '');
+                            if (selectedClassId && selectedClassId == c.id) option.selected = true;
+                            classSelect.appendChild(option);
+                        });
+                    })
+                    .catch(err => {
+                        console.error('Erreur:', err);
+                        classSelect.innerHTML = '<option value="">Erreur de chargement</option>';
+                    });
+            }
+
+            // Recharger classes à chaque changement de département
+            if (departmentSelect) {
+                departmentSelect.addEventListener('change', function() {
+                    const depId = this.value;
+                    classYearContainer.querySelectorAll('.class-academic-row').forEach(row => {
+                        const yearSelect = row.querySelector('.academic-year-select');
+                        const classSelect = row.querySelector('.class-select');
+                        loadClasses(depId, yearSelect.value, classSelect, classSelect.value);
+                    });
+                });
+            }
+
+            // Recharger classes à chaque changement d'année académique dans une ligne
+            if (classYearContainer) {
+                classYearContainer.addEventListener('change', function(e) {
+                    if (e.target.classList.contains('academic-year-select')) {
+                        const row = e.target.closest('.class-academic-row');
+                        const classSelect = row.querySelector('.class-select');
+                        loadClasses(departmentSelect ? departmentSelect.value : null, e.target.value,
+                            classSelect, classSelect.value);
+                    }
+                });
+            }
+
+            // Ajouter une nouvelle ligne classe/année
             document.getElementById('addClassYearRow').addEventListener('click', function() {
-                let container = document.getElementById('classYearContainer');
-                let row = document.createElement('div');
+                const row = document.createElement('div');
                 row.className = 'row align-items-end mb-2 class-academic-row g-2';
+
+                // Récupération dynamique des options année via Blade JSON
+                const academicYearOptions = @json($academicYears->map(fn($y) => ['id' => $y->id, 'name' => $y->name]));
+
+                let yearOptionsHTML = '<option value="">Sélectionnez une année académique</option>';
+                academicYearOptions.forEach(y => {
+                    yearOptionsHTML += `<option value="${y.id}">${y.name}</option>`;
+                });
+
                 row.innerHTML = `
-                <div class="col-md-5">
-                    <select name="class_ids[]" class="form-select" required>
-                        <option value="">Sélectionnez une classe</option>
-                        @foreach ($getClass as $class)
-                            <option value="{{ $class->id }}">{{ $class->name }} - {{ $class->opt }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="col-md-5">
-                    <select name="academic_year_ids[]" class="form-select" required>
-                        <option value="">Sélectionnez une année académique</option>
-                        @foreach ($academicYears as $year)
-                            <option value="{{ $year->id }}">{{ $year->name }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="col-md-2 text-end">
-                    <button type="button" class="btn btn-danger btn-sm remove-row" title="Supprimer cette affectation">
-                        <i class="fas fa-trash-alt"></i>
-                    </button>
-                </div>
-            `;
-                container.appendChild(row);
+            <div class="col-md-5">
+                <select name="class_ids[]" class="form-select class-select" required>
+                    <option value="">Sélectionnez une classe</option>
+                </select>
+            </div>
+            <div class="col-md-5">
+                <select name="academic_year_ids[]" class="form-select academic-year-select" required>
+                    ${yearOptionsHTML}
+                </select>
+            </div>
+            <div class="col-md-2 text-end">
+                <button type="button" class="btn btn-danger btn-sm remove-row" title="Supprimer cette affectation">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+            </div>
+        `;
+
+                classYearContainer.appendChild(row);
+
+                // Charger les classes pour la nouvelle ligne
+                const newClassSelect = row.querySelector('.class-select');
+                const newYearSelect = row.querySelector('.academic-year-select');
+                loadClasses(departmentSelect ? departmentSelect.value : null, newYearSelect.value,
+                    newClassSelect);
             });
 
-            // Suppression dynamique d'une ligne
-            document.getElementById('classYearContainer').addEventListener('click', function(e) {
-                if (e.target.closest('.remove-row')) {
-                    e.target.closest('.class-academic-row').remove();
-                }
-            });
-        });
-    </script>
-@endsection
+            // Supprimer une ligne classe/année
+            if (classYearContainer) {
+                classYearContainer.addEventListener('click', function(e) {
+                    if (e.target.closest('.remove-row')) {
+                        e.target.closest('.class-academic-row').remove();
+                    }
+                });
+            }
 
-@section('script')
-    <script>
-        document.getElementById('addClassYear').addEventListener('click', function() {
-            const container = document.getElementById('classYearContainer');
-            // Clone le premier bloc (hors valeurs)
-            const firstRow = container.querySelector('.class-academic-row');
-            const newRow = firstRow.cloneNode(true);
-            newRow.querySelectorAll('select').forEach(select => select.value = '');
-            container.appendChild(newRow);
-        });
-
-        // Bouton suppression de ligne
-        document.addEventListener('click', function(e) {
-            if (e.target.classList.contains('removeClassYear')) {
-                const rows = document.querySelectorAll('.class-academic-row');
-                if (rows.length > 1) { // Toujours avoir au moins un bloc
-                    e.target.closest('.class-academic-row').remove();
-                }
+            // Initialisation au chargement : charger les classes déjà présentes
+            if (departmentSelect && classYearContainer) {
+                const depIdInit = departmentSelect.value;
+                classYearContainer.querySelectorAll('.class-academic-row').forEach(row => {
+                    const classSelect = row.querySelector('.class-select');
+                    const yearSelect = row.querySelector('.academic-year-select');
+                    loadClasses(depIdInit, yearSelect.value, classSelect, classSelect.value);
+                });
             }
         });
     </script>

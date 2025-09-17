@@ -23,10 +23,11 @@
                                         accept=".xlsx,.xls,.csv" required>
                                     <small class="form-text text-muted">
                                         Formats acceptés : <span class="fw-bold">.xlsx, .xls, .csv</span><br>
-                                        <a href="{{ asset('sample/student_import_sample.xlsx') }}" class="text-primary"
+                                        <a href="{{ url('sample/student_import_sample.xlsx') }}" class="text-primary"
                                             download>
                                             <i class="fas fa-download me-1"></i> Télécharger le modèle
                                         </a>
+
                                     </small>
                                 </div>
                                 <button type="submit" class="btn btn-success px-4 py-2">

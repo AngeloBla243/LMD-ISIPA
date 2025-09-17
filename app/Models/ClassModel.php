@@ -18,6 +18,7 @@ class ClassModel extends Model
         'amount',
         'status',
         'academic_year_id', // Ajouter cette ligne
+        'department_id',
         'created_by'
     ];
 
@@ -128,5 +129,10 @@ class ClassModel extends Model
     public function feeTypes()
     {
         return $this->belongsToMany(FeeType::class, 'class_fee_type', 'class_id', 'fee_type_id');
+    }
+
+    public function department()
+    {
+        return $this->belongsTo(Department::class, 'department_id');
     }
 }

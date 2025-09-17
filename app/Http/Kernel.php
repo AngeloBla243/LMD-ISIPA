@@ -71,6 +71,9 @@ class Kernel extends HttpKernel
         'student' => \App\Http\Middleware\StudentMiddleware::class,
         'teacher' => \App\Http\Middleware\TeacherMiddleware::class,
         'parent' => \App\Http\Middleware\ParentMiddleware::class,
+        'departement' => \App\Http\Middleware\DepartementMiddleware::class,
+        'jury' => \App\Http\Middleware\JuryMiddleware::class,
+        'apparitorat' => \App\Http\Middleware\ApparitoratMiddleware::class,
         'common' => \App\Http\Middleware\CommonMiddleware::class,
 
 

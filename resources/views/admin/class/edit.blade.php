@@ -49,6 +49,19 @@
                                 @enderror
                             </div>
 
+                            <div class="form-group">
+                                <label for="department_id">Département</label>
+                                <select name="department_id" id="department_id" class="form-control" required>
+                                    <option value="">Sélectionnez un département</option>
+                                    @foreach ($departments as $dept)
+                                        <option value="{{ $dept->id }}"
+                                            @if (isset($getRecord) && $getRecord->department_id == $dept->id) selected @endif>
+                                            {{ $dept->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
                             <div class="mb-4">
                                 <label for="opt" class="form-label fw-semibold">Option</label>
                                 <select id="opt" name="opt"
@@ -77,6 +90,7 @@
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
+
 
                             <div class="mb-4">
                                 <label for="amount" class="form-label fw-semibold">Montant ($) <span

@@ -111,6 +111,7 @@
                                 <tr>
                                     <th style="width: 60px;">#</th>
                                     <th>Année Académique</th>
+                                    <th>Département</th>
                                     <th>Nom</th>
                                     <th>Option</th>
                                     <th>Montant</th>
@@ -127,6 +128,7 @@
                                             {{ ($getRecord->currentPage() - 1) * $getRecord->perPage() + $loop->iteration }}
                                         </td>
                                         <td>{{ $value->academic_year_name ?? 'N/A' }}</td>
+                                        <td>{{ $value->department_name ?? 'N/A' }}</td> <!-- Ajout -->
                                         <td>{{ $value->name }}</td>
                                         <td>{{ $value->opt }}</td>
                                         <td>${{ number_format($value->amount, 2) }}</td>

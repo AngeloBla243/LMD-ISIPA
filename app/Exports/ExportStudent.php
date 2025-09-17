@@ -7,11 +7,13 @@ use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use App\Models\User;
 
-class ExportStudent implements  FromCollection, WithMapping, WithHeadings
+class ExportStudent implements FromCollection, WithMapping, WithHeadings
 {
     /**
-    * @return \Illuminate\Support\Collection
-    */
+     * Définir la ligne des en-têtes dans le fichier Excel.
+     *
+     * @return array
+     */
     public function headings(): array
     {
         return [
@@ -36,33 +38,36 @@ class ExportStudent implements  FromCollection, WithMapping, WithHeadings
         ];
     }
 
+    /**
+     * Mapper chaque modèle User vers une ligne Excel.
+     *
+     * @param mixed $value
+     * @return array
+     */
     public function map($value): array
     {
-        $student_name = $value->name.' '.$value->last_name;
-        $parent_name = $value->parent_name.' '.$value->parent_last_name;
+        $student_name = trim($value->name . ' ' . $value->last_name);
 
-        $date_of_birth = '';
-        if(!empty($value->date_of_birth))
-        {
-            $date_of_birth = date('d-m-Y', strtotime($value->date_of_birth));
+        // Gestion du nom complet du parent si disponible
+        $parent_name = '';
+        if (!empty($value->parent_name) || !empty($value->parent_last_name)) {
+            $parent_name = trim($value->parent_name . ' ' . $value->parent_last_name);
         }
 
-        $admission_date = '';
-        if(!empty($value->admission_date))
-        {
-            $admission_date = date('d-m-Y', strtotime($value->admission_date));
-        }
+        $date_of_birth = !empty($value->date_of_birth) ? date('d-m-Y', strtotime($value->date_of_birth)) : '';
+        $admission_date = !empty($value->admission_date) ? date('d-m-Y', strtotime($value->admission_date)) : '';
 
         $status = ($value->status == 0) ? 'Active' : 'Inactive';
-                              
+
         return [
             $value->id,
-            $student_name,            
-            $parent_name,           
+            $student_name,
+            $parent_name,
             $value->email,
             $value->admission_number,
             $value->roll_number,
-            $value->class_name,
+            // assurez-vous que class_name est chargé ou calculé dans getStudent()
+            $value->class_name ?? '',
             $value->gender,
             $date_of_birth,
             $value->caste,
@@ -73,13 +78,23 @@ class ExportStudent implements  FromCollection, WithMapping, WithHeadings
             $value->height,
             $value->weight,
             $status,
-            date('d-m-Y H:i A', strtotime($value->created_at))
+            date('d-m-Y H:i A', strtotime($value->created_at)),
         ];
     }
 
+    /**
+     * Fournir la collection des étudiants à exporter.
+     * Appelle une méthode statique du modèle User qui doit renvoyer une collection.
+     *
+     * @return \Illuminate\Support\Collection
+     */
     public function collection()
     {
+        // Ici, 1 indique la suppression de la pagination dans getStudent()
         $remove_pagination = 1;
+
+        // Cette méthode getStudent doit être définie dans User.php
+        // Elle doit inclure les relations nécessaires pour avoir class_name et parent name, etc.
         return User::getStudent($remove_pagination);
     }
 }

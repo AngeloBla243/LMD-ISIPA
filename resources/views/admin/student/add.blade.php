@@ -84,6 +84,25 @@
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
                                         </div>
+
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-semibold">Département <span
+                                                    class="text-danger">*</span></label>
+                                            <select name="department_id"
+                                                class="form-select form-control @error('department_id') is-invalid @enderror"
+                                                required>
+                                                <option value="">Choisir le département</option>
+                                                @foreach ($departments as $department)
+                                                    <option value="{{ $department->id }}"
+                                                        {{ old('department_id') == $department->id ? 'selected' : '' }}>
+                                                        {{ $department->name }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                            @error('department_id')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
                                         {{-- <div class="col-md-6">
                                             <label class="form-label fw-semibold">Classe <span
                                                     class="text-danger">*</span></label>

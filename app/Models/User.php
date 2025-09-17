@@ -21,9 +21,25 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
+        'last_name',
         'email',
+        'admission_number',
+        'roll_number',
+        'class_id',
+        'gender',
+        'date_of_birth',
+        'caste',
+        'religion',
+        'mobile_number',
+        'admission_date',
+        'blood_group',
+        'height',
+        'weight',
+        'status',
         'password',
+        'user_type',
     ];
+
 
     /**
      * The attributes that should be hidden for serialization.
@@ -732,5 +748,10 @@ class User extends Authenticatable
         )
             ->wherePivot('academic_year_id', $academicYear->id)
             ->first(); // Retourne directement l'objet Classe
+    }
+
+    public function department()
+    {
+        return $this->belongsTo(Department::class);
     }
 }

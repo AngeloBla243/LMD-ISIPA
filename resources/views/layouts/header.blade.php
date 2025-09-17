@@ -116,6 +116,40 @@
         </div>
     @endif
 
+    @if (Auth::check() && Auth::user()->user_type == 5)
+        @php
+            $allAcademicYears = \App\Models\AcademicYear::orderBy('start_date', 'desc')->get();
+            $currentYear = \App\Models\AcademicYear::find(
+                session('academic_year_id', $allAcademicYears->where('is_active', 1)->first()?->id),
+            );
+        @endphp
+
+        <div class="p-2">
+            <form method="GET" action="{{ route('set_academic_year_teacher') }}" id="academicYearFormSidebarTeacher"
+                class="d-flex align-items-center" style="gap:8px;">
+                <label for="academic_year_id" class="mb-0" style="font-weight:600;">
+                    <i class="far fa-calendar-alt text-primary"></i>
+                </label>
+                <select name="academic_year_id" id="academic_year_id_teacher" class="form-select"
+                    style="width:190px; background: #f8faff; border: 1.2px solid #007bff; font-weight:600; color:#245aea;"
+                    onchange="this.form.submit()">
+                    @foreach ($allAcademicYears as $year)
+                        <option value="{{ $year->id }}" @if ($currentYear && $year->id == $currentYear->id) selected @endif>
+                            {{ $year->name }}{{ $year->is_active ? '' : '' }}
+                        </option>
+                    @endforeach
+                </select>
+            </form>
+            @if ($currentYear && !$currentYear->is_active)
+                <div class="alert alert-warning mt-2 py-1 px-2 mb-0 d-flex align-items-center"
+                    style="font-size:0.96em;">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <span>Année académique non active</span>
+                </div>
+            @endif
+        </div>
+    @endif
+
 
 
 
@@ -154,7 +188,7 @@
                             </p>
                         </a>
                     </li>
-                    <li class="nav-item">
+                    {{-- <li class="nav-item">
                         <a href="{{ url('admin/admin/list') }}"
                             class="nav-link @if (Request::segment(2) == 'admin') active @endif">
                             <i class="nav-icon fa fa-list-alt"></i>
@@ -163,6 +197,32 @@
                             </p>
                         </a>
                     </li>
+
+                    <li class="nav-item">
+                        <a href="{{ url('admin/departement/list') }}"
+                            class="nav-link @if (Request::segment(2) == 'departement') active @endif">
+
+                            <i class="nav-icon fa fa-building"></i>
+                            <p>Départements</p>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a href="{{ url('admin/jury/list') }}"
+                            class="nav-link @if (Request::segment(2) == 'jury') active @endif">
+                            <i class="nav-icon fa fa-gavel"></i>
+                            <p>Jury</p>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a href="{{ url('admin/apparitorat/list') }}"
+                            class="nav-link @if (Request::segment(2) == 'apparitorat') active @endif">
+                            <i class="nav-icon fa fa-user-shield"></i>
+                            <p>Apparitorat</p>
+                        </a>
+                    </li>
+
 
 
 
@@ -185,6 +245,91 @@
                                 Étudiants
                             </p>
                         </a>
+                    </li> --}}
+
+                    <li class="nav-item @if (Request::segment(2) == 'admin' ||
+                            Request::segment(2) == 'departement' ||
+                            Request::segment(2) == 'jury' ||
+                            Request::segment(2) == 'apparitorat' ||
+                            Request::segment(2) == 'teacher' ||
+                            Request::segment(2) == 'parent' ||
+                            Request::segment(2) == 'student') menu-is-opening menu-open @endif">
+
+                        <a href="#" class="nav-link @if (Request::segment(2) == 'admin' ||
+                                Request::segment(2) == 'departement' ||
+                                Request::segment(2) == 'jury' ||
+                                Request::segment(2) == 'apparitorat' ||
+                                Request::segment(2) == 'teacher' ||
+                                Request::segment(2) == 'parent' ||
+                                Request::segment(2) == 'student') active @endif">
+                            <i class="nav-icon fa fa-users-cog"></i>
+                            <p>
+                                Gestion administrative
+                                <i class="fas fa-angle-left right"></i>
+                            </p>
+                        </a>
+
+                        <ul class="nav nav-treeview">
+
+                            <li class="nav-item">
+                                <a href="{{ url('admin/admin/list') }}"
+                                    class="nav-link @if (Request::segment(2) == 'admin') active @endif">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Admins</p>
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a href="{{ url('admin/departement/list') }}"
+                                    class="nav-link @if (Request::segment(2) == 'departement') active @endif">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Départements</p>
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a href="{{ url('admin/jury/list') }}"
+                                    class="nav-link @if (Request::segment(2) == 'jury') active @endif">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Jury</p>
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a href="{{ url('admin/apparitorat/list') }}"
+                                    class="nav-link @if (Request::segment(2) == 'apparitorat') active @endif">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Apparitorat</p>
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a href="{{ url('admin/teacher/list') }}"
+                                    class="nav-link @if (Request::segment(2) == 'teacher') active @endif">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Professeurs</p>
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a href="{{ url('admin/student/list') }}"
+                                    class="nav-link @if (Request::segment(2) == 'student') active @endif">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Étudiants</p>
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a href="{{ url('admin/parent/list') }}"
+                                    class="nav-link @if (Request::segment(2) == 'parent') active @endif">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>
+                                        Parents
+                                    </p>
+                                </a>
+                            </li>
+
+                        </ul>
                     </li>
 
 
@@ -199,22 +344,13 @@
                     </li> --}}
 
 
-                    <li class="nav-item">
-                        <a href="{{ url('admin/parent/list') }}"
-                            class="nav-link @if (Request::segment(2) == 'parent') active @endif">
-                            <i class="nav-icon fa fa-list-alt"></i>
-                            <p>
-                                Parents
-                            </p>
-                        </a>
-                    </li>
-
                     <li class="nav-item  @if (Request::segment(2) == 'class' ||
                             Request::segment(2) == 'ue' ||
                             Request::segment(2) == 'subject' ||
                             Request::segment(2) == 'assign_subject' ||
                             Request::segment(2) == 'assign_class_teacher' ||
                             Request::segment(2) == 'academic-years' ||
+                            Request::segment(2) == 'departement' ||
                             Request::segment(2) == 'theses' ||
                             Request::segment(2) == 'class_timetable') menu-is-opening menu-open @endif">
                         <a href="#" class="nav-link  @if (Request::segment(2) == 'class' ||
@@ -223,6 +359,7 @@
                                 Request::segment(2) == 'assign_subject' ||
                                 Request::segment(2) == 'assign_class_teacher' ||
                                 Request::segment(2) == 'academic-years' ||
+                                Request::segment(2) == 'departement' ||
                                 Request::segment(2) == 'theses' ||
                                 Request::segment(2) == 'class_timetable') active @endif">
                             <i class="nav-icon fa-solid fa-calendar-days"></i>
@@ -240,6 +377,15 @@
                                     Années académiques
                                 </a>
                             </li>
+
+                            <li class="nav-item">
+                                <a href="{{ route('admin.departementName.list') }}"
+                                    class="nav-link @if (Request::segment(2) == 'departement') active @endif">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    Départements
+                                </a>
+                            </li>
+
 
                             <li class="nav-item">
                                 <a href="{{ url('admin/class/list') }}"
@@ -987,6 +1133,45 @@
                             </p>
                         </a>
                     </li>
+                @elseif(Auth::user()->user_type == 5)
+                    <li class="nav-item">
+                        <a href="{{ url('departement/dashboard') }}"
+                            class="nav-link @if (Request::segment(1) == 'departement' && Request::segment(2) == 'dashboard') active @endif">
+                            <i class="nav-icon fa fa-building"></i>
+                            <p>Tableau de bord Département</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url('departement/student/list') }}"
+                            class="nav-link @if (Request::segment(1) == 'departement' && Request::segment(2) == 'student') active @endif">
+                            <i class="nav-icon fa fa-list"></i>
+                            <p>Liste des étudiants</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url('departement/assign_subject/list') }}"
+                            class="nav-link @if (Request::segment(1) == 'departement' && Request::segment(2) == 'assign_subject') active @endif">
+                            <i class="nav-icon fa fa-book"></i>
+                            <p>Assignation des matières</p>
+                        </a>
+                    </li>
+                @elseif(Auth::user()->user_type == 6)
+                    <li class="nav-item">
+                        <a href="{{ url('jury/dashboard') }}"
+                            class="nav-link @if (Request::segment(1) == 'jury' && Request::segment(2) == 'dashboard') active @endif">
+                            <i class="nav-icon fa fa-gavel"></i>
+                            <p>Tableau de bord Jury</p>
+                        </a>
+                    </li>
+                @elseif(Auth::user()->user_type == 7)
+                    <li class="nav-item">
+                        <a href="{{ url('apparitorat/dashboard') }}"
+                            class="nav-link @if (Request::segment(1) == 'apparitorat' && Request::segment(2) == 'dashboard') active @endif">
+                            <i class="nav-icon fa fa-user-shield"></i>
+                            <p>Tableau de bord Apparitorat</p>
+                        </a>
+                    </li>
+
                 @endif
 
 

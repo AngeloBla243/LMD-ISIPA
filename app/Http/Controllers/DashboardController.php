@@ -58,24 +58,7 @@ class DashboardController extends Controller
             $data['TotalNoticeBoard'] = NoticeBoardModel::getRecordUserCount(Auth::user()->user_type);
 
             return view('teacher.dashboard', $data);
-        }
-
-        //else if (Auth::user()->user_type == 3) {
-        //     $data['academicYears'] = AcademicYear::orderBy('start_date', 'desc')->get();
-        //     $data['TotalPaidAmount'] = StudentAddFeesModel::TotalPaidAmountStudent(Auth::user()->id);
-        //     $data['TotalSubject'] = ClassSubjectModel::MySubjectTotal(Auth::user()->class_id);
-        //     $data['TotalNoticeBoard'] = NoticeBoardModel::getRecordUserCount(Auth::user()->user_type);
-        //     $data['TotalHomework'] = HomeworkModel::getRecordStudentCount(Auth::user()->class_id, Auth::user()->id);
-        //     $data['getRecord'] = ClassSubjectModel::MySubject(Auth::user()->class_id);
-
-        //     $data['TotalSubmittedHomework'] = HomeworkSubmitModel::getRecordStudentCount(Auth::user()->id);
-
-        //     $data['TotalAttendance'] = StudentAttendanceModel::getRecordStudentCount(Auth::user()->id);
-
-
-        //     return view('student.dashboard', $data);
-        // }
-        else if (Auth::user()->user_type == 4) {
+        } else if (Auth::user()->user_type == 4) {
             $student_ids = User::getMyStudentIds(Auth::user()->id);
             $class_ids = User::getMyStudentClassIds(Auth::user()->id);
 
@@ -100,32 +83,6 @@ class DashboardController extends Controller
 
 
     // Dans le DashboardController
-
-    // public function dash(Request $request)
-    // {
-    //     $academicYearId = session('academic_year_id') ?? AcademicYear::where('is_active', 1)->value('id');
-
-    //     // Récupère la classe de l'étudiant pour cette année (via la table student_class)
-    //     $studentClass = DB::table('student_class')
-    //         ->where('student_id', Auth::id())
-    //         ->where('academic_year_id', $academicYearId)
-    //         ->value('class_id');
-
-    //     // S'il n'est pas inscrit pour cette année, sortie propre
-    //     if (!$studentClass) {
-    //         $data['TotalSubject'] = 0;
-    //         $data['getRecord'] = collect();
-    //         $data['message'] = "Vous n'êtes pas inscrit dans une classe pour l'année académique sélectionnée.";
-    //         return view('student.dashboard', $data);
-    //     }
-
-    //     $data['TotalSubject'] = ClassSubjectModel::MySubjectTotal($studentClass, $academicYearId);
-    //     $data['getRecord'] = ClassSubjectModel::MySubject($studentClass, $academicYearId);
-
-    //     // ... autres indicateurs dashboard
-
-    //     return view('student.dashboard', $data);
-    // }
 
     public function dash(Request $request)
     {
@@ -170,5 +127,53 @@ class DashboardController extends Controller
         $data['fees'] = $fees;
 
         return view('student.dashboard', $data);
+    }
+
+    public function departementDashboard()
+    {
+        $data['header_title'] = 'Dashboard Département';
+
+        $user = Auth::user();
+
+        // Total étudiants affectés à ce département
+        $data['TotalStudent'] = User::where('user_type', 3)
+            ->where('department_id', $user->department_id)
+            ->count();
+
+        // Autres statistiques spécifiques au département (à compléter selon besoin)
+        // Exemple : total teachers dans le département (si lié), etc.
+
+        return view('departement.dashboard', $data);
+    }
+
+    public function juryDashboard()
+    {
+        $data['header_title'] = 'Dashboard Jury';
+
+        $user = Auth::user();
+
+        // Récupérer les étudiants affectés au département du jury connecté
+        $data['TotalStudent'] = User::where('user_type', 3)
+            ->where('department_id', $user->department_id)  // jury lié à un département
+            ->count();
+
+        $data['students'] = User::where('user_type', 3)
+            ->where('department_id', $user->department_id)
+            ->get(['id', 'name', 'email']); // récupérer quelques champs utiles
+
+        return view('jury.dashboard', $data);
+    }
+
+
+    public function apparitoratDashboard()
+    {
+        $data['header_title'] = 'Dashboard Apparitorat';
+
+        // Récupérer tous les étudiants
+        $data['TotalStudent'] = User::where('user_type', 3)->count();
+
+        $data['students'] = User::where('user_type', 3)->get(['id', 'name', 'email']);
+
+        return view('apparitorat.dashboard', $data);
     }
 }

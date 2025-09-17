@@ -132,6 +132,11 @@ class ClassSubjectModel extends Model
         return $this->belongsTo(AcademicYear::class);
     }
 
+    public function class()
+    {
+        return $this->belongsTo(ClassModel::class, 'class_id');
+    }
+
 
 
 
@@ -154,5 +159,33 @@ class ClassSubjectModel extends Model
     public function subject()
     {
         return $this->belongsTo(SubjectModel::class, 'subject_id');
+    }
+
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    static public function getRecordByDepartment($departmentId)
+    {
+        $return = self::select(
+            'class_subject.*',
+            'class.name as class_name',
+            'class.opt as class_opt',
+            'subject.name as subject_name',
+            'subject.code as subject_code',
+            'academic_years.name as academic_year_name',
+            'users.name as created_by_name'
+        )
+            ->join('class', 'class.id', '=', 'class_subject.class_id')
+            ->join('subject', 'subject.id', '=', 'class_subject.subject_id')
+            ->join('academic_years', 'academic_years.id', '=', 'class_subject.academic_year_id')
+            ->join('users', 'users.id', '=', 'class_subject.created_by')
+            ->where('class_subject.is_delete', 0)
+            ->where('class.department_id', $departmentId);
+
+        // Vous pouvez ajouter les filtres request ici
+
+        return $return->orderBy('class_subject.id', 'asc')->paginate(50);
     }
 }
