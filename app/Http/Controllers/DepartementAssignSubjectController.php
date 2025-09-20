@@ -89,20 +89,19 @@ class DepartementAssignSubjectController extends Controller
         $departmentId = Auth::user()->department_id;
         $getRecord = ClassSubjectModel::findOrFail($id);
 
-        // Vérifier que la classe appartient au département de l'utilisateur
+        // Vérifier que la classe appartient bien au département
         $class = ClassModel::where('department_id', $departmentId)->findOrFail($getRecord->class_id);
 
-        $academicYears = AcademicYear::orderBy('start_date', 'desc')->get();
+        // Récupérer uniquement les matières liées à l'année académique de la classe
+        $data['getSubject'] = SubjectModel::where('academic_year_id', $class->academic_year_id)->orderBy('name')->get();
 
-        $data = [
-            'getRecord' => $getRecord,
-            'getAssignSubjectID' => ClassSubjectModel::getAssignSubjectID($getRecord->class_id),
-            'getClass' => ClassModel::where('department_id', $departmentId)->get(),
-            'getSubject' => SubjectModel::orderBy('name')->get(),
-            'academicYears' => $academicYears,
-            'selectedAcademicYear' => $class->academic_year_id ?? null,
-            'header_title' => "Modifier l'assignation",
-        ];
+        $data['academicYears'] = AcademicYear::orderBy('start_date', 'desc')->get();
+
+        $data['getRecord'] = $getRecord;
+        $data['getAssignSubjectID'] = ClassSubjectModel::getAssignSubjectID($getRecord->class_id);
+        $data['getClass'] = ClassModel::where('department_id', $departmentId)->get();
+        $data['selectedAcademicYear'] = $class->academic_year_id ?? null;
+        $data['header_title'] = "Modifier l'assignation";
 
         return view('departement.assign_subject.edit', $data);
     }
@@ -147,6 +146,32 @@ class DepartementAssignSubjectController extends Controller
 
         return redirect()->route('departement.assign_subject.list')->with('success', 'Matière assignée avec succès');
     }
+
+    public function edit_single($id)
+    {
+        $departmentId = Auth::user()->department_id;
+
+        $record = ClassSubjectModel::findOrFail($id);
+
+        // Vérifier que la classe appartient bien au département
+        $class = ClassModel::where('department_id', $departmentId)->findOrFail($record->class_id);
+
+        // Récupérer les matières associées à l'année académique de la classe
+        $subjects = SubjectModel::where('academic_year_id', $class->academic_year_id)->orderBy('name')->get();
+
+        // Récupérer toutes les années académiques pour la sélection
+        $academicYears = AcademicYear::orderBy('start_date', 'desc')->get();
+
+        return view('departement.assign_subject.edit_single', [
+            'record' => $record,
+            'class' => $class,
+            'subjects' => $subjects,
+            'academicYears' => $academicYears,
+            'selectedAcademicYear' => $class->academic_year_id,
+            'header_title' => "Modifier l'assignation simple",
+        ]);
+    }
+
 
     public function update(Request $request)
     {

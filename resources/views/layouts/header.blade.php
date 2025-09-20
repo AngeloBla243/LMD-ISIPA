@@ -1155,6 +1155,13 @@
                             <p>Assignation des matières</p>
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a href="{{ route('departement.assign_teacher.list') }}"
+                            class="nav-link @if (request()->is('departement/assign_teacher*')) active @endif">
+                            <i class="nav-icon fas fa-chalkboard-teacher"></i>
+                            <p>Assignation Professeurs</p>
+                        </a>
+                    </li>
                 @elseif(Auth::user()->user_type == 6)
                     <li class="nav-item">
                         <a href="{{ url('jury/dashboard') }}"

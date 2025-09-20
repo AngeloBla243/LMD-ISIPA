@@ -234,4 +234,14 @@ class AssignClassTeacherModel extends Model
     {
         return $this->belongsTo(SubjectModel::class, 'subject_id');
     }
+
+    public function teacher()
+    {
+        return $this->belongsTo(User::class, 'teacher_id');
+    }
+
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
 }

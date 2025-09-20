@@ -37,7 +37,7 @@ use App\Http\Controllers\JuryController;
 use App\Http\Controllers\DepartementNameController;
 use App\Http\Controllers\DepartementStudentController;
 use App\Http\Controllers\DepartementAssignSubjectController;
-
+use App\Http\Controllers\DepartementAssignTeacherController;
 
 
 
@@ -716,12 +716,31 @@ Route::group(['middleware' => ['auth', 'departement']], function () {
     Route::get('departement/assign_subject/add', [DepartementAssignSubjectController::class, 'add'])->name('departement.assign_subject.add');
     Route::post('departement/assign_subject/insert', [DepartementAssignSubjectController::class, 'insert'])->name('departement.assign_subject.insert');
     Route::get('departement/assign_subject/edit/{id}', [DepartementAssignSubjectController::class, 'edit'])->name('departement.assign_subject.edit');
+    Route::get('departement/assign_subject/edit_single/{id}', [DepartementAssignSubjectController::class, 'edit_single'])->name('departement.assign_subject.edit_single');
     Route::post('departement/assign_subject/update_single/{id}', [DepartementAssignSubjectController::class, 'update_single'])->name('departement.assign_subject.update_single');
     Route::post('departement/assign_subject/update', [DepartementAssignSubjectController::class, 'update'])->name('departement.assign_subject.update');
     Route::get('departement/assign_subject/delete/{id}', [DepartementAssignSubjectController::class, 'delete'])->name('departement.assign_subject.delete');
 
     // Route::get('departement/get-classes-by-department-year/{department}/{year}', [ClassController::class, 'getClassesByDepartmentAndYear']);
     Route::get('departement/get-subjects-by-year/{year}', [SubjectController::class, 'getSubjectsByYear']);
+    Route::get('departement/assign_teacher/get-classes-by-year/{yearId}', [DepartementAssignTeacherController::class, 'getClassesByYear'])
+        ->name('departement.assign_teacher.get_classes_by_year');
+
+
+    // assignation des classes et cours aux enseignant
+
+    Route::get('departement/assign_teacher/list', [DepartementAssignTeacherController::class, 'list'])->name('departement.assign_teacher.list');
+    Route::get('departement/assign_teacher/add', [DepartementAssignTeacherController::class, 'add'])->name('departement.assign_teacher.add');
+    Route::post('departement/assign_teacher/insert', [DepartementAssignTeacherController::class, 'insert'])->name('departement.assign_teacher.insert');
+    Route::get('departement/assign_teacher/edit/{id}', [DepartementAssignTeacherController::class, 'edit'])->name('departement.assign_teacher.edit');
+    Route::post('departement/assign_teacher/edit/{id}', [DepartementAssignTeacherController::class, 'update'])->name('departement.assign_teacher.update');
+    Route::get('departement/assign_teacher/delete/{id}', [DepartementAssignTeacherController::class, 'delete'])->name('departement.assign_teacher.delete');
+
+    Route::get('departement/assign_teacher/assign_subject/{teacher_id}', [DepartementAssignTeacherController::class, 'assign_subject'])
+        ->name('departement.assign_teacher.assign_subject');
+
+    Route::post('departement/assign_teacher/assign_subject', [DepartementAssignTeacherController::class, 'insert_assign_subject'])
+        ->name('departement.assign_teacher.assign_subject.submit');
 });
 Route::group(['middleware' => ['auth', 'jury']], function () {
     Route::get('jury/dashboard', [DashboardController::class, 'juryDashboard']);
