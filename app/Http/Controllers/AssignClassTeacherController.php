@@ -298,13 +298,6 @@ class AssignClassTeacherController extends Controller
 
     // teacher side work
 
-    // public function MyClassSubject()
-    // {
-    //     $data['getRecord'] = AssignClassTeacherModel::getMyClassSubject(Auth::user()->id);
-    //     $data['header_title'] = "My Class & Subject";
-    //     return view('teacher.my_class_subject', $data);
-    // }
-
     public function MyClassSubject()
     {
         // Récupérer l'année académique sélectionnée
