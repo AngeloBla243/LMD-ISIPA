@@ -1162,12 +1162,50 @@
                             <p>Assignation Professeurs</p>
                         </a>
                     </li>
+
+                    <li class="nav-item">
+                        <a href="{{ route('departement.class_timetable.list') }}"
+                            class="nav-link @if (request()->is('departement/class_timetable*')) active @endif">
+                            <i class="nav-icon fas fa-calendar-alt"></i>
+                            <p>Emploi du Temps</p>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a href="{{ route('departement.exam_schedule') }}"
+                            class="nav-link @if (request()->is('departement/exam_schedule*')) active @endif">
+                            <i class="nav-icon fas fa-file-alt"></i>
+                            <p>Planning Examens</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ route('departement.marks_register') }}"
+                            class="nav-link @if (request()->is('departement/marks_register*')) active @endif">
+                            <i class="nav-icon fas fa-clipboard-list"></i>
+                            <p>Fiche de Cotation</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ route('departement.recours.list') }}"
+                            class="nav-link @if (request()->is('departement/recours*')) active @endif">
+                            <i class="nav-icon fas fa-exclamation-triangle"></i>
+                            <p>Gestion des Recours</p>
+                        </a>
+                    </li>
                 @elseif(Auth::user()->user_type == 6)
                     <li class="nav-item">
                         <a href="{{ url('jury/dashboard') }}"
                             class="nav-link @if (Request::segment(1) == 'jury' && Request::segment(2) == 'dashboard') active @endif">
                             <i class="nav-icon fa fa-gavel"></i>
                             <p>Tableau de bord Jury</p>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a href="{{ route('jury.marks_register') }}"
+                            class="nav-link @if (Request::segment(1) == 'jury' && Request::segment(2) == 'marks_register') active @endif">
+                            <i class="nav-icon fas fa-file-alt"></i>
+                            <p>Fiche de Jury</p>
                         </a>
                     </li>
                 @elseif(Auth::user()->user_type == 7)

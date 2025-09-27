@@ -38,6 +38,11 @@ use App\Http\Controllers\DepartementNameController;
 use App\Http\Controllers\DepartementStudentController;
 use App\Http\Controllers\DepartementAssignSubjectController;
 use App\Http\Controllers\DepartementAssignTeacherController;
+use App\Http\Controllers\DepartementClassTimetableController;
+use App\Http\Controllers\DepartementMarksRegisterController;
+use App\Http\Controllers\DepartementRecoursController;
+use App\Http\Controllers\JuryMarksRegisterController;
+
 
 
 
@@ -68,9 +73,17 @@ use App\Http\Controllers\DepartementAssignTeacherController;
 
 
 
-Route::get('/', [AuthController::class, 'login']);
-Route::post('login', [AuthController::class, 'AuthLogin'])->name('login');
-Route::post('login', [AuthController::class, 'AuthLogin']);
+// Route::get('/', [AuthController::class, 'login']);
+// Route::post('login', [AuthController::class, 'AuthLogin'])->name('login');
+// Route::post('login', [AuthController::class, 'AuthLogin']);
+// Route::get('logout', [AuthController::class, 'logout'])->name('logout');
+// Route de la page de login (GET)
+Route::get('/', [AuthController::class, 'login'])->name('login');
+
+// Route de soumission du formulaire de login (POST)
+Route::post('login', [AuthController::class, 'AuthLogin'])->name('login.submit');
+
+// Route de déconnexion
 Route::get('logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('forgot-password', [AuthController::class, 'forgotpassword']);
 Route::post('forgot-password', [AuthController::class, 'PostForgotPassword']);
@@ -741,10 +754,47 @@ Route::group(['middleware' => ['auth', 'departement']], function () {
 
     Route::post('departement/assign_teacher/assign_subject', [DepartementAssignTeacherController::class, 'insert_assign_subject'])
         ->name('departement.assign_teacher.assign_subject.submit');
+
+    // planninge de cours
+
+    Route::get('departement/class_timetable/list', [DepartementClassTimetableController::class, 'list'])->name('departement.class_timetable.list');
+    Route::get('departement/class_timetable/get-classes-by-year/{yearId}', [DepartementClassTimetableController::class, 'getClassesByYear'])->name('departement.class_timetable.get_classes_by_year');
+    Route::post('departement/class_timetable/get-subject', [DepartementClassTimetableController::class, 'getSubject'])->name('departement.class_timetable.get_subject');
+    Route::post('departement/class_timetable/add', [DepartementClassTimetableController::class, 'insert_update'])->name('departement.class_timetable.insert_update');
+
+    // PLANNING EXAMEN
+
+    Route::get('departement/exam_schedule', [DepartementClassTimetableController::class, 'examSchedule'])
+        ->name('departement.exam_schedule');
+
+    Route::post('departement/exam_schedule_insert', [DepartementClassTimetableController::class, 'examScheduleInsert'])
+        ->name('departement.exam_schedule_insert');
+
+    // COTATION ETUDIANT
+
+    Route::get('departement/marks_register', [DepartementMarksRegisterController::class, 'marksRegister'])
+        ->name('departement.marks_register');
+    Route::get('departement/result_print/print', [DepartementMarksRegisterController::class, 'printClassResults'])
+        ->name('departement.result_print');
+
+    // RECOURS
+    Route::get('departement/recours/list', [DepartementRecoursController::class, 'list'])
+        ->name('departement.recours.list');
+
+    Route::post('departement/recours/toggle-status/{id}', [DepartementRecoursController::class, 'toggleStatus'])
+        ->name('departement.recours.toggle_status');
+
+    Route::delete('departement/recours/delete/{id}', [DepartementRecoursController::class, 'destroy'])
+        ->name('departement.recours.delete');
 });
 Route::group(['middleware' => ['auth', 'jury']], function () {
-    Route::get('jury/dashboard', [DashboardController::class, 'juryDashboard']);
+    Route::get('jury/dashboard', [DashboardController::class, 'juryDashboard'])->name('jury.dashboard');
+    Route::get('jury/marks_register', [JuryMarksRegisterController::class, 'list'])->name('jury.marks_register');
+    Route::get('jury/classes-by-year/{year}', [JuryMarksRegisterController::class, 'getClassesByYear']);
+    Route::get('jury/exams-by-year/{year}', [JuryMarksRegisterController::class, 'getExamsByYear']);
+    Route::post('jury/save_all_marks', [JuryMarksRegisterController::class, 'saveAllMarks'])->name('jury.save_all_marks');
 });
+
 
 Route::group(['middleware' => ['auth', 'apparitorat']], function () {
     Route::get('apparitorat/dashboard', [DashboardController::class, 'apparitoratDashboard']);

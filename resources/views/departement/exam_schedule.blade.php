@@ -1,4 +1,5 @@
 @extends('layouts.app')
+
 @section('style')
     <style type="text/css">
         .styled-table {
@@ -38,8 +39,43 @@
             background-color: #f1f1f1;
             cursor: pointer;
         }
+
+        .card {
+            border-radius: 1.25rem;
+        }
+
+        .card-header {
+            border-radius: 1.25rem 1.25rem 0 0;
+        }
+
+        .table-primary th {
+            background-color: #cfe2ff !important;
+            color: #084298 !important;
+            font-weight: 600;
+        }
+
+        .btn-primary,
+        .btn-success {
+            font-weight: 500;
+        }
+
+        .btn-sm {
+            padding: 0.25rem 0.75rem;
+            font-size: 0.9rem;
+        }
+
+        .form-label {
+            font-weight: 600;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, .25);
+        }
     </style>
 @endsection
+
 @section('content')
     <div class="content-wrapper">
         <!-- Content Header -->
@@ -47,13 +83,13 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h1 class="h3 fw-bold text-primary">Exam Schedule</h1>
+                        <h1 class="h3 fw-bold text-primary">Planning des Examens</h1>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Main content -->
+        <!-- Main Content -->
         <section class="content pb-5">
             <div class="container-fluid">
                 <div class="row">
@@ -63,7 +99,7 @@
                         <div class="card shadow-sm rounded-4 border-0 mb-4">
                             <div class="card-header bg-primary text-white rounded-top-4">
                                 <h3 class="card-title mb-0">
-                                    <i class="fa-solid fa-magnifying-glass me-2"></i>Search Exam Schedule
+                                    <i class="fa-solid fa-magnifying-glass me-2"></i>Rechercher Planning d'Examens
                                 </h3>
                             </div>
                             <form method="get" action="">
@@ -82,6 +118,7 @@
                                                 @endforeach
                                             </select>
                                         </div>
+
                                         <div class="col-md-3">
                                             <label class="form-label fw-semibold">Classe</label>
                                             <select class="form-select form-control" name="class_id" required
@@ -95,6 +132,7 @@
                                                 @endforeach
                                             </select>
                                         </div>
+
                                         <div class="col-md-3">
                                             <label class="form-label fw-semibold">Examen</label>
                                             <select class="form-select form-control" name="exam_id" required
@@ -108,12 +146,12 @@
                                                 @endforeach
                                             </select>
                                         </div>
+
                                         <div class="col-md-3 d-flex align-items-end gap-2">
                                             <button class="btn btn-primary w-100" type="submit">
-                                                <i class="fa-solid fa-magnifying-glass me-1"></i> Rechercher
+                                                <i class="fa-solid fa-magnifying-glass me-1"></i>Rechercher
                                             </button>
-                                            <a href="{{ url('admin/examinations/exam_schedule') }}"
-                                                class="btn btn-success w-100">
+                                            <a href="{{ url('departement/exam_schedule') }}" class="btn btn-success w-100">
                                                 Réinitialiser
                                             </a>
                                         </div>
@@ -125,7 +163,7 @@
                         @include('_message')
 
                         @if (!empty($getRecord))
-                            <form action="{{ url('admin/examinations/exam_schedule_insert') }}" method="post">
+                            <form action="{{ route('departement.exam_schedule_insert') }}" method="post">
                                 @csrf
                                 <input type="hidden" name="exam_id" value="{{ Request::get('exam_id') }}">
                                 <input type="hidden" name="class_id" value="{{ Request::get('class_id') }}">
@@ -134,20 +172,20 @@
                                 <div class="card shadow-sm rounded-4 border-0">
                                     <div class="card-header bg-primary text-white rounded-top-4">
                                         <h3 class="card-title mb-0">
-                                            <i class="fa-solid fa-calendar-days me-2"></i>Exam Schedule
+                                            <i class="fa-solid fa-calendar-days me-2"></i>Planning des Examens
                                         </h3>
                                     </div>
                                     <div class="card-body p-0 table-responsive">
                                         <table class="table table-hover table-bordered align-middle mb-0">
                                             <thead class="table-primary text-center text-uppercase small">
                                                 <tr>
-                                                    <th>Subject Name</th>
-                                                    <th>Exam Date</th>
-                                                    <th>Start Time</th>
-                                                    <th>End Time</th>
-                                                    <th>Room Number</th>
-                                                    <th>Full Marks</th>
-                                                    <th>Passing Marks</th>
+                                                    <th>Matière</th>
+                                                    <th>Date d'Examen</th>
+                                                    <th>Heure Début</th>
+                                                    <th>Heure Fin</th>
+                                                    <th>Salle</th>
+                                                    <th>Note Totale</th>
+                                                    <th>Note de Passage</th>
                                                     <th>Credit(Ec)</th>
                                                 </tr>
                                             </thead>
@@ -204,7 +242,7 @@
                                         <div class="text-center py-4">
                                             <button class="btn btn-primary px-5 py-2 fw-semibold shadow-sm"
                                                 type="submit">
-                                                <i class="fas fa-save me-2"></i> Enregistrer le planning
+                                                <i class="fas fa-save me-2"></i>Enregistrer le planning
                                             </button>
                                         </div>
                                     </div>
@@ -217,41 +255,4 @@
             </div>
         </section>
     </div>
-
-    <style>
-        .card {
-            border-radius: 1.25rem;
-        }
-
-        .card-header {
-            border-radius: 1.25rem 1.25rem 0 0;
-        }
-
-        .table-primary th {
-            background-color: #cfe2ff !important;
-            color: #084298 !important;
-            font-weight: 600;
-        }
-
-        .btn-primary,
-        .btn-success {
-            font-weight: 500;
-        }
-
-        .btn-sm {
-            padding: 0.25rem 0.75rem;
-            font-size: 0.9rem;
-        }
-
-        .form-label {
-            font-weight: 600;
-        }
-
-        .form-control:focus,
-        .form-select:focus {
-            border-color: #0d6efd;
-            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, .25);
-        }
-    </style>
-
 @endsection

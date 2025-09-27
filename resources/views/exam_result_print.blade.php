@@ -447,13 +447,12 @@ if ($moyenneGenerale >= 18) {
                         <th rowspan="2" style="background:#fff;">Décision</th>
                     </tr>
                     <tr>
-                        {{-- <th style="background:#fff;"></th>
-                    <th style="background:#fff;"></th> --}}
+
                         <th>EC</th>
                         <th>UE</th>
                         <th>EC</th>
                         <th>UE</th>
-                        {{-- <th style="background:#fff;"></th> --}}
+
                     </tr>
                 </thead>
                 <tbody>
