@@ -2,6 +2,60 @@
 
 @section('style')
     <style type="text/css">
+        /* Vos styles existants */
+        .modal {
+            /*...*/
+        }
+
+        .modal-content {
+            /*...*/
+        }
+
+        .close {
+            /*...*/
+        }
+
+        .close:hover,
+        .close:focus {
+            /*...*/
+        }
+
+        .styled-table thead tr {
+            background-color: #009879;
+            color: #fff;
+            text-align: left;
+        }
+
+        .card {
+            border-radius: 1.25rem;
+        }
+
+        .card-header {
+            border-radius: 1.25rem 1.25rem 0 0;
+        }
+
+        .table-primary th {
+            background-color: #cfe2ff !important;
+            color: #084298 !important;
+            font-weight: 600;
+        }
+
+        .btn-primary,
+        .btn-success {
+            font-weight: 500;
+        }
+
+        .btn-sm {
+            padding: 0.25rem 0.75rem;
+            font-size: 0.9rem;
+        }
+
+        .form-label {
+            font-weight: 600;
+        }
+    </style>
+
+    <style type="text/css">
         .styled-table thead tr {
             background-color: #009879;
             color: #ffffff;
@@ -39,14 +93,11 @@
 @endsection
 
 @section('content')
+
     <div class="content-wrapper">
         <section class="content-header py-3 bg-light border-bottom mb-4">
             <div class="container-fluid">
-                <div class="row mb-2">
-                    <div class="col-sm-6">
-                        <h1 class="h3 fw-bold text-primary">Fiche de Jury</h1>
-                    </div>
-                </div>
+                <h1 class="h3 fw-bold text-primary">Fiche de Cotation</h1>
             </div>
         </section>
 
@@ -66,8 +117,7 @@
                                         @foreach ($academicYears as $year)
                                             <option value="{{ $year->id }}"
                                                 {{ request('academic_year_id') == $year->id ? 'selected' : '' }}>
-                                                {{ $year->name }}
-                                            </option>
+                                                {{ $year->name }}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -79,8 +129,7 @@
                                         <option value="">Sélectionner</option>
                                         @foreach ($filteredExams as $exam)
                                             <option value="{{ $exam->id }}"
-                                                {{ request('exam_id') == $exam->id ? 'selected' : '' }}>
-                                                {{ $exam->name }}
+                                                {{ request('exam_id') == $exam->id ? 'selected' : '' }}>{{ $exam->name }}
                                             </option>
                                         @endforeach
                                     </select>
@@ -94,8 +143,7 @@
                                         @foreach ($filteredClasses as $class)
                                             <option value="{{ $class->id }}"
                                                 {{ request('class_id') == $class->id ? 'selected' : '' }}>
-                                                {{ $class->name }} {{ $class->opt }}
-                                            </option>
+                                                {{ $class->name }} {{ $class->opt }}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -112,7 +160,6 @@
                         @if (!empty($getSubject) && !empty($getStudent))
                             <form id="marksRegisterForm" method="POST">
                                 @csrf
-                                <!-- Champs cachés -->
                                 <input type="hidden" name="exam_id" value="{{ request('exam_id') }}">
                                 <input type="hidden" name="class_id" value="{{ request('class_id') }}">
                                 <input type="hidden" name="academic_year_id" value="{{ request('academic_year_id') }}">
@@ -123,13 +170,9 @@
                                             <tr>
                                                 <th style="min-width: 250px;">Nom Étudiant</th>
                                                 @foreach ($getSubject as $subject)
-                                                    <th style="min-width: 200px;">
-                                                        {{ $subject->subject_name }}
-                                                        <br />
-                                                        <span class="text-muted small">
-                                                            ({{ $subject->subject_type }}:
-                                                            {{ $subject->passing_mark }}/{{ $subject->full_marks }})
-                                                        </span>
+                                                    <th style="min-width: 200px;">{{ $subject->subject_name }}<br />
+                                                        <span class="text-muted small">({{ $subject->subject_type }}:
+                                                            {{ $subject->passing_mark }}/{{ $subject->full_marks }})</span>
                                                     </th>
                                                 @endforeach
                                                 <th>Actions</th>
@@ -138,18 +181,16 @@
                                         <tbody>
                                             @foreach ($getStudent as $student)
                                                 <tr>
-                                                    <td class="fw-semibold text-start">
-                                                        {{ $student->name }} {{ $student->last_name }}
-                                                    </td>
+                                                    <td class="fw-semibold text-start">{{ $student->name }}
+                                                        {{ $student->last_name }}</td>
                                                     @foreach ($getSubject as $subject)
                                                         @php
-                                                            $getMark = \App\Models\ExamScheduleModel::getMark(
+                                                            $getMark = $subject->getMark(
                                                                 $student->id,
                                                                 request('exam_id'),
                                                                 request('class_id'),
                                                                 $subject->subject_id,
                                                             );
-
                                                             $totalMark =
                                                                 !empty($getMark) &&
                                                                 is_numeric($getMark->class_work) &&
@@ -158,22 +199,28 @@
                                                                     : 0;
                                                         @endphp
                                                         <td>
+                                                            <input type="hidden"
+                                                                name="marks[{{ $student->id }}][{{ $subject->subject_id }}][full_marks]"
+                                                                value="{{ $subject->full_marks }}">
+                                                            <input type="hidden"
+                                                                name="marks[{{ $student->id }}][{{ $subject->subject_id }}][passing_mark]"
+                                                                value="{{ $subject->passing_mark }}">
+                                                            <input type="hidden"
+                                                                name="marks[{{ $student->id }}][{{ $subject->subject_id }}][ponde]"
+                                                                value="{{ $subject->ponde }}">
                                                             <input type="number"
                                                                 name="marks[{{ $student->id }}][{{ $subject->subject_id }}][class_work]"
                                                                 class="form-control form-control-sm mb-1"
                                                                 placeholder="Travail"
                                                                 value="{{ $getMark->class_work ?? '' }}" min="0"
                                                                 max="{{ $subject->full_marks }}" step="0.01" />
-
                                                             <input type="number"
                                                                 name="marks[{{ $student->id }}][{{ $subject->subject_id }}][exam]"
                                                                 class="form-control form-control-sm" placeholder="Examen"
                                                                 value="{{ $getMark->exam ?? '' }}" min="0"
                                                                 max="{{ $subject->full_marks }}" step="0.01" />
-
                                                             @if ($totalMark > 0)
-                                                                <small>
-                                                                    Crédit: {{ $subject->ponde }} -
+                                                                <small>Crédit: {{ $subject->ponde }} -
                                                                     @if ($totalMark >= $subject->passing_mark)
                                                                         <span class="text-success fw-bold">Valide</span>
                                                                     @else
@@ -183,26 +230,39 @@
                                                             @endif
                                                         </td>
                                                     @endforeach
+
                                                     <td>
-                                                        <a href="{{ url('admin/my_exam_result/print?exam_id=' . request('exam_id') . '&student_id=' . $student->id) }}"
-                                                            target="_blank" class="btn btn-primary btn-sm">
-                                                            Imprimer
-                                                        </a>
+                                                        <small style="display: block; margin-top: 5px;">
+                                                            Moyenne générale :
+                                                            <span
+                                                                style="color: {{ round($studentStats[$student->id]['average'] ?? 0, 2) < 10 ? 'red' : 'green' }}; font-weight: bold;">
+                                                                {{ round($studentStats[$student->id]['average'] ?? 0) }}
+                                                            </span>
+                                                            <br />
+                                                            Crédits validés :
+                                                            <strong>{{ $studentStats[$student->id]['credits'] ?? 0 }}</strong>
+                                                        </small>
                                                     </td>
+
+
                                                 </tr>
                                             @endforeach
                                             @if ($getStudent->isEmpty())
                                                 <tr>
                                                     <td colspan="{{ count($getSubject) + 2 }}"
                                                         class="text-center text-muted py-4">
-                                                        <i class="fa-solid fa-folder-open fa-2x mb-2"></i><br />
-                                                        Aucun étudiant trouvé.
+                                                        <i class="fa-solid fa-folder-open fa-2x mb-2"></i><br> Aucun
+                                                        étudiant trouvé.
                                                     </td>
                                                 </tr>
                                             @endif
                                         </tbody>
                                     </table>
                                 </div>
+
+                                <button type="button" id="btnPerequation" class="btn btn-info mt-3" style="display:none;">
+                                    <i class="fas fa-sync-alt"></i> Appliquer Péréquation
+                                </button>
 
                                 <button type="button" id="saveAllBtn" class="btn btn-success mt-3">
                                     <i class="fas fa-save"></i> Enregistrer Tout
@@ -212,7 +272,6 @@
 
                     </div>
                 </div>
-            </div>
         </section>
     </div>
 @endsection
@@ -222,13 +281,40 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function() {
+            // Logique pour détecter si péréquation est possible (supposée flag côté backend)
+            let perequationNeeded = @json($perequationNeeded ?? false);
+            if (perequationNeeded) {
+                $('#btnPerequation').show();
+            }
+
+            $('#btnPerequation').click(function(e) {
+                e.preventDefault();
+                $.ajax({
+                    url: '{{ route('jury.perequate_marks') }}', // Route à créer en backend
+                    method: 'POST',
+                    data: $('#marksRegisterForm').serialize(),
+                    dataType: 'json',
+                    success: function(response) {
+                        if (response.success) {
+                            Swal.fire('Succès', 'Péréquation appliquée', 'success').then(() =>
+                                location.reload());
+                        } else {
+                            Swal.fire('Erreur', response.message ||
+                                'Erreur lors de la péréquation', 'error');
+                        }
+                    },
+                    error: function() {
+                        Swal.fire('Erreur', 'Erreur technique lors de la péréquation', 'error');
+                    }
+                });
+            });
+
             $('#saveAllBtn').click(function(e) {
                 e.preventDefault();
-                let formData = $('#marksRegisterForm').serialize();
                 $.ajax({
                     url: "{{ route('jury.save_all_marks') }}",
                     method: 'POST',
-                    data: formData,
+                    data: $('#marksRegisterForm').serialize(),
                     dataType: 'json',
                     success: function(response) {
                         if (response.success) {
@@ -237,9 +323,7 @@
                                 text: response.message,
                                 icon: 'success',
                                 confirmButtonText: 'OK'
-                            }).then(() => {
-                                window.location.reload();
-                            });
+                            }).then(() => window.location.reload());
                         } else {
                             Swal.fire('Attention', response.message, 'warning');
                         }

@@ -793,6 +793,7 @@ Route::group(['middleware' => ['auth', 'jury']], function () {
     Route::get('jury/classes-by-year/{year}', [JuryMarksRegisterController::class, 'getClassesByYear']);
     Route::get('jury/exams-by-year/{year}', [JuryMarksRegisterController::class, 'getExamsByYear']);
     Route::post('jury/save_all_marks', [JuryMarksRegisterController::class, 'saveAllMarks'])->name('jury.save_all_marks');
+    Route::post('jury/perequate_marks', [JuryMarksRegisterController::class, 'perequateMarks'])->name('jury.perequate_marks');
 });
 
 
