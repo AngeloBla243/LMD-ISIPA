@@ -216,13 +216,21 @@
                                                                     <input type="hidden"
                                                                         name="mark[{{ $i }}][subject_id]"
                                                                         value="{{ $subject->subject_id }}">
+
                                                                     <input type="text"
                                                                         name="mark[{{ $i }}][class_work]"
                                                                         id="class_work_{{ $student->id }}{{ $subject->subject_id }}"
                                                                         class="form-control form-control-sm"
                                                                         style="width:120px" placeholder="Notes"
+                                                                        value="{{ !empty($getMark->class_work) ? $getMark->class_work : '' }}"
+                                                                        disabled>
+
+                                                                    <!-- Champ caché pour envoyer la valeur même si input désactivé -->
+                                                                    <input type="hidden"
+                                                                        name="mark[{{ $i }}][class_work]"
                                                                         value="{{ !empty($getMark->class_work) ? $getMark->class_work : '' }}">
                                                                 </div>
+
                                                                 <div class="mb-2">
                                                                     <label class="form-label small">Examen</label>
                                                                     <input type="text"
@@ -230,8 +238,10 @@
                                                                         id="exam_{{ $student->id }}{{ $subject->subject_id }}"
                                                                         class="form-control form-control-sm"
                                                                         style="width:120px" placeholder="Notes"
-                                                                        value="{{ !empty($getMark->exam) ? $getMark->exam : '' }}">
+                                                                        value="{{ !empty($getMark->exam) ? $getMark->exam : '' }}"
+                                                                        disabled>
                                                                 </div>
+
                                                                 <div class="mb-2">
                                                                 </div>
                                                                 @if (!empty($getMark))
@@ -250,14 +260,11 @@
                                                             @php $i++; @endphp
                                                         @endforeach
                                                         <td style="min-width: 230px;">
-                                                            {{-- <button type="submit"
-                                                                class="btn btn-success btn-sm shadow-sm SubmitForm">
-                                                                <i class="fas fa-save"></i> Enregistrer
-                                                            </button> --}}
-                                                            <a class="btn btn-primary btn-sm shadow-sm" target="_blank"
+
+                                                            {{-- <a class="btn btn-primary btn-sm shadow-sm" target="_blank"
                                                                 href="{{ url('admin/my_exam_result/print?exam_id=' . Request::get('exam_id') . '&student_id=' . $student->id) }}">
                                                                 Imprimer
-                                                            </a>
+                                                            </a> --}}
                                                         </td>
                                                     </tr>
                                                 </form>

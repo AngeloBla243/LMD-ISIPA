@@ -771,7 +771,15 @@
 
 
 
-
+                    <li class="nav-item">
+                        <a href="{{ url('teacher/recours/list') }}"
+                            class="nav-link @if (Request::segment(2) == 'recurs') active @endif">
+                            <i class="nav-icon fa-solid fa-folder-open"></i>
+                            <p>
+                                Recours
+                            </p>
+                        </a>
+                    </li>
 
 
 
@@ -848,15 +856,7 @@
                         </a>
                     </li>
 
-                    <li class="nav-item">
-                        <a href="{{ url('teacher/recours/list') }}"
-                            class="nav-link @if (Request::segment(2) == 'recurs') active @endif">
-                            <i class="nav-icon fa-solid fa-folder-open"></i>
-                            <p>
-                                Recours
-                            </p>
-                        </a>
-                    </li>
+
 
 
                     <li class="nav-item">

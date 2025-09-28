@@ -61,68 +61,136 @@ class RecoursController extends Controller
         return redirect()->back()->with('success', 'Statut du recours mis à jour !');
     }
 
+    // public function listForTeacher(Request $request)
+    // {
+    //     // 1. Récupérer l'année académique sélectionnée
+    //     $academicYearId = $request->get(
+    //         'academic_year_id',
+    //         session('academic_year_id', AcademicYear::where('is_active', 1)->value('id'))
+    //     );
+
+    //     // 2. Récupérer les classes assignées avec filtre académique
+    //     $assignedClasses = AssignClassTeacherModel::join('class', 'class.id', '=', 'assign_class_teacher.class_id')
+    //         ->where('assign_class_teacher.teacher_id', Auth::id())
+    //         ->when($academicYearId, function ($q) use ($academicYearId) {
+    //             $q->where('class.academic_year_id', $academicYearId);
+    //         })
+    //         ->pluck('class_id')
+    //         ->toArray();
+
+    //     // 3. Gestion cas aucune classe
+    //     if (empty($assignedClasses)) {
+    //         return view('teacher.recours.list', [
+    //             'recours' => collect(),
+    //             'academicYears' => AcademicYear::all(),
+    //             'selectedAcademicYear' => AcademicYear::find($academicYearId)
+    //         ])->with('error', 'Aucune classe assignée pour cette année');
+    //     }
+
+    //     // 4. Récupérer les recours avec relations
+    //     $recours = Recours::whereIn('class_id', $assignedClasses)
+    //         ->with(['student', 'class', 'subject.academicYear'])
+    //         ->get();
+
+    //     // 5. Filtrer par matière enseignée + année
+    //     $filteredRecours = $recours->filter(function ($recour) use ($academicYearId) {
+    //         return AssignClassTeacherModel::where('teacher_id', Auth::id())
+    //             ->where('class_id', $recour->class_id)
+    //             ->where('subject_id', $recour->subject_id)
+    //             ->whereHas('class', function ($q) use ($academicYearId) {
+    //                 $q->where('academic_year_id', $academicYearId);
+    //             })
+    //             ->exists();
+    //     });
+
+    //     // 6. Ajouter l'ID d'examen
+    //     $filteredRecours->each(function ($recour) {
+    //         $recour->exam_id = ExamScheduleModel::getExamIdBySubject(
+    //             $recour->subject_id,
+    //             $recour->class_id
+    //         );
+    //     });
+
+    //     foreach ($recours as $recour) {
+    //         $recour->exam_id = ExamScheduleModel::getExamIdBySubject(
+    //             $recour->subject_id,
+    //             $recour->class_id
+    //         );
+    //         $recour->academic_year_id = $academicYearId; // Ajouter l'année académique
+    //     }
+
+    //     return view('teacher.recours.list', [
+    //         'recours' => $filteredRecours,
+    //         'academicYears' => AcademicYear::orderBy('start_date', 'desc')->get(),
+    //         'selectedAcademicYear' => AcademicYear::find($academicYearId)
+    //     ]);
+    // }
+
     public function listForTeacher(Request $request)
     {
-        // 1. Récupérer l'année académique sélectionnée
+        // 1. Récupérer l'année académique sélectionnée ou par défaut depuis la session
         $academicYearId = $request->get(
             'academic_year_id',
             session('academic_year_id', AcademicYear::where('is_active', 1)->value('id'))
         );
 
-        // 2. Récupérer les classes assignées avec filtre académique
+        // 2. Récupérer les classes assignées à l'enseignant avec filtre année académique
         $assignedClasses = AssignClassTeacherModel::join('class', 'class.id', '=', 'assign_class_teacher.class_id')
             ->where('assign_class_teacher.teacher_id', Auth::id())
-            ->when($academicYearId, function ($q) use ($academicYearId) {
-                $q->where('class.academic_year_id', $academicYearId);
+            ->when($academicYearId, function ($query) use ($academicYearId) {
+                $query->where('class.academic_year_id', $academicYearId);
             })
-            ->pluck('class_id')
-            ->toArray();
+            ->select('class.id', 'class.name', 'class.opt')
+            ->get();
 
-        // 3. Gestion cas aucune classe
-        if (empty($assignedClasses)) {
+        // 3. Si aucune classe sélectionnée dans la requête, on prend la première classe assignée si elle existe
+        $selectedClassId = $request->get('class_id');
+        if (!$selectedClassId && $assignedClasses->isNotEmpty()) {
+            $selectedClassId = $assignedClasses->first()->id;
+        }
+
+        // 4. Si aucune classe assignée, on retourne la vue avec message d'erreur
+        if ($assignedClasses->isEmpty()) {
             return view('teacher.recours.list', [
                 'recours' => collect(),
-                'academicYears' => AcademicYear::all(),
-                'selectedAcademicYear' => AcademicYear::find($academicYearId)
+                'academicYears' => AcademicYear::orderBy('start_date', 'desc')->get(),
+                'selectedAcademicYear' => AcademicYear::find($academicYearId),
+                'filteredClasses' => $assignedClasses,
+                'selectedClassId' => null,
             ])->with('error', 'Aucune classe assignée pour cette année');
         }
 
-        // 4. Récupérer les recours avec relations
-        $recours = Recours::whereIn('class_id', $assignedClasses)
-            ->with(['student', 'class', 'subject.academicYear'])
-            ->get();
+        // 5. Récupérer les recours pour la classe sélectionnée
+        $recours = collect();
+        if ($selectedClassId) {
+            $recours = Recours::where('class_id', $selectedClassId)
+                ->with(['student', 'class', 'subject.academicYear'])
+                ->get();
 
-        // 5. Filtrer par matière enseignée + année
-        $filteredRecours = $recours->filter(function ($recour) use ($academicYearId) {
-            return AssignClassTeacherModel::where('teacher_id', Auth::id())
-                ->where('class_id', $recour->class_id)
-                ->where('subject_id', $recour->subject_id)
-                ->whereHas('class', function ($q) use ($academicYearId) {
-                    $q->where('academic_year_id', $academicYearId);
-                })
-                ->exists();
-        });
+            // Filtration par matière enseignée + année académique
+            $recours = $recours->filter(function ($recour) use ($academicYearId) {
+                return AssignClassTeacherModel::where('teacher_id', Auth::id())
+                    ->where('class_id', $recour->class_id)
+                    ->where('subject_id', $recour->subject_id)
+                    ->whereHas('class', function ($query) use ($academicYearId) {
+                        $query->where('academic_year_id', $academicYearId);
+                    })
+                    ->exists();
+            });
 
-        // 6. Ajouter l'ID d'examen
-        $filteredRecours->each(function ($recour) {
-            $recour->exam_id = ExamScheduleModel::getExamIdBySubject(
-                $recour->subject_id,
-                $recour->class_id
-            );
-        });
-
-        foreach ($recours as $recour) {
-            $recour->exam_id = ExamScheduleModel::getExamIdBySubject(
-                $recour->subject_id,
-                $recour->class_id
-            );
-            $recour->academic_year_id = $academicYearId; // Ajouter l'année académique
+            // Ajout de l'ID d'examen dans chaque recours
+            $recours->each(function ($recour) {
+                $recour->exam_id = ExamScheduleModel::getExamIdBySubject($recour->subject_id, $recour->class_id);
+            });
         }
 
+        // 6. Passage des variables à la vue
         return view('teacher.recours.list', [
-            'recours' => $filteredRecours,
+            'recours' => $recours,
             'academicYears' => AcademicYear::orderBy('start_date', 'desc')->get(),
-            'selectedAcademicYear' => AcademicYear::find($academicYearId)
+            'selectedAcademicYear' => AcademicYear::find($academicYearId),
+            'filteredClasses' => $assignedClasses,
+            'selectedClassId' => $selectedClassId,
         ]);
     }
 

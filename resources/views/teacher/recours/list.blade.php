@@ -28,7 +28,7 @@
                             <form method="get" action="">
                                 <div class="card-body">
                                     <div class="row g-3">
-                                        <div class="col-md-3">
+                                        {{-- <div class="col-md-3">
                                             <label class="form-label fw-semibold">Année Académique</label>
                                             <select name="academic_year_id" class="form-select form-control"
                                                 onchange="this.form.submit()">
@@ -40,19 +40,20 @@
                                                     </option>
                                                 @endforeach
                                             </select>
-                                        </div>
+                                        </div> --}}
                                         <div class="col-md-3">
                                             <label class="form-label fw-semibold">Classe</label>
                                             <select name="class_id" class="form-select form-control"
-                                                {{ empty($filteredClasses) ? 'disabled' : '' }}>
+                                                onchange="this.form.submit()">
                                                 <option value="">Sélectionner</option>
-                                                @foreach ($filteredClasses ?? [] as $class)
+                                                @foreach ($filteredClasses as $class)
                                                     <option value="{{ $class->id }}"
                                                         {{ isset($selectedClassId) && $selectedClassId == $class->id ? 'selected' : '' }}>
                                                         {{ $class->name }} {{ $class->opt }}
                                                     </option>
                                                 @endforeach
                                             </select>
+
                                         </div>
                                         <div class="col-md-3 d-flex align-items-end gap-2">
                                             <button type="submit" class="btn btn-primary w-100">
@@ -188,7 +189,7 @@
     </style>
 @endsection
 
-@section('script')
+
 @section('script')
     <script>
         $(document).on('click', '.open-mark-modal', function() {
@@ -206,5 +207,4 @@
                 });
         });
     </script>
-@endsection
 @endsection

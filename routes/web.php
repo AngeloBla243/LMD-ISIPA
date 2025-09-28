@@ -500,9 +500,9 @@ Route::group(['middleware' => 'teacher'], function () {
 
     Route::get('teacher/marks_register', [ExaminationsController::class, 'marks_register_teacher']);
     Route::post('teacher/submit_marks_register', [ExaminationsController::class, 'submit_marks_register']);
-
-    Route::post('teacher/submit_all_marks_register', [ExaminationsController::class, 'submit_all_marks_register'])
-        ->name('teacher.submit_all_marks_register');
+    Route::get('teacher/marks_register/export', [ExaminationsController::class, 'exportMarks'])->name('teacher.marks_export');
+    Route::post('teacher/marks_register/import', [ExaminationsController::class, 'importMarks'])->name('teacher.marks_import');
+    Route::post('teacher/submit_all_marks_register', [ExaminationsController::class, 'submit_all_marks_register'])->name('teacher.submit_all_marks_register');
     Route::post('teacher/single_submit_marks_register', [ExaminationsController::class, 'single_submit_marks_register']);
 
 

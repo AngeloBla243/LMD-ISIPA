@@ -21,6 +21,9 @@ use App\Models\recours;
 use Termwind\Components\Dd;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\MarksExport;
+use App\Imports\MarksImport;
 
 class ExaminationsController extends Controller
 {
@@ -491,106 +494,83 @@ class ExaminationsController extends Controller
 
     public function submit_all_marks_register(Request $request)
     {
-        DB::beginTransaction();
-
         try {
-            $request->validate([
-                'exam_id'   => 'required|exists:exam,id',
-                'class_id'  => 'required|exists:class,id',
-                'marks'     => 'required|array'
-            ]);
+            $data = $request->all();
 
-            $currentExam = ExamModel::with('semester')->findOrFail($request->exam_id);
-            $class = ClassModel::findOrFail($request->class_id);
-            $academicYearId = $class->academic_year_id;
-
-            if (!$currentExam->semester_id || !$currentExam->semester) {
-                throw new \Exception("Configuration invalide : semestre non défini");
+            if (empty($data['marks']) || !is_array($data['marks'])) {
+                return response()->json([
+                    'success' => false,
+                    'message' => "Aucune donnée envoyée."
+                ]);
             }
 
-            $session2Exam = null;
-            if ($currentExam->session == 1) {
-                $session2Exam = ExamModel::firstOrCreate(
-                    [
-                        'semester_id' => $currentExam->semester_id,
-                        'session' => 2,
-                        'academic_year_id' => $currentExam->academic_year_id
-                    ],
-                    [
-                        'name' => $currentExam->name . ' - Rattrapage',
-                        'created_by' => Auth::id()
-                    ]
-                );
-            }
+            $currentExam = ExamModel::with('semester')->findOrFail($data['exam_id']);
+            $semesterId = $currentExam->semester_id;
 
-            $validationErrors = [];
+            foreach ($data['marks'] as $studentId => $subjects) {
+                foreach ($subjects as $subject) {
+                    $getExamSchedule = ExamScheduleModel::findOrFail($subject['id']);
+                    $class = ClassModel::findOrFail($data['class_id']);
 
-            foreach ($request->marks as $studentId => $subjects) {
-                foreach ($subjects as $subjectId => $mark) {
-                    if (empty($mark['subject_id'])) {
-                        $validationErrors[] = "Subject ID manquant pour l'étudiant $studentId";
-                        continue;
-                    }
-
-                    $examSchedule = ExamScheduleModel::where([
-                        'exam_id' => $currentExam->id,
-                        'class_id' => $class->id,
-                        'subject_id' => $subjectId
-                    ])->first();
-
-                    if (!$examSchedule) {
-                        $validationErrors[] = "Aucun planning d'examen trouvé pour la matière {$subjectId}";
-                        continue;
-                    }
-
-                    $classWork = $mark['class_work'] ?? 0;
-                    $examScore = $mark['exam'] ?? 0;
+                    $classWork = $subject['class_work'] ?? 0;
+                    $examScore = $subject['exam'] ?? 0;
                     $totalScore = $classWork + $examScore;
 
-                    if ($totalScore > $examSchedule->full_marks) {
-                        $validationErrors[] = "Note totale ($totalScore) > max ({$examSchedule->full_marks}) pour étudiant $studentId";
-                        continue;
+                    if ($totalScore > $getExamSchedule->full_marks) {
+                        continue; // skip si dépasse le max
                     }
 
-                    // Enregistrement Session 1
+                    // Session 1
                     MarksRegisterModel::updateOrCreate(
                         [
                             'student_id' => $studentId,
                             'exam_id' => $currentExam->id,
-                            'subject_id' => $subjectId
+                            'subject_id' => $subject['subject_id']
                         ],
                         [
-                            'semester_id' => $currentExam->semester_id,
+                            'semester_id' => $semesterId,
                             'class_work' => $classWork,
                             'exam' => $examScore,
-                            'full_marks' => $examSchedule->full_marks,
-                            'passing_mark' => $examSchedule->passing_mark,
-                            'ponde' => $examSchedule->ponde,
+                            'full_marks' => $getExamSchedule->full_marks,
+                            'passing_mark' => $getExamSchedule->passing_mark,
+                            'ponde' => $getExamSchedule->ponde,
                             'status' => 1,
-                            'class_id' => $class->id,
-                            'academic_year_id' => $academicYearId,
+                            'class_id' => $data['class_id'],
+                            'academic_year_id' => $class->academic_year_id,
                             'created_by' => Auth::id()
                         ]
                     );
 
-                    // Gestion Session 2
-                    if ($session2Exam) {
+                    // Session 2 (copie automatique si session == 1)
+                    if ($currentExam->session == 1) {
+                        $session2Exam = ExamModel::firstOrCreate(
+                            [
+                                'semester_id' => $semesterId,
+                                'session' => 2,
+                                'academic_year_id' => $currentExam->academic_year_id
+                            ],
+                            [
+                                'name' => $currentExam->name . ' - Session Rattrapage',
+                                'created_by' => Auth::id()
+                            ]
+                        );
+
                         MarksRegisterModel::updateOrCreate(
                             [
                                 'student_id' => $studentId,
                                 'exam_id' => $session2Exam->id,
-                                'subject_id' => $subjectId
+                                'subject_id' => $subject['subject_id']
                             ],
                             [
-                                'semester_id' => $currentExam->semester_id,
+                                'semester_id' => $semesterId,
                                 'class_work' => $classWork,
                                 'exam' => $examScore,
-                                'full_marks' => $examSchedule->full_marks,
-                                'passing_mark' => $examSchedule->passing_mark,
-                                'ponde' => $examSchedule->ponde,
+                                'full_marks' => $getExamSchedule->full_marks,
+                                'passing_mark' => $getExamSchedule->passing_mark,
+                                'ponde' => $getExamSchedule->ponde,
                                 'status' => 0,
-                                'class_id' => $class->id,
-                                'academic_year_id' => $academicYearId,
+                                'class_id' => $data['class_id'],
+                                'academic_year_id' => $class->academic_year_id,
                                 'created_by' => Auth::id()
                             ]
                         );
@@ -598,30 +578,17 @@ class ExaminationsController extends Controller
                 }
             }
 
-            if (!empty($validationErrors)) {
-                DB::rollBack();
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Erreurs de validation',
-                    'errors' => $validationErrors
-                ], 422);
-            }
-
-            DB::commit();
-
             return response()->json([
                 'success' => true,
-                'message' => 'Toutes les notes ont été enregistrées avec succès'
+                'message' => "Toutes les notes ont été enregistrées avec succès."
             ]);
         } catch (\Exception $e) {
-            DB::rollBack();
             return response()->json([
                 'success' => false,
-                'message' => 'Erreur : ' . $e->getMessage()
-            ], 500);
+                'message' => "Erreur : " . $e->getMessage()
+            ]);
         }
     }
-
 
 
 
@@ -1550,5 +1517,26 @@ class ExaminationsController extends Controller
         $data['getRecord'] = $result;
         $data['header_title'] = "My Exam Result";
         return view('parent.my_exam_result', $data);
+    }
+
+
+    public function exportMarks(Request $request)
+    {
+        return Excel::download(
+            new MarksExport($request->exam_id, $request->class_id),
+            'marks_register.xlsx'
+        );
+    }
+
+
+    public function importMarks(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:xlsx,csv'
+        ]);
+
+        Excel::import(new MarksImport, $request->file('file'));
+
+        return redirect()->back()->with('success', 'Import des notes effectué avec succès.');
     }
 }

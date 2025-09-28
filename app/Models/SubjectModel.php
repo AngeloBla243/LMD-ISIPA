@@ -146,4 +146,12 @@ class SubjectModel extends Model
     {
         return $this->belongsTo(UeModel::class, 'ue_id');
     }
+
+    // Dans SubjectModel.php
+    public function teachers()
+    {
+        // Supposons une table pivot 'assign_class_teacher' où la matière est assignée à un enseignant
+        return $this->belongsToMany(User::class, 'assign_class_teacher', 'subject_id', 'teacher_id')
+            ->wherePivot('is_delete', 0); // Filtre si colonne exists
+    }
 }
