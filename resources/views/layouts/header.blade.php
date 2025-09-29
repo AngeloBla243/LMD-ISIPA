@@ -541,6 +541,13 @@
                         </ul>
                     </li>
 
+                    <li class="nav-item">
+                        <a href="{{ url('admin/features') }}"
+                            class="nav-link @if (Request::segment(2) == 'features') active @endif">
+                            <i class="nav-icon fas fa-toggle-on"></i>
+                            <p>Gestion des fonctionnalités</p>
+                        </a>
+                    </li>
 
                     <li class="nav-item  @if (Request::segment(2) == 'attendance') menu-is-opening menu-open @endif">
                         <a href="#" class="nav-link  @if (Request::segment(2) == 'attendance') active @endif">
@@ -742,7 +749,7 @@
                         </a>
                     </li>
 
-                    <li class="nav-item">
+                    {{-- <li class="nav-item">
                         <a href="{{ url('teacher/marks_register') }}"
                             class="nav-link @if (Request::segment(2) == 'marks_register') active @endif">
                             <i class="nav-icon fa-solid fa-pen-to-square"></i>
@@ -750,7 +757,18 @@
                                 Fiche de Cotation
                             </p>
                         </a>
-                    </li>
+                    </li> --}}
+
+                    @if (\App\Models\FeatureToggle::isFeatureActive('teacher_marks_register'))
+                        <li class="nav-item">
+                            <a href="{{ url('teacher/marks_register') }}"
+                                class="nav-link @if (Request::segment(2) == 'marks_register') active @endif">
+                                <i class="nav-icon fa-solid fa-pen-to-square"></i>
+                                <p>Fiche de Cotation</p>
+                            </a>
+                        </li>
+                    @endif
+
 
                     {{-- Dans resources/views/layouts/sidebar-teacher.blade.php --}}
                     <li class="nav-item">
@@ -880,6 +898,19 @@
                     </li>
 
                     <li class="nav-item">
+                        <a href="{{ url('student/my_notice_board') }}"
+                            class="nav-link {{ Request::is('student/my_notice_board*') ? 'active' : '' }}">
+                            <i class="nav-icon fa-solid fa-bell"></i>
+                            <p>
+                                Valves
+                                @if (!empty($unread_notices) && $unread_notices > 0)
+                                    <span class="badge bg-danger ms-2">{{ $unread_notices }}</span>
+                                @endif
+                            </p>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
                         <a href="{{ url('student/fees_collection') }}"
                             class="nav-link @if (Request::segment(2) == 'fees_collection') active @endif">
                             <i class="nav-icon fa-solid fa-wallet"></i>
@@ -889,28 +920,8 @@
                         </a>
                     </li>
 
-                    <li class="nav-item">
-                        <a href="{{ url('student/exams') }}"
-                            class="nav-link @if (Request::segment(2) == 'exams' && Request::segment(1) == 'student') active @endif">
-                            <i class="nav-icon fa fa-file-alt"></i>
-                            <p>
-                                Examens en Ligne
-                            </p>
-                        </a>
-                    </li>
-
 
                     {{-- <li class="nav-item">
-                        <a href="{{ route('student.submissions') }}"
-                            class="nav-link @if (Request::segment(2) == 'submissions') active @endif">
-                            <i class="nav-icon fa-solid fa-file-lines"></i>
-                            <p>
-                                Mes Soumissions
-                            </p>
-                        </a>
-                    </li> --}}
-
-                    <li class="nav-item">
                         <a href="{{ route('student.submissions') }}"
                             class="nav-link {{ Request::is('student/submissions*') ? 'active' : '' }}">
                             <i class="nav-icon fa-solid fa-file-lines"></i>
@@ -921,7 +932,24 @@
                                 @endif
                             </p>
                         </a>
-                    </li>
+                    </li> --}}
+
+                    {{-- Lien Student Mes Soumissions --}}
+                    @if (\App\Models\FeatureToggle::isFeatureActive('student_submissions'))
+                        <li class="nav-item">
+                            <a href="{{ route('student.submissions') }}"
+                                class="nav-link {{ Request::is('student/submissions*') ? 'active' : '' }}">
+                                <i class="nav-icon fa-solid fa-file-lines"></i>
+                                <p>
+                                    Mes Soumissions
+                                    @if (isset($newSubmissionCount) && $newSubmissionCount > 0)
+                                        <span class="badge bg-danger ms-2">{{ $newSubmissionCount }}</span>
+                                    @endif
+                                </p>
+                            </a>
+
+                        </li>
+                    @endif
 
 
 
@@ -972,7 +1000,7 @@
                     </li>
 
 
-                    <li class="nav-item">
+                    {{-- <li class="nav-item">
                         <a href="{{ url('student/my_exam_result') }}"
                             class="nav-link @if (Request::segment(2) == 'my_exam_result') active @endif">
                             <i class="nav-icon fa-solid fa-pen-to-square"></i>
@@ -980,7 +1008,18 @@
                                 Mes Resultats
                             </p>
                         </a>
-                    </li>
+                    </li> --}}
+
+                    {{-- Lien Mes Résultats (Student) --}}
+                    @if (\App\Models\FeatureToggle::isFeatureActive('student_exam_results'))
+                        <li class="nav-item">
+                            <a href="{{ url('student/my_exam_result') }}"
+                                class="nav-link @if (Request::segment(2) == 'my_exam_result') active @endif">
+                                <i class="nav-icon fa-solid fa-pen-to-square"></i>
+                                <p>Mes Résultats</p>
+                            </a>
+                        </li>
+                    @endif
 
 
                     <li class="nav-item">
@@ -993,25 +1032,12 @@
                         </a>
                     </li>
 
-                    {{-- <li class="nav-item">
-                        <a href="{{ url('student/my_notice_board') }}"
-                            class="nav-link @if (Request::segment(2) == 'my_notice_board') active @endif">
-                            <i class="nav-icon fa-solid fa-bell"></i>
-                            <p>
-                                Valves
-                            </p>
-                        </a>
-                    </li> --}}
-
                     <li class="nav-item">
-                        <a href="{{ url('student/my_notice_board') }}"
-                            class="nav-link {{ Request::is('student/my_notice_board*') ? 'active' : '' }}">
-                            <i class="nav-icon fa-solid fa-bell"></i>
+                        <a href="{{ url('student/exams') }}"
+                            class="nav-link @if (Request::segment(2) == 'exams' && Request::segment(1) == 'student') active @endif">
+                            <i class="nav-icon fa fa-file-alt"></i>
                             <p>
-                                Valves
-                                @if (!empty($unread_notices) && $unread_notices > 0)
-                                    <span class="badge bg-danger ms-2">{{ $unread_notices }}</span>
-                                @endif
+                                Examens en Ligne
                             </p>
                         </a>
                     </li>
@@ -1037,15 +1063,19 @@
                             </p>
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a href="{{ url('student/thesis') }}""
-                            class="nav-link @if (Request::segment(2) == 'thesis') active @endif">
-                            <i class="nav-icon fas fa-download"></i>
-                            <p>
-                                Soumettre mon mémoire
-                            </p>
-                        </a>
-                    </li>
+
+
+                    @if (\App\Models\FeatureToggle::isFeatureActive('student_submissions'))
+                        <li class="nav-item">
+                            <a href="{{ url('student/thesis') }}""
+                                class="nav-link @if (Request::segment(2) == 'thesis') active @endif">
+                                <i class="nav-icon fas fa-download"></i>
+                                <p>
+                                    Soumettre mon mémoire
+                                </p>
+                            </a>
+                        </li>
+                    @endif
 
 
 
@@ -1201,13 +1231,24 @@
                         </a>
                     </li>
 
-                    <li class="nav-item">
+                    {{-- Lien Jury Fiche de Cotation --}}
+                    @if (\App\Models\FeatureToggle::isFeatureActive('jury_marks_register'))
+                        <li class="nav-item">
+                            <a href="{{ route('jury.marks_register') }}"
+                                class="nav-link @if (Request::segment(1) == 'jury' && Request::segment(2) == 'marks_register') active @endif">
+                                <i class="nav-icon fas fa-file-alt"></i>
+                                <p>Fiche de Jury</p>
+                            </a>
+                        </li>
+                    @endif
+
+                    {{-- <li class="nav-item">
                         <a href="{{ route('jury.marks_register') }}"
                             class="nav-link @if (Request::segment(1) == 'jury' && Request::segment(2) == 'marks_register') active @endif">
                             <i class="nav-icon fas fa-file-alt"></i>
                             <p>Fiche de Jury</p>
                         </a>
-                    </li>
+                    </li> --}}
                 @elseif(Auth::user()->user_type == 7)
                     <li class="nav-item">
                         <a href="{{ url('apparitorat/dashboard') }}"

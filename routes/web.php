@@ -42,6 +42,7 @@ use App\Http\Controllers\DepartementClassTimetableController;
 use App\Http\Controllers\DepartementMarksRegisterController;
 use App\Http\Controllers\DepartementRecoursController;
 use App\Http\Controllers\JuryMarksRegisterController;
+use App\Http\Controllers\FeaturesController;
 
 
 
@@ -464,6 +465,24 @@ Route::group(['middleware' => 'admin'], function () {
     Route::get('admin/examinations/semestre/list', [SemesterController::class, 'list'])->name('admin.semester.list');
     Route::get('admin/examinations/semestre/create', [SemesterController::class, 'createForm'])->name('admin.semester.create.form');
     Route::post('admin/examinations/semestre/create', [SemesterController::class, 'create'])->name('admin.semester.create');
+
+    // Route::resource('admin/features', FeaturesController::class)
+    //     ->only(['index', 'edit', 'update'])
+    //     ->names([
+    //         'index' => 'admin.features.index',
+    //         'edit' => 'admin.features.edit',
+    //         'update' => 'admin.features.update',
+    //     ]);
+
+    Route::resource('admin/features', FeaturesController::class)
+        ->only(['index', 'create', 'store', 'edit', 'update'])
+        ->names([
+            'index' => 'admin.features.index',
+            'create' => 'admin.features.create',
+            'store' => 'admin.features.store',
+            'edit' => 'admin.features.edit',
+            'update' => 'admin.features.update',
+        ]);
 });
 
 
