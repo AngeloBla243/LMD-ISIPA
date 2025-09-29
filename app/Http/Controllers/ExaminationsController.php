@@ -1528,14 +1528,18 @@ class ExaminationsController extends Controller
         );
     }
 
-
     public function importMarks(Request $request)
     {
         $request->validate([
-            'file' => 'required|file|mimes:xlsx,csv'
+            'file' => 'required|file|mimes:xlsx,csv',
+            'exam_id' => 'required',
+            'class_id' => 'required',
         ]);
 
-        Excel::import(new MarksImport, $request->file('file'));
+        Excel::import(
+            new MarksImport($request->exam_id, $request->class_id),
+            $request->file('file')
+        );
 
         return redirect()->back()->with('success', 'Import des notes effectué avec succès.');
     }
