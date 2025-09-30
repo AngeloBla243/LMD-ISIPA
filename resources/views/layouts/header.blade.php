@@ -704,27 +704,49 @@
                         </a>
                     </li>
 
+                    <li class="nav-item @if (Request::segment(2) == 'my_calendar' ||
+                            Request::segment(2) == 'my_exam_timetable' ||
+                            Request::segment(2) == 'my_class_subject') menu-is-opening menu-open @endif">
 
-                    <li class="nav-item">
-                        <a href="{{ url('teacher/my_class_subject') }}"
-                            class="nav-link @if (Request::segment(2) == 'my_class_subject') active @endif">
-                            <i class="nav-icon fa-solid fa-book"></i>
+                        <a href="#" class="nav-link @if (Request::segment(2) == 'my_calendar' ||
+                                Request::segment(2) == 'my_exam_timetable' ||
+                                Request::segment(2) == 'my_class_subject') active @endif">
+                            <i class="nav-icon fas fa-chalkboard-teacher"></i>
                             <p>
-                                Mes classes et mes Cours
+                                Mon Organisation
+                                <i class="fas fa-angle-left right"></i>
                             </p>
                         </a>
+
+                        <ul class="nav nav-treeview">
+
+                            <li class="nav-item">
+                                <a href="{{ url('teacher/my_calendar') }}"
+                                    class="nav-link @if (Request::segment(2) == 'my_calendar') active @endif">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Mon calendrier</p>
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a href="{{ url('teacher/my_exam_timetable') }}"
+                                    class="nav-link @if (Request::segment(2) == 'my_exam_timetable') active @endif">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Mon emploi du temps</p>
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a href="{{ url('teacher/my_class_subject') }}"
+                                    class="nav-link @if (Request::segment(2) == 'my_class_subject') active @endif">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Mes classes et mes cours</p>
+                                </a>
+                            </li>
+
+                        </ul>
                     </li>
 
-
-                    <li class="nav-item">
-                        <a href="{{ url('teacher/my_exam_timetable') }}"
-                            class="nav-link @if (Request::segment(2) == 'my_exam_timetable') active @endif">
-                            <i class="nav-icon fa-solid fa-calendar-days"></i>
-                            <p>
-                                Mon emploi du temps
-                            </p>
-                        </a>
-                    </li>
 
                     <li class="nav-item">
                         <a href="{{ url('teacher/exams') }}"
@@ -737,27 +759,6 @@
                     </li>
 
 
-
-
-                    <li class="nav-item">
-                        <a href="{{ url('teacher/my_calendar') }}"
-                            class="nav-link @if (Request::segment(2) == 'my_calendar') active @endif">
-                            <i class="nav-icon fa-solid fa-calendar"></i>
-                            <p>
-                                Mon calendrier
-                            </p>
-                        </a>
-                    </li>
-
-                    {{-- <li class="nav-item">
-                        <a href="{{ url('teacher/marks_register') }}"
-                            class="nav-link @if (Request::segment(2) == 'marks_register') active @endif">
-                            <i class="nav-icon fa-solid fa-pen-to-square"></i>
-                            <p>
-                                Fiche de Cotation
-                            </p>
-                        </a>
-                    </li> --}}
 
                     @if (\App\Models\FeatureToggle::isFeatureActive('teacher_marks_register'))
                         <li class="nav-item">
@@ -788,16 +789,17 @@
                     </li>
 
 
-
-                    <li class="nav-item">
-                        <a href="{{ url('teacher/recours/list') }}"
-                            class="nav-link @if (Request::segment(2) == 'recurs') active @endif">
-                            <i class="nav-icon fa-solid fa-folder-open"></i>
-                            <p>
-                                Recours
-                            </p>
-                        </a>
-                    </li>
+                    @if (\App\Models\FeatureToggle::isFeatureActive('teacher_marks_register'))
+                        <li class="nav-item">
+                            <a href="{{ url('teacher/recours/list') }}"
+                                class="nav-link @if (Request::segment(2) == 'recurs') active @endif">
+                                <i class="nav-icon fa-solid fa-folder-open"></i>
+                                <p>
+                                    Recours
+                                </p>
+                            </a>
+                        </li>
+                    @endif
 
 
 
@@ -920,34 +922,42 @@
                         </a>
                     </li>
 
-
-                    {{-- <li class="nav-item">
-                        <a href="{{ route('student.submissions') }}"
-                            class="nav-link {{ Request::is('student/submissions*') ? 'active' : '' }}">
-                            <i class="nav-icon fa-solid fa-file-lines"></i>
-                            <p>
-                                Mes Soumissions
-                                @if (isset($newSubmissionCount) && $newSubmissionCount > 0)
-                                    <span class="badge bg-danger ms-2">{{ $newSubmissionCount }}</span>
-                                @endif
-                            </p>
-                        </a>
-                    </li> --}}
-
                     {{-- Lien Student Mes Soumissions --}}
                     @if (\App\Models\FeatureToggle::isFeatureActive('student_submissions'))
-                        <li class="nav-item">
-                            <a href="{{ route('student.submissions') }}"
-                                class="nav-link {{ Request::is('student/submissions*') ? 'active' : '' }}">
-                                <i class="nav-icon fa-solid fa-file-lines"></i>
+                        <li class="nav-item @if (Request::segment(2) == 'thesis' || Request::is('student/submissions*')) menu-is-opening menu-open @endif">
+
+                            <a href="#" class="nav-link @if (Request::segment(2) == 'thesis' || Request::is('student/submissions*')) active @endif">
+                                <i class="nav-icon fas fa-upload"></i>
                                 <p>
                                     Mes Soumissions
-                                    @if (isset($newSubmissionCount) && $newSubmissionCount > 0)
-                                        <span class="badge bg-danger ms-2">{{ $newSubmissionCount }}</span>
-                                    @endif
+                                    <i class="fas fa-angle-left right"></i>
                                 </p>
                             </a>
 
+                            <ul class="nav nav-treeview">
+
+                                <li class="nav-item">
+                                    <a href="{{ url('student/thesis') }}"
+                                        class="nav-link @if (Request::segment(2) == 'thesis') active @endif">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Soumettre mon mémoire</p>
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a href="{{ route('student.submissions') }}"
+                                        class="nav-link {{ Request::is('student/submissions*') ? 'active' : '' }}">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>
+                                            Mes Soumissions
+                                            @if (isset($newSubmissionCount) && $newSubmissionCount > 0)
+                                                <span class="badge bg-danger ms-2">{{ $newSubmissionCount }}</span>
+                                            @endif
+                                        </p>
+                                    </a>
+                                </li>
+
+                            </ul>
                         </li>
                     @endif
 
@@ -1000,16 +1010,6 @@
                     </li>
 
 
-                    {{-- <li class="nav-item">
-                        <a href="{{ url('student/my_exam_result') }}"
-                            class="nav-link @if (Request::segment(2) == 'my_exam_result') active @endif">
-                            <i class="nav-icon fa-solid fa-pen-to-square"></i>
-                            <p>
-                                Mes Resultats
-                            </p>
-                        </a>
-                    </li> --}}
-
                     {{-- Lien Mes Résultats (Student) --}}
                     @if (\App\Models\FeatureToggle::isFeatureActive('student_exam_results'))
                         <li class="nav-item">
@@ -1032,53 +1032,48 @@
                         </a>
                     </li>
 
-                    <li class="nav-item">
-                        <a href="{{ url('student/exams') }}"
-                            class="nav-link @if (Request::segment(2) == 'exams' && Request::segment(1) == 'student') active @endif">
-                            <i class="nav-icon fa fa-file-alt"></i>
+                    <li class="nav-item @if (Request::segment(2) == 'exams' ||
+                            Request::segment(2) == 'my_homework' ||
+                            Request::segment(2) == 'my_submitted_homework') menu-is-opening menu-open @endif">
+
+                        <a href="#" class="nav-link @if (Request::segment(2) == 'exams' ||
+                                Request::segment(2) == 'my_homework' ||
+                                Request::segment(2) == 'my_submitted_homework') active @endif">
+                            <i class="nav-icon fa fa-book"></i>
                             <p>
-                                Examens en Ligne
+                                Mes Cours & Examens
+                                <i class="fas fa-angle-left right"></i>
                             </p>
                         </a>
+
+                        <ul class="nav nav-treeview">
+
+                            <li class="nav-item">
+                                <a href="{{ url('student/exams') }}"
+                                    class="nav-link @if (Request::segment(2) == 'exams') active @endif">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Examens en Ligne</p>
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a href="{{ url('student/my_homework') }}"
+                                    class="nav-link @if (Request::segment(2) == 'my_homework') active @endif">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Mes Devoirs</p>
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a href="{{ url('student/my_submitted_homework') }}"
+                                    class="nav-link @if (Request::segment(2) == 'my_submitted_homework') active @endif">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Devoirs soumis</p>
+                                </a>
+                            </li>
+
+                        </ul>
                     </li>
-
-
-
-                    <li class="nav-item">
-                        <a href="{{ url('student/my_homework') }}"
-                            class="nav-link @if (Request::segment(2) == 'my_homework') active @endif">
-                            <i class="nav-icon fa-solid fa-house"></i>
-                            <p>
-                                Mes devoirs
-                            </p>
-                        </a>
-                    </li>
-
-                    <li class="nav-item">
-                        <a href="{{ url('student/my_submitted_homework') }}"
-                            class="nav-link @if (Request::segment(2) == 'my_submitted_homework') active @endif">
-                            <i class="nav-icon fas fa-download"></i>
-                            <p>
-                                Devoirs soumis
-                            </p>
-                        </a>
-                    </li>
-
-
-                    @if (\App\Models\FeatureToggle::isFeatureActive('student_submissions'))
-                        <li class="nav-item">
-                            <a href="{{ url('student/thesis') }}""
-                                class="nav-link @if (Request::segment(2) == 'thesis') active @endif">
-                                <i class="nav-icon fas fa-download"></i>
-                                <p>
-                                    Soumettre mon mémoire
-                                </p>
-                            </a>
-                        </li>
-                    @endif
-
-
-
 
                     <li class="nav-item">
                         <a href="{{ url('student/account') }}"
@@ -1222,6 +1217,15 @@
                             <p>Gestion des Recours</p>
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a href="{{ url('departement/change_password') }}"
+                            class="nav-link @if (Request::segment(2) == 'change_password') active @endif">
+                            <i class="nav-icon fa-solid fa-id-card-clip"></i>
+                            <p>
+                                Changer le mot de passe
+                            </p>
+                        </a>
+                    </li>
                 @elseif(Auth::user()->user_type == 6)
                     <li class="nav-item">
                         <a href="{{ url('jury/dashboard') }}"
@@ -1241,20 +1245,30 @@
                             </a>
                         </li>
                     @endif
-
-                    {{-- <li class="nav-item">
-                        <a href="{{ route('jury.marks_register') }}"
-                            class="nav-link @if (Request::segment(1) == 'jury' && Request::segment(2) == 'marks_register') active @endif">
-                            <i class="nav-icon fas fa-file-alt"></i>
-                            <p>Fiche de Jury</p>
+                    <li class="nav-item">
+                        <a href="{{ url('jury/change_password') }}"
+                            class="nav-link @if (Request::segment(2) == 'change_password') active @endif">
+                            <i class="nav-icon fa-solid fa-id-card-clip"></i>
+                            <p>
+                                Changer le mot de passe
+                            </p>
                         </a>
-                    </li> --}}
+                    </li>
                 @elseif(Auth::user()->user_type == 7)
                     <li class="nav-item">
                         <a href="{{ url('apparitorat/dashboard') }}"
                             class="nav-link @if (Request::segment(1) == 'apparitorat' && Request::segment(2) == 'dashboard') active @endif">
                             <i class="nav-icon fa fa-user-shield"></i>
                             <p>Tableau de bord Apparitorat</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url('apparitorat/change_password') }}"
+                            class="nav-link @if (Request::segment(2) == 'change_password') active @endif">
+                            <i class="nav-icon fa-solid fa-id-card-clip"></i>
+                            <p>
+                                Changer le mot de passe
+                            </p>
                         </a>
                     </li>
 

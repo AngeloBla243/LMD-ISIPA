@@ -240,10 +240,4 @@ class UserController extends Controller
             return redirect()->back()->with('error', "Old Password is not Currect");
         }
     }
-
-    // public function studentClasses()
-    // {
-    //     return $this->belongsToMany(ClassModel::class, 'student_class')
-    //         ->withPivot('academic_year_id');
-    // }
 }

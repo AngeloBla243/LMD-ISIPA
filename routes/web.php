@@ -739,6 +739,10 @@ Route::group(['middleware' => 'parent'], function () {
 // Routes Departement
 Route::group(['middleware' => ['auth', 'departement']], function () {
     Route::get('departement/dashboard', [DashboardController::class, 'departementDashboard']);
+
+    Route::get('departement/change_password', [UserController::class, 'change_password']);
+    Route::post('departement/change_password', [UserController::class, 'update_change_password']);
+
     Route::get('departement/student/list', [DepartementStudentController::class, 'list'])->name('departement.student.list');
     Route::get('departement/student/edit/{id}', [DepartementStudentController::class, 'edit'])->name('departement.student.edit');
     Route::post('departement/student/edit/{id}', [DepartementStudentController::class, 'update'])->name('departement.student.update');
@@ -808,6 +812,10 @@ Route::group(['middleware' => ['auth', 'departement']], function () {
 });
 Route::group(['middleware' => ['auth', 'jury']], function () {
     Route::get('jury/dashboard', [DashboardController::class, 'juryDashboard'])->name('jury.dashboard');
+
+    Route::get('jury/change_password', [UserController::class, 'change_password']);
+    Route::post('jury/change_password', [UserController::class, 'update_change_password']);
+
     Route::get('jury/marks_register', [JuryMarksRegisterController::class, 'list'])->name('jury.marks_register');
     Route::get('jury/classes-by-year/{year}', [JuryMarksRegisterController::class, 'getClassesByYear']);
     Route::get('jury/exams-by-year/{year}', [JuryMarksRegisterController::class, 'getExamsByYear']);
@@ -818,4 +826,6 @@ Route::group(['middleware' => ['auth', 'jury']], function () {
 
 Route::group(['middleware' => ['auth', 'apparitorat']], function () {
     Route::get('apparitorat/dashboard', [DashboardController::class, 'apparitoratDashboard']);
+    Route::get('apparitorat/change_password', [UserController::class, 'change_password']);
+    Route::post('apparitorat/change_password', [UserController::class, 'update_change_password']);
 });
